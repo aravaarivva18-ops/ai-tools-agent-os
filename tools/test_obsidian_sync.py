@@ -25,7 +25,7 @@ def temp_vault():
 def test_sanitize_filename(temp_vault):
     """Verify filename sanitization removes forbidden characters."""
     manager = ObsidianVaultManager(temp_vault)
-    bad_name = "Lead / Name * With : In?val\"id < Chars>"
+    bad_name = 'Lead / Name * With : In?val"id < Chars>'
     clean = manager._sanitize_filename(bad_name)
     assert clean == "Lead  Name  With  Invalid  Chars"
 

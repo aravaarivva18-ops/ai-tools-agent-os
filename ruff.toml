@@ -1,0 +1,67 @@
+# Global Ruff configuration (Google & PEP8 Code Quality standards)
+# https://docs.astral.sh/ruff/configuration/
+
+# Same as Black's default line length (Google standard is usually 80, but 88 is standard for modern python tooling)
+line-length = 88
+indent-width = 4
+target-version = "py312"
+
+# Exclude common directory patterns
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    ".reaper_venv",
+    "__pypackages__",
+    "build",
+    "dist",
+]
+
+[lint]
+# Enable standard Pyflakes (F), Pycodestyle (E, W), Isort (I), and Pydantic (PD) checks
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "PT", "ARG", "PD", "RUF", "S", "D", "C90"]
+ignore = [
+    "E501",    # Line too long (managed by ruff format)
+    "S310",    # Audit URL open for urllib (will be replaced by requests/curl_cffi/selectolax)
+    "S110",    # try-except-pass
+    "S112",    # try-except-continue
+    "B007",    # Unused loop control variable
+    "F401",    # Unused imports in legacy files
+    "RUF013",  # Implicit Optional
+    "C403",    # Unnecessary list comprehension
+    "E741",    # Ambiguous variable name
+    "F841",    # Unused local variables in legacy files
+    "E722",    # Bare except in legacy files
+    "ARG001",  # Unused arguments in legacy files
+    "B905",    # zip() strict parameter
+    "D1",      # Ignore missing docstrings entirely, only check format of existing docstrings
+    "D205",    # 1 blank line required between summary line and description
+    "D209",    # Multi-line docstring closing quotes should be on a separate line
+    "D212",    # Multi-line docstring summary should start at the first line
+    "D415",    # First line should end with a period, question mark, or exclamation point
+    "RUF001",  # String contains ambiguous Cyrillic characters
+    "RUF002",  # Docstring contains ambiguous Cyrillic characters
+    "RUF003",  # Comment contains ambiguous Cyrillic characters
+]
+
+# Allow fixable rules to be automatically resolved by ruff
+fixable = ["ALL"]
+unfixable = []
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.mccabe]
+max-complexity = 35
+
+[lint.per-file-ignores]
+"**/tests/*" = ["S101"]
+"**/test_*.py" = ["S101"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "lf"

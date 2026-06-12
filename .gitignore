@@ -1,0 +1,22 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
+# Environments
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# Project-specific local databases / vaults
+vault/
+pgdata/
+
+# IDE settings
+.idea/
+.vscode/
+.DS_Store
