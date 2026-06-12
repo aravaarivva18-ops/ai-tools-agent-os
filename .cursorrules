@@ -1,77 +1,65 @@
-# AI Tools Monorepo Workspace - Cursor Rules
+# AI Tools Workspace Constitution (.cursorrules)
 
-You are an expert AI development assistant optimized for this monorepo containing multiple Python projects: `geo-seo`, `ai-sales`, `ai-marketing`, and `ai-legal`. Always follow these rules, code patterns, and constraints.
-
----
-
-## 🛠️ Tech Stack & Workspace Config
-- **Python Version**: 3.12+ (managed by `uv` workspace)
-- **Environment**: Virtual environment located at `./.venv` (run commands with `uv run`)
-- **Linter & Formatter**: Ruff (uses `./ruff.toml`, enforces Google Style & PEP8 with D and C90 rules)
-- **Prompt Testing**: Built-in AI subagent framework (Self-Evaluation)
-- **Agent Skills**: Modular JIT rules stored in `./skills/` directories.
-- **TUI Interfaces**: Textual for local console monitoring.
+Свод обязательных требований для работы в монорепозитории `ai-tools`. Формулировки строго императивные, без описательных преамбул.
 
 ---
 
-## 📁 Monorepo Projects
-- **geo-seo**: SEO crawler & scanner. Modern parser using selectolax & curl_cffi.
-- **ai-sales**: Sales assistant & company auditor. PDF report generator with Typst.
-- **ai-marketing**: Marketing assistant. PDF report generator with Typst.
-- **ai-legal**: Legal analysis, draft contract generator. PDF generator with Typst.
-- **skills**: Modular instructions for specific technologies.
-- **ollama**: Configuration files for local LLM orchestration.
-- **tools**: Command-line dashboard (`dashboard.py`) and development utilities.
+## 🛠️ 1. Технологический стек и окружение
+* **Python**: Версия `3.12+` (управление через `uv`).
+* **Виртуальное окружение**: Запуск всех команд строго через префикс `uv run` из директории `./.venv`.
+* **Линтер и форматирование**: Ruff (конфигурация `./ruff.toml`, правила D и C90).
+* **Prompt Testing**: Локальный фреймворк Self-Evaluation.
+* **TUI**: Библиотека Textual для терминальных интерфейсов.
 
 ---
 
-## 🔌 Just-In-Time (JIT) Agent Skills
-Before modifying or writing code, identify which technologies your task involves and load the corresponding instruction sheet:
-- **Scraping & HTML Parsing (Selectolax / curl_cffi)**: Load and read [skills/stealth-scraping/SKILL.md](file:///Users/rus/ai-tools/skills/stealth-scraping/SKILL.md)
-- **PDF Generation & Formatting (Typst)**: Load and read [skills/typst-pdf/SKILL.md](file:///Users/rus/ai-tools/skills/typst-pdf/SKILL.md)
-- **Prompt Engineering & Validation**: Load and read [skills/prompt-testing/SKILL.md](file:///Users/rus/ai-tools/skills/prompt-testing/SKILL.md)
-- **Database Persistence & RLS (Supabase / pgvector / Alembic)**: Load and read [skills/database-persistence/SKILL.md](file:///Users/rus/ai-tools/skills/database-persistence/SKILL.md)
-- **VPS Deployment & DNS (SSH / Cloudflare API)**: Load and read [skills/vps-automation/SKILL.md](file:///Users/rus/ai-tools/skills/vps-automation/SKILL.md)
-- **Agent Orchestration & Caching (SPARC / Checkpoints / Prompt Caching)**: Load and read [skills/agent-orchestration/SKILL.md](file:///Users/rus/ai-tools/skills/agent-orchestration/SKILL.md)
-- **Frontend Standards & Design (Mobile-First / Accessibility / Web Vitals)**: Load and read [skills/frontend-standards/SKILL.md](file:///Users/rus/ai-tools/skills/frontend-standards/SKILL.md)
-- **Adaptive Agent Memory (Scoping / Consolidation Engine)**: Load and read [skills/agent-memory/SKILL.md](file:///Users/rus/ai-tools/skills/agent-memory/SKILL.md)
-- **Prompt Engineering & Delimiters (XML / CoT / ReAct / Caching)**: Load and read [skills/prompt-engineering/SKILL.md](file:///Users/rus/ai-tools/skills/prompt-engineering/SKILL.md)
+## 📁 2. Структура монорепозитория
+* `geo-seo` — Парсер и краулер на `selectolax` и `curl_cffi`.
+* `ai-sales` — Генератор PDF-отчетов об аудитах на `Typst`.
+* `ai-marketing` — Генератор маркетинговых отчетов на `Typst`.
+* `ai-legal` — Анализ контрактов и генерация документов на `Typst`.
+* `skills` — Инструкции и JIT-правила для технологий.
+* `tools` — CLI-панель управления (`dashboard.py`).
 
 ---
 
-## 💻 CLI Commands (Run from Workspace Root)
-- `make sync` — Synchronize all workspace packages and lock dependencies.
-- `make format` — Run Ruff formatter.
-- `make lint` — Run Ruff check with auto-fix.
-- `make check` — Check all files for linting, typing, formatting, and import errors.
-- `make test` — Run all pytest test suites.
-- `make clean` — Wipe caches and temporary directories.
+## 🔌 3. Подключение JIT-навыков (JIT Skills Checklist)
+ИИ обязан прочитать соответствующий `SKILL.md` перед изменением кода:
+* *Скрапинг и Парсинг (Selectolax / curl_cffi)*: [skills/stealth-scraping/SKILL.md](file:///Users/rus/ai-tools/skills/stealth-scraping/SKILL.md)
+* *Генерация PDF (Typst)*: [skills/typst-pdf/SKILL.md](file:///Users/rus/ai-tools/skills/typst-pdf/SKILL.md)
+* *Тестирование промптов*: [skills/prompt-testing/SKILL.md](file:///Users/rus/ai-tools/skills/prompt-testing/SKILL.md)
+* *Базы данных и RLS (Supabase / Alembic)*: [skills/database-persistence/SKILL.md](file:///Users/rus/ai-tools/skills/database-persistence/SKILL.md)
+* *Деплой на VPS (Cloudflare / SSH)*: [skills/vps-automation/SKILL.md](file:///Users/rus/ai-tools/skills/vps-automation/SKILL.md)
+* *Кэширование и ординация агентов (SPARC)*: [skills/agent-orchestration/SKILL.md](file:///Users/rus/ai-tools/skills/agent-orchestration/SKILL.md)
+* *Стандарты фронтенда*: [skills/frontend-standards/SKILL.md](file:///Users/rus/ai-tools/skills/frontend-standards/SKILL.md)
+* *Оптимизация сайтов Tilda (Terebro GNB)*: [skills/terebro-optimization/SKILL.md](file:///Users/rus/ai-tools/skills/terebro-optimization/SKILL.md)
+* *Работа с Obsidian (Markdown / Canvas / CLI / Bases / Defuddle)*: Обращаться к навыкам в директории `.agents/skills/` при работе с хранилищем и файлами Obsidian.
 
 ---
 
-## 📐 Critical Coding Guidelines
-
-### 1. Code Quality & Google Python Style
-- **Clean Imports**: Only import packages and modules. Avoid importing specific functions or classes (except from `typing`).
-  - *Yes*: `import os`, `import selectolax.lexbor`
-  - *No*: `from selectolax.lexbor import LexborHTMLParser` (Prefer using the full namespace or alias)
-- **Exceptions**: Never catch generic `except Exception: pass` without logging or re-raising.
-- **Type Annotations**: Annotate all function signatures (parameters and return types).
-
-### 2. Testing (TDD)
-- Test behavior, not implementation details. Refactoring should not break tests.
-- Minimize mocks. Use real code and light fakes where possible. Mock only external APIs or network calls.
-
-### 3. Always Update Rules (Aktualizacja правил)
-- After any changes to the code, tech stack, dependencies, or conventions, you **must** check if these changes require updating project rules or configuration files (`CLAUDE.md`, `.cursorrules`, `GEMINI_ANTIGRAVITY.md`, or `SKILL.md` files).
-- Keep all rules up-to-date to prevent synchronization issues or conflicts in subsequent sessions.
+## 💻 4. CLI Команды (Запуск из корня воркспейса)
+* `make sync` — Синхронизировать зависимости и пакеты.
+* `make format` — Форматировать код через Ruff.
+* `make lint` — Проверить Ruff с автоисправлением.
+* `make check` — Полная проверка Ruff, импортов и типов.
+* `make test` — Запуск тестов pytest.
+* `make clean` — Очистка временных файлов и кэша.
 
 ---
 
-## 🔄 Verification Checklist
-Before finishing any task, run:
-1. `make format` and `make lint` to clean up syntax.
-2. `make check` to verify Ruff finds no errors.
-3. `make test` to ensure tests are passing.
-4. If prompt modifications were made, perform Self-Evaluation using JIT subagents as detailed in [skills/prompt-testing/SKILL.md](file:///Users/rus/ai-tools/skills/prompt-testing/SKILL.md).
-5. Check and update `CLAUDE.md` / `.cursorrules` / `GEMINI_ANTIGRAVITY.md` / `SKILL.md` files if any stack, dependencies, or conventions changed.
+## 📐 5. Кодинг-стандарты и правила
+* **Чистые импорты**: Импортировать только пакеты и модули (`import os`, `import selectolax.lexbor`). Импорт конкретных функций/классов запрещен (исключение — `typing`).
+* **Контроль исключений**: Запрещен пустой перехват `except Exception: pass`. Всегда логгировать или пробрасывать ошибку повторно.
+* **Аннотации типов**: Все функции и методы обязаны содержать аннотации типов для параметров и возвращаемых значений.
+* **TDD**: Разработка ведется строго от тестов. Кодирование функционала без тестов запрещено. Рефакторинг не должен ломать публичные API.
+* **Workspace Discovery**: Перед началом любой задачи ИИ обязан отсканировать рабочую область и все родительские папки на наличие файлов правил (`.cursorrules`, `.clinerules`, `GEMINI_ANTIGRAVITY.md`) и папок `skills/`, даже если целевые файлы лежат вне основного проекта (например, на Рабочем столе).
+* **Своевременное обновление правил**: При любых изменениях стека, зависимостей или соглашений ИИ обязан обновить `.cursorrules`, `GEMINI_ANTIGRAVITY.md` и соответствующие `SKILL.md`.
+
+---
+
+## 🔄 6. Чек-лист верификации перед сдачей задачи
+ИИ обязан выполнить перед завершением:
+1. `make format` и `make lint` — очистить синтаксис.
+2. `make check` — убедиться в отсутствии ошибок линтинга и типов.
+3. `make test` — пройти все тест-кейсы (30+ тестов).
+4. Проверить и актуализировать `CLAUDE.md`, `.cursorrules`, `GEMINI_ANTIGRAVITY.md` и файлы `SKILL.md`.
