@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Local database for agent memory and RAG vectors
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: ai_tools_db
+    restart: always
+    environment:
+      POSTGRES_USER: rus
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_DB: ai_tools_memory
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # Main application container running scrapers and tasks
+  app:
+    build: .
+    container_name: ai_tools_app
+    restart: always
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://rus:secure_password@db:5432/ai_tools_memory
+      - OBSIDIAN_VAULT_PATH=/app/vault
+    volumes:
+      # Mount workspace code for live reloading during development
+      - .:/app
+      # Mount Obsidian Vault directory from local host machine
+      # User can specify their actual Obsidian Vault folder path on macOS host
+      - ./vault:/app/vault
+
+volumes:
+  pgdata:
