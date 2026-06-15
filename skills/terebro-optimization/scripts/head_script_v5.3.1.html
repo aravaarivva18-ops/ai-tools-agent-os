@@ -1,0 +1,651 @@
+<!-- ============================================================ -->
+<!-- ЭЛИТНЫЙ ОПТИМИЗИРОВАННЫЙ ЕДИНЫЙ КОД (ВЕРСИЯ 5.3.1)          -->
+<!-- ПСК Энергомакс | terebro-gnb.com                           -->
+<!-- ИСПРАВЛЕНО: счётчик Метрики 80313952 не работал с 12.06.2026 -->
+<!-- Причина: lazy-load + конфликт с Tilda standard analytics    -->
+<!-- Фикс: Метрика инициализируется СИНХРОННО в head             -->
+<!--       (BotFAQtor + Callibri остаются lazy)                  -->
+<!-- ============================================================ -->
+
+<!-- 1. Предзагрузка критических ресурсов (Шрифты и Стили для FCP/LCP) -->
+<link rel="preload" href="https://static.tildacdn.com/tild6339-3266-4861-a562-663932383063/Oswald-Medium_1.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="https://static.tildacdn.com/tild3537-3636-4661-b836-666436373562/Oswald-Regular.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="https://static.tildacdn.com/tild3961-3631-4935-a263-623938353262/OpenSans-Regular.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="https://static.tildacdn.com/tild3039-3738-4562-b836-636363366466/OpenSans-SemiBold.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="https://static.tildacdn.com/tild3038-6338-4863-b365-306366306235/OpenSans-Bold.woff" as="font" type="font/woff" crossorigin>
+
+<!-- Для десктопной версии предзагружаем LCP картинку, но только для больших экранов -->
+<link rel="preload" href="https://static.tildacdn.com/tild3732-3866-4732-b564-346337356133/2323.jpg" as="image" media="(min-width: 980px)" fetchpriority="high">
+
+<!-- 2. Ускорение сетевых соединений (Preconnect & DNS-prefetch) -->
+<link rel="preconnect" href="https://static.tildacdn.com" crossorigin>
+<link rel="preconnect" href="https://images.tildacdn.com" crossorigin>
+<link rel="preconnect" href="https://mc.yandex.ru" crossorigin>
+<link rel="dns-prefetch" href="https://static.tildacdn.com">
+<link rel="dns-prefetch" href="https://images.tildacdn.com">
+<link rel="dns-prefetch" href="https://mc.yandex.ru">
+<link rel="dns-prefetch" href="https://cdn.callibri.ru">
+<link rel="dns-prefetch" href="https://cdn.botfaqtor.ru">
+
+<!-- 3. Форсирование font-display: swap для устранения невидимого текста (FCP Fix) -->
+<style>
+@font-face {
+  font-family: 'Opensans';
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url('https://static.tildacdn.com/tild6339-3266-4861-a562-663932383063/Oswald-Medium_1.woff') format('woff');
+}
+@font-face {
+  font-family: 'Opensans';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url('https://static.tildacdn.com/tild3537-3636-4661-b836-666436373562/Oswald-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'Opensans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('https://static.tildacdn.com/tild3933-6439-4966-b131-303431386465/OpenSans-LightItalic.woff') format('woff');
+}
+@font-face {
+  font-family: 'Opensans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://static.tildacdn.com/tild3961-3631-4935-a263-623938353262/OpenSans-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'Opensans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('https://static.tildacdn.com/tild3039-3738-4562-b836-636363366466/OpenSans-SemiBold.woff') format('woff');
+}
+@font-face {
+  font-family: 'Opensans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('https://static.tildacdn.com/tild3038-6338-4863-b365-306366306235/OpenSans-Bold.woff') format('woff');
+}
+</style>
+
+<!-- 4. Оптимизированный предзаказ критических стилей Tilda (LCP/CLS Fix) -->
+<link rel="preload" href="https://static.tildacdn.com/css/tilda-grid-3.0.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="https://static.tildacdn.com/css/tilda-forms-1.0.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="https://static.tildacdn.com/css/tilda-quiz-form-1.1.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript>
+  <link rel="stylesheet" href="https://static.tildacdn.com/css/tilda-grid-3.0.min.css">
+  <link rel="stylesheet" href="https://static.tildacdn.com/css/tilda-forms-1.0.min.css">
+  <link rel="stylesheet" href="https://static.tildacdn.com/css/tilda-quiz-form-1.1.min.css">
+</noscript>
+
+<!-- 5. Быстрое скрытие куки-баннера для вернувшихся пользователей (LCP: 0) -->
+<script>try{if(localStorage.getItem('t886cookiename_5657012')||localStorage.getItem('trb_cookie_ok'))document.documentElement.className+=' trb-no-banner';}catch(e){}</script>
+<style>
+.trb-no-banner #rec1204863351{display:none!important}
+.uc-mobile-menu-child:not(.active){display:none!important}
+.trb-fab{z-index:100002!important}
+html:not(.trb-no-banner) .trb-fab{transform:translateY(-110px)}
+@media(max-width:640px){html:not(.trb-no-banner) .trb-fab{transform:translateY(-150px)}}
+@media(max-width:1199px){
+.tn-elem__15789363811727430780030 .tn-atom{font-size:0!important;color:transparent!important;line-height:0!important;letter-spacing:0!important;text-indent:-9999px!important;white-space:nowrap!important;display:inline-block!important;width:24px!important;height:24px!important;padding:0!important;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23B90F0F'><path d='M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z'/></svg>")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:24px 24px!important;background-color:transparent!important;vertical-align:middle!important}
+.tn-elem__15789363811727430780030 .tn-atom::before,.tn-elem__15789363811727430780030 .tn-atom::after{display:none!important;content:none!important}
+}
+</style>
+
+<!-- ============================================================ -->
+<!-- 6. ЯНДЕКС.МЕТРИКА — СИНХРОННАЯ ИНИЦИАЛИЗАЦИЯ (ФИКС v5.3.1)   -->
+<!-- ВАЖНО: Метрика должна стартовать сразу, БЕЗ lazy-load,       -->
+<!-- иначе теряются 80%+ визитов (особенно от DDoS-Guard и ботов) -->
+<!-- ============================================================ -->
+<script type="text/javascript">
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(80313952, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/80313952" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- 7. Умная логика UTM, Cookies, CRM, ленивого старта виджетов и FAB -->
+<script>
+(function () {
+  // Динамически инжектируем шрифт с font-display: swap в самый конец head, чтобы гарантированно перезаписать стили Tilda
+  try {
+    var fontStyle = document.createElement('style');
+    fontStyle.textContent = [
+      "@font-face{font-family:'Opensans';src:url('https://static.tildacdn.com/tild6339-3266-4861-a562-663932383063/Oswald-Medium_1.woff') format('woff');font-weight:100;font-style:normal;font-display:swap}",
+      "@font-face{font-family:'Opensans';src:url('https://static.tildacdn.com/tild3537-3636-4661-b836-666436373562/Oswald-Regular.woff') format('woff');font-weight:200;font-style:normal;font-display:swap}",
+      "@font-face{font-family:'Opensans';src:url('https://static.tildacdn.com/tild3933-6439-4966-b131-303431386465/OpenSans-LightItalic.woff') format('woff');font-weight:300;font-style:normal;font-display:swap}",
+      "@font-face{font-family:'Opensans';src:url('https://static.tildacdn.com/tild3961-3631-4935-a263-623938353262/OpenSans-Regular.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}",
+      "@font-face{font-family:'Opensans';src:url('https://static.tildacdn.com/tild3039-3738-4562-b836-636363366466/OpenSans-SemiBold.woff') format('woff');font-weight:600;font-style:normal;font-display:swap}",
+      "@font-face{font-family:'Opensans';src:url('https://static.tildacdn.com/tild3038-6338-4863-b365-306366306235/OpenSans-Bold.woff') format('woff');font-weight:700;font-style:normal;font-display:swap}"
+    ].join('\n');
+    document.head.appendChild(fontStyle);
+  } catch(e) {}
+
+  const CONFIG = {
+    metrikaId: 80313952,
+    botfaqtorId: 39652,
+    callibriId: 47281,
+    delayMs: 4500
+  };
+
+  // --- Утилиты: чтение URL-параметров и cookie ---
+  function getParam(name) {
+    var match = location.search.match(new RegExp('[?&]' + name + '=([^&#]*)'));
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+
+  function setCookie(name, value, days) {
+    var d = new Date();
+    d.setTime(d.getTime() + days * 86400000);
+    document.cookie = name + '=' + encodeURIComponent(value) + ';path=/;expires=' + d.toUTCString() + ';SameSite=Lax';
+  }
+
+  function getCookie(name) {
+    var match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+
+  // ВАЖНО: window.ym уже определён выше (синхронная инициализация Метрики),
+  // буфер ym_buffer больше не нужен — все вызовы ym() идут напрямую.
+
+  // --- Шаг 1: Сохранение UTM и yclid из URL в cookie ---
+  var utmFields = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+
+  utmFields.forEach(function (p) {
+    var v = getParam(p);
+    if (v) setCookie('_em_' + p, v, 30);
+  });
+
+  function getYclidValue() {
+    return getParam('yclid') || getParam('YCLID') || getParam('UF_CRM_YCLID') || getCookie('_em_yclid') || getCookie('yclid');
+  }
+
+  var rawYclid = getParam('yclid') || getParam('YCLID') || getParam('UF_CRM_YCLID');
+  if (rawYclid) {
+    setCookie('_em_yclid', rawYclid, 30);
+    setCookie('yclid', rawYclid, 30);
+  }
+
+  // --- Шаг 2: yclid → URL (replaceState) ---
+  var yclid = getYclidValue();
+  if (yclid) {
+    try {
+      var url = new URL(window.location);
+      var changed = false;
+      if (!url.searchParams.has('yclid')) {
+        url.searchParams.set('yclid', yclid);
+        changed = true;
+      }
+      if (!url.searchParams.has('UF_CRM_YCLID')) {
+        url.searchParams.set('UF_CRM_YCLID', yclid);
+        changed = true;
+      }
+      if (changed) window.history.replaceState({}, '', url);
+    } catch(e) {}
+  }
+
+  // --- Шаг 3: Авто-нормализация + заполнение скрытых полей форм ---
+  var yclidFieldAliases = ['UF_CRM_YCLID', 'yclid', 'YCLID', 'UF_CRM_66C5F330C345D'];
+  var requiredHiddenFields = utmFields.concat(yclidFieldAliases).concat(['clientid', 'tildaspec-cookie']);
+
+  function ensureHiddenFields(root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    var forms = [];
+    if (root && root.tagName === 'FORM') {
+      forms = [root];
+    } else {
+      forms = Array.prototype.slice.call(scope.querySelectorAll('form'));
+    }
+    forms.forEach(function(form) {
+      requiredHiddenFields.forEach(function(name) {
+        if (!form.querySelector('input[name="' + name + '"]')) {
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = name;
+          input.value = '';
+          input.className = 't-input';
+          input.setAttribute('data-tilda-name', name);
+          input.setAttribute('data-em-autofield', '1');
+          form.appendChild(input);
+        }
+      });
+    });
+  }
+
+  function fillClientId() {
+    try {
+      window.ym(CONFIG.metrikaId, 'getClientID', function(cid) {
+        if (!cid) return;
+        ensureHiddenFields();
+        document.querySelectorAll('input[name="clientid"]').forEach(function(el) { el.value = cid; });
+      });
+    } catch(e) {}
+  }
+
+  function buildCookieStringWithYclid() {
+    var cookieString = '';
+    try { cookieString = document.cookie || ''; } catch(e) {}
+    var y = getYclidValue();
+    if (y) {
+      var enc = encodeURIComponent(y);
+      if (cookieString.indexOf('_em_yclid=') === -1) {
+        cookieString += (cookieString ? '; ' : '') + '_em_yclid=' + enc;
+      }
+      if (cookieString.indexOf('yclid=') === -1) {
+        cookieString += (cookieString ? '; ' : '') + 'yclid=' + enc;
+      }
+    }
+    return cookieString;
+  }
+
+  function refreshTildaSpecFields(root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    var cookieString = buildCookieStringWithYclid();
+    if (!cookieString) return;
+    scope.querySelectorAll('input[name="tildaspec-cookie"], textarea[name="tildaspec-cookie"]').forEach(function(el) { el.value = cookieString; });
+  }
+
+  function fillForms() {
+    ensureHiddenFields();
+    utmFields.forEach(function (p) {
+      var val = getParam(p) || getCookie('_em_' + p);
+      if (val) {
+        document.querySelectorAll('input[name="' + p + '"]').forEach(function (el) { el.value = val; });
+      }
+    });
+    var y = getYclidValue();
+    if (y) {
+      yclidFieldAliases.forEach(function(name) {
+        document.querySelectorAll('input[name="' + name + '"], textarea[name="' + name + '"]').forEach(function (el) { el.value = y; });
+      });
+    }
+    refreshTildaSpecFields();
+    fillClientId();
+  }
+
+  function fillFormBeforeSubmit(form) {
+    try {
+      ensureHiddenFields(form);
+      fillForms();
+      refreshTildaSpecFields(form);
+    } catch(e) {}
+  }
+
+  // --- АСИНХРОННЫЙ ЗАГРУЗЧИК ВИДЖЕТОВ BotFAQtor + Callibri (TBT: 0ms) ---
+  // ПРИМЕЧАНИЕ: Метрика инициализирована СИНХРОННО выше (блок 6),
+  // здесь lazy-load только для виджетов чата/антибота — они не влияют
+  // на сбор статистики и могут грузиться по активности пользователя.
+  var widgetsLoaded = false;
+  function loadWidgets() {
+    if (widgetsLoaded) return;
+    widgetsLoaded = true;
+
+    // Удаляем слушатели событий активности
+    activityEvents.forEach(function(event) {
+      window.removeEventListener(event, loadWidgets, { passive: true });
+    });
+    clearTimeout(autoLoadTimeout);
+
+    console.log("⚡ Инициализация BotFAQtor и Callibri (Метрика уже работает)...");
+
+    // 1. Инициализация BotFAQtor
+    window._ab_id_ = CONFIG.botfaqtorId;
+    var bfScript = document.createElement("script");
+    bfScript.type = "text/javascript";
+    bfScript.async = true;
+    bfScript.src = "https://cdn.botfaqtor.ru/one.js";
+    document.head.appendChild(bfScript);
+
+    // 2. Инициализация Callibri
+    var calScript = document.createElement("script");
+    calScript.type = "text/javascript";
+    calScript.charset = "utf-8";
+    calScript.async = true;
+    calScript.src = "https://cdn.callibri.ru/callibri.js?id=" + CONFIG.callibriId;
+    document.head.appendChild(calScript);
+  }
+
+  // Навешиваем слушатели на действия пользователя
+  var activityEvents = ['scroll', 'click', 'mousemove', 'touchstart'];
+  activityEvents.forEach(function(event) {
+    window.addEventListener(event, loadWidgets, { passive: true });
+  });
+
+  // Автозагрузка по таймеру
+  var autoLoadTimeout = setTimeout(loadWidgets, CONFIG.delayMs);
+
+  // Получение ClientID Метрики сразу (Метрика уже инициализирована синхронно)
+  setTimeout(fillClientId, 1000);
+
+  // --- Инициализация заполнения форм ---
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(fillForms, 500);
+    });
+  } else {
+    fillForms();
+  }
+
+  setTimeout(fillForms, 1500);
+  setTimeout(fillForms, 4000);
+
+  // --- MutationObserver — квизы ---
+  var observerStarted = false;
+  function startObserver() {
+    if (observerStarted) return;
+    observerStarted = true;
+    var observer = new MutationObserver(function (mutations) {
+      var needRefill = false;
+      for (var i = 0; i < mutations.length; i++) {
+        var m = mutations[i];
+        if (m.addedNodes.length > 0) {
+          for (var j = 0; j < m.addedNodes.length; j++) {
+            var node = m.addedNodes[j];
+            if (node.nodeType === 1) {
+              if (node.tagName === 'FORM' || node.tagName === 'INPUT' ||
+                  (node.querySelectorAll && node.querySelectorAll('input').length > 0)) {
+                needRefill = true;
+                break;
+              }
+            }
+          }
+        }
+        if (needRefill) break;
+      }
+      if (needRefill) {
+        setTimeout(fillForms, 300);
+        setTimeout(ensureHiddenFields, 600);
+        setTimeout(refreshTildaSpecFields, 900);
+        setTimeout(fillClientId, 1000);
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startObserver);
+  } else {
+    startObserver();
+  }
+
+  // --- Финальное заполнение перед отправкой формы ---
+  function startSubmitGuard() {
+    document.addEventListener('submit', function(e) {
+      var form = e.target;
+      if (form && form.tagName === 'FORM') {
+        fillFormBeforeSubmit(form);
+      }
+    }, true);
+
+    document.addEventListener('click', function(e) {
+      var el = e.target;
+      var btn = el && el.closest ? el.closest('button, input[type="submit"], .t-submit') : null;
+      if (!btn) return;
+      var form = btn.closest ? btn.closest('form') : null;
+      if (form) fillFormBeforeSubmit(form);
+    }, true);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startSubmitGuard);
+  } else {
+    startSubmitGuard();
+  }
+
+  // --- reachGoal — successbox Tilda ---
+  var goalSent = {};
+  function startSuccessObserver() {
+    var sObserver = new MutationObserver(function (mutations) {
+      for (var i = 0; i < mutations.length; i++) {
+        var m = mutations[i];
+        if (m.type === 'attributes' && m.attributeName === 'style') {
+          var el = m.target;
+          if (el && el.classList && (el.classList.contains('t-form__successbox') || el.classList.contains('js-successbox'))) {
+            var display = window.getComputedStyle(el).display;
+            if (display !== 'none') {
+              var rec = el.closest('[id^="rec"]');
+              var key = rec ? rec.id : 'form_' + i;
+              if (!goalSent[key]) {
+                goalSent[key] = true;
+                try {
+                  window.ym(CONFIG.metrikaId, 'reachGoal', 'lead_submit_submit_form');
+                } catch(e) {}
+                setTimeout(function() { delete goalSent[key]; }, 30000);
+              }
+            }
+          }
+        }
+      }
+    });
+    sObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['style'],
+      subtree: true
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startSuccessObserver);
+  } else {
+    startSuccessObserver();
+  }
+
+  // --- FAB мессенджеров ---
+  function initFAB() {
+    var css = document.createElement('style');
+    css.textContent = [
+      '.trb-fab{position:fixed;bottom:24px;right:20px;z-index:99999;display:flex;flex-direction:column;align-items:flex-end;font-family:"Open Sans",-apple-system,BlinkMacSystemFont,sans-serif}',
+      '.trb-fab-menu{display:flex;flex-direction:column;align-items:flex-end;gap:12px;margin-bottom:14px;opacity:0;transform:translateY(16px) scale(.85);pointer-events:none;transition:all .3s cubic-bezier(.34,1.56,.64,1)}',
+      '.trb-fab-menu.trb-open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}',
+      '.trb-fab-item{display:flex;align-items:center;gap:10px;cursor:pointer}',
+      '.trb-fab-lbl{background:#fff;color:#333;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.12);white-space:nowrap;line-height:1;cursor:pointer;text-decoration:none!important;display:inline-block;-webkit-user-select:none;user-select:none}',
+      '.trb-fab-ico{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.18);transition:transform .2s;flex-shrink:0;overflow:hidden;text-decoration:none!important;font-size:0!important;color:transparent!important;line-height:0!important}',
+      'a.trb-fab-ico,a.trb-fab-ico:visited,a.trb-fab-ico:hover{text-decoration:none!important;color:transparent!important;font-size:0!important}',
+      '.trb-fab-ico:active{transform:scale(.92)}',
+      '.trb-fab-ico:hover{transform:scale(1.05)}',
+      '.trb-ico-phone{background:#27AE60}',
+      '.trb-ico-tg{background:#0088CC}',
+      '.trb-ico-max{background:linear-gradient(135deg,#4cf 0%,#53e 66%,#93d 100%)}',
+      '.trb-fab-ico svg{width:24px;height:24px}',
+      '.trb-fab-btn{width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(192,57,43,.4);transition:all .3s;-webkit-tap-highlight-color:transparent;outline:none;position:relative;background:linear-gradient(135deg,#C0392B,#E74C3C)}',
+      '.trb-fab-btn:hover{box-shadow:0 6px 24px rgba(192,57,43,.5);transform:scale(1.05)}',
+      '.trb-fab-btn svg{width:28px;height:28px;transition:transform .3s}',
+      '.trb-fab-btn.trb-active svg{transform:rotate(45deg)}',
+      '.trb-fab-btn::before{content:"";position:absolute;width:100%;height:100%;border-radius:50%;background:rgba(192,57,43,.3);animation:trb-pulse 2s ease-out infinite}',
+      '.trb-fab-btn.trb-active::before{animation:none;opacity:0}',
+      '@keyframes trb-pulse{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.8);opacity:0}}',
+      '.trb-fab-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.2);z-index:99998}',
+      '.trb-fab-overlay.trb-show{display:block}',
+      '@supports(padding-bottom:env(safe-area-inset-bottom)){.trb-fab{bottom:calc(24px + env(safe-area-inset-bottom))}}'
+    ].join('');
+    document.head.appendChild(css);
+
+    var tgText = encodeURIComponent('Здравствуйте! Интересует стоимость установки ГНБ Теребро. Подскажите по моделям и ценам.');
+    var maxUrl = 'https://max.ru/u/f9LHodD0cOJxrGnf1jK27lULPPp-fFp1rRqdr8Et4omg5Wa0TXrP_XHYees';
+
+    var ov = document.createElement('div');
+    ov.className = 'trb-fab-overlay';
+    ov.id = 'trb-fab-overlay';
+    document.body.appendChild(ov);
+
+    var fab = document.createElement('div');
+    fab.className = 'trb-fab';
+    fab.innerHTML = [
+      '<div class="trb-fab-menu" id="trb-fab-menu">',
+      '  <div class="trb-fab-item" id="trb-btn-phone-row">',
+      '    <span class="trb-fab-lbl" id="trb-btn-phone-lbl" role="button" tabindex="0" aria-label="Позвонить">Позвонить</span>',
+      '    <a href="tel:88006000425" class="trb-fab-ico trb-ico-phone" id="trb-btn-phone" aria-label="Позвонить"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill="white" d="M19.23 15.26l-2.54-.29c-.61-.07-1.21.14-1.64.57l-1.84 1.84c-2.83-1.44-5.15-3.75-6.59-6.59l1.85-1.85c.43-.43.64-1.03.57-1.64l-.29-2.52c-.12-1.01-.97-1.77-1.99-1.77H5.03c-1.13 0-2.07.94-2 2.07.53 8.54 7.36 15.36 15.89 15.89 1.13.07 2.07-.87 2.07-2v-1.73c.01-1.01-.75-1.86-1.76-1.98z"/></svg></a>',
+      '  </div>',
+      '  <div class="trb-fab-item" id="trb-btn-tg-row">',
+      '    <span class="trb-fab-lbl" id="trb-btn-tg-lbl" role="button" tabindex="0" aria-label="Telegram">Telegram</span>',
+      '    <a href="https://t.me/Terebrozakaz?text=' + tgText + '" target="_blank" rel="noopener" class="trb-fab-ico trb-ico-tg" id="trb-btn-tg" aria-label="Telegram"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" fill="white"/></svg></a>',
+      '  </div>',
+      '  <div class="trb-fab-item" id="trb-btn-max-row">',
+      '    <span class="trb-fab-lbl" id="trb-btn-max-lbl" role="button" tabindex="0" aria-label="MAX">MAX</span>',
+      '    <a href="' + maxUrl + '" target="_blank" rel="noopener" class="trb-fab-ico trb-ico-max" id="trb-btn-max" aria-label="MAX"><svg viewBox="0 0 1000 1000" fill="none" aria-hidden="true"><path fill="#fff" fill-rule="evenodd" d="M508.211 878.328c-75.007 0-109.864-10.95-170.453-54.75-38.325 49.275-159.686 87.783-164.979 21.9 0-49.456-10.95-91.248-23.36-136.873-14.782-56.21-31.572-118.807-31.572-209.508 0-216.626 177.754-379.597 388.357-379.597 210.785 0 375.947 171.001 375.947 381.604.707 207.346-166.595 376.118-373.94 377.224m3.103-571.585c-102.564-5.292-182.499 65.7-200.201 177.024-14.6 92.162 11.315 204.398 33.397 210.238 10.585 2.555 37.23-18.98 53.837-35.587a189.8 189.8 0 0 0 92.71 33.032c106.273 5.112 197.08-75.794 204.215-181.95 4.154-106.382-77.67-196.486-183.958-202.574Z" clip-rule="evenodd"/></svg></a>',
+      '  </div>',
+      '</div>',
+      '<button class="trb-fab-btn" id="trb-fab-btn" aria-label="Связаться с нами">',
+      '  <svg viewBox="0 0 24 24" fill="none"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z" fill="white"/><path d="M7 9h10v2H7V9z" fill="white" opacity=".7"/><path d="M7 12h6v2H7v-2z" fill="white" opacity=".5"/></svg>',
+      '</button>'
+    ].join('');
+    document.body.appendChild(fab);
+
+    var btn = document.getElementById('trb-fab-btn');
+    var menu = document.getElementById('trb-fab-menu');
+    var isOpen = false;
+
+    function toggle() {
+      isOpen = !isOpen;
+      menu.classList.toggle('trb-open', isOpen);
+      btn.classList.toggle('trb-active', isOpen);
+      ov.classList.toggle('trb-show', isOpen);
+    }
+
+    function sendGoal(name) {
+      try { window.ym(CONFIG.metrikaId, 'reachGoal', name); } catch(e) {}
+    }
+
+    btn.addEventListener('click', function(e) { e.stopPropagation(); toggle(); });
+    ov.addEventListener('click', function() { if (isOpen) toggle(); });
+
+    var phoneIco = document.getElementById('trb-btn-phone');
+    var phoneLbl = document.getElementById('trb-btn-phone-lbl');
+    if (phoneIco) {
+      phoneIco.addEventListener('click', function() {
+        sendGoal('phone_click_mobile');
+        setTimeout(function() { if (isOpen) toggle(); }, 300);
+      });
+    }
+    if (phoneLbl && phoneIco) {
+      phoneLbl.addEventListener('click', function() {
+        sendGoal('phone_click_mobile');
+        try { window.location.href = phoneIco.getAttribute('href') || 'tel:88006000425'; } catch(e) {}
+        setTimeout(function() { if (isOpen) toggle(); }, 300);
+      });
+      phoneLbl.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); phoneLbl.click(); }
+      });
+    }
+
+    var tgIco = document.getElementById('trb-btn-tg');
+    var tgLbl = document.getElementById('trb-btn-tg-lbl');
+    if (tgIco) {
+      tgIco.addEventListener('click', function() {
+        sendGoal('messenger_telegram_click');
+        setTimeout(function() { if (isOpen) toggle(); }, 300);
+      });
+    }
+    if (tgLbl && tgIco) {
+      tgLbl.addEventListener('click', function() {
+        sendGoal('messenger_telegram_click');
+        try { window.open(tgIco.getAttribute('href'), '_blank', 'noopener'); } catch(e) {}
+        setTimeout(function() { if (isOpen) toggle(); }, 300);
+      });
+      tgLbl.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tgLbl.click(); }
+      });
+    }
+
+    var maxIco = document.getElementById('trb-btn-max');
+    var maxLbl = document.getElementById('trb-btn-max-lbl');
+    if (maxIco) {
+      maxIco.addEventListener('click', function() {
+        sendGoal('messenger_max_click');
+        setTimeout(function() { if (isOpen) toggle(); }, 300);
+      });
+    }
+    if (maxLbl && maxIco) {
+      maxLbl.addEventListener('click', function() {
+        sendGoal('messenger_max_click');
+        try { window.open(maxIco.getAttribute('href'), '_blank', 'noopener'); } catch(e) {}
+        setTimeout(function() { if (isOpen) toggle(); }, 300);
+      });
+      maxLbl.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); maxLbl.click(); }
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFAB);
+  } else {
+    initFAB();
+  }
+
+  // --- Страховочный reachGoal на /tnx ---
+  function sendTnxGoal() {
+    var path = location.pathname.replace(/\/$/, '').toLowerCase();
+    if (path !== '/tnx') return;
+    var key = 'trb_tnx_goal_sent_v29';
+    try {
+      if (sessionStorage.getItem(key)) return;
+    } catch(e) {}
+    var attempts = 0;
+    var maxAttempts = 30;
+    var timer = setInterval(function() {
+      attempts++;
+      if (typeof ym === 'function') {
+        clearInterval(timer);
+        try {
+          window.ym(CONFIG.metrikaId, 'reachGoal', 'lead_submit_submit_form');
+          try { sessionStorage.setItem(key, '1'); } catch(e) {}
+        } catch(e) {}
+      } else if (attempts >= maxAttempts) {
+        clearInterval(timer);
+      }
+    }, 100);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', sendTnxGoal);
+  } else {
+    sendTnxGoal();
+  }
+
+  // --- Cookie banner fix ---
+  function initCookieBanner() {
+    var b = document.getElementById('rec1204863351');
+    if (!b) return;
+    if (localStorage.getItem('t886cookiename_5657012') || localStorage.getItem('trb_cookie_ok')) {
+      b.style.display = 'none';
+      return;
+    }
+    var okText = b.querySelector('.t-btnflex__text');
+    if (okText) okText.textContent = 'Принять';
+    var tildaBtn = b.querySelector('.t886__btn');
+    if (tildaBtn) {
+      tildaBtn.addEventListener('click', function () {
+        try {
+          localStorage.setItem('trb_cookie_ok', '1');
+          localStorage.setItem('t886cookiename_5657012', 'true');
+          b.style.display = 'none';
+          document.documentElement.classList.add('trb-no-banner');
+        } catch(e) {}
+      }, { once: true });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCookieBanner);
+  } else {
+    initCookieBanner();
+  }
+})();
+</script>
+
+<script type="text/javascript">window.dataLayer=window.dataLayer||[];</script>
