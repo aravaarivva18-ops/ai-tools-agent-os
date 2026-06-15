@@ -28,5 +28,11 @@ COPY . .
 # Run dev sync to finalize packages
 RUN uv sync --frozen
 
+# Create a non-root user and change ownership of work directory
+RUN groupadd -g 10001 nonroot && useradd -u 10001 -g nonroot -s /bin/sh -m nonroot \
+    && chown -R nonroot:nonroot /app
+
+USER nonroot
+
 # Default command (can be overridden in docker-compose)
 CMD ["uv", "run", "python", "tools/dashboard.py"]

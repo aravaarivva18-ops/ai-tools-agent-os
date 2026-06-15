@@ -44,6 +44,9 @@ ignore = [
     "RUF001",  # String contains ambiguous Cyrillic characters
     "RUF002",  # Docstring contains ambiguous Cyrillic characters
     "RUF003",  # Comment contains ambiguous Cyrillic characters
+    "S311",    # Standard pseudo-random generators (used for simple text humanizer variations, not crypto)
+    "S603",    # subprocess check (used for executing test processes locally)
+    "S607",    # subprocess partial path (used for pytest execution in tests)
 ]
 
 # Allow fixable rules to be automatically resolved by ruff

@@ -33,7 +33,7 @@
 * *Кэширование и ординация агентов (SPARC)*: [skills/agent-orchestration/SKILL.md](file:///Users/rus/ai-tools/skills/agent-orchestration/SKILL.md)
 * *Стандарты фронтенда*: [skills/frontend-standards/SKILL.md](file:///Users/rus/ai-tools/skills/frontend-standards/SKILL.md)
 * *Оптимизация сайтов Tilda (Terebro GNB)*: [skills/terebro-optimization/SKILL.md](file:///Users/rus/ai-tools/skills/terebro-optimization/SKILL.md)
-* *Работа с Obsidian (Markdown / Canvas / CLI / Bases / Defuddle)*: Обращаться к навыкам в директории `.agents/skills/` при работе с хранилищем и файлами Obsidian.
+* *Работа с Obsidian*: При работе с Obsidian-хранилищем использовать стандартный Markdown форматированный синтаксис, избегать дублирования метаданных и использовать нативный JSON для Canvas.
 
 ---
 
