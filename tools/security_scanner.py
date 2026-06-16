@@ -21,8 +21,8 @@ def get_verified_python_path() -> str:
 
 def build_bandit_command(
     targets: list[str],
-    exclude_dirs: Optional[list[str]] = None,
-    skip_tests: Optional[list[str]] = None,
+    exclude_dirs: list[str] | None = None,
+    skip_tests: list[str] | None = None,
     quiet: bool = False,
 ) -> list[str]:
     """Builds the shell command list for executing Bandit using the verified python path."""
@@ -46,8 +46,8 @@ def build_bandit_command(
 
 def run_security_scan(
     targets: list[str],
-    exclude_dirs: Optional[list[str]] = None,
-    skip_tests: Optional[list[str]] = None,
+    exclude_dirs: list[str] | None = None,
+    skip_tests: list[str] | None = None,
     quiet: bool = False,
 ) -> tuple[int, str, str]:
     """
