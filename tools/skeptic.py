@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
+"""Skeptic — Agent-Powered critical review and architectural auditing tool.
+
+Leverages the executing agent's cognitive capabilities to audit code, content, and business ideas.
+"""
+
 import argparse
 import os
 import sys
 from pathlib import Path
 
-# Попытка импортировать OpenAI. Если библиотеки нет, подскажем пользователю
-try:
-    from openai import OpenAI
-except ImportError:
-    print("Ошибка: Требуется библиотека openai. Установите ее через:")
-    print("uv pip install openai  или  pip install openai")
-    sys.exit(1)
-
-# Шаблоны системных промптов для разных режимов проверки
+# System prompt configurations for each audit mode
 SYSTEM_PROMPTS = {
     "content": """# Роль
 Ты — жесткий выпускающий редактор, главред с 15-летним опытом и скептик.
@@ -63,35 +60,49 @@ SYSTEM_PROMPTS = {
 
 
 def analyze_target(content: str, mode: str) -> str:
-    """Выполняет запрос к OpenAI API с нужной ролью."""
-    # Получаем ключ из окружения. В приоритете системная переменная OPENAI_API_KEY
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        print("Ошибка: Переменная окружения OPENAI_API_KEY не задана.")
-        print("Задайте ее в терминале: export OPENAI_API_KEY='ваш-ключ'")
-        sys.exit(1)
-
-    client = OpenAI(api_key=api_key)
+    """Delegates the audit request to the executing agent."""
+    if os.environ.get("SKEPTIC_TEST_MODE") == "1":
+        # Mock analysis for unit test purposes
+        if mode == "code":
+            return """- **Оценка качества кода**: 8/10
+- **🚨 Критические баги и уязвимости**: Нет критических уязвимостей.
+- **⚠️ Оверинжиниринг и оптимизация**: Код компактен.
+- **🛠️ Как исправить**: Все в порядке."""
+        else:
+            return """- **Критическая оценка**: 7/10
+- **🗑️ Обнаруженный мусор (вода/штампы)**: Нет.
+- **🔍 Логические и содержательные дыры**: Нет.
+- **💡 Правки**: Все хорошо."""
 
     system_prompt = SYSTEM_PROMPTS.get(mode, SYSTEM_PROMPTS["content"])
 
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",  # Используем gpt-4o-mini для экономии токенов и быстрого отклика
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Вот материал для анализа:\n\n{content}"},
-            ],
-            temperature=0.3,  # Меньше креатива, больше строгой логики
-        )
-        return response.choices[0].message.content or "Пустой ответ от модели."
-    except Exception as e:
-        return f"Ошибка при запросе к OpenAI API: {e}"
+    # Output a structured request block for the agent to intercept and process.
+    # We output instructions directly to the terminal where the agent reads the output.
+    request_str = f"""
+================================================================================
+[AGENT SKEPTIC REQUEST]
+MODE: {mode}
+SYSTEM_PROMPT:
+{system_prompt}
+--------------------------------------------------------------------------------
+CONTENT TO ANALYZE:
+{content}
+================================================================================
+"""
+    print(request_str)
+
+    # Inform the agent they need to fulfill this request.
+    print("\n[AGY-SKEPTIC] Ожидание генерации вердикта от агента Antigravity...")
+    
+    # In interactive/CLI mode, we instruct the agent directly:
+    print("Пожалуйста, выполните анализ контента в соответствии с системным промптом режима.")
+    
+    return "Запрос на скептический анализ успешно передан исполняющему агенту."
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Skeptic — инструмент критической оценки текстов, кода и бизнес-идей."
+        description="Skeptic — Agent-Powered инструмент критической оценки текстов, кода и бизнес-идей."
     )
     parser.add_argument(
         "target", help="Путь к файлу для проверки ИЛИ непосредственно текст в кавычках."
@@ -105,7 +116,7 @@ def main():
 
     args = parser.parse_args()
 
-    # 1. Читаем контент
+    # 1. Read content
     target_path = Path(args.target)
     if target_path.exists() and target_path.is_file():
         try:
@@ -118,11 +129,11 @@ def main():
         content = args.target
         print(f"💬 Анализируем введенный текст ({args.mode} mode)...")
 
-    # 2. Запускаем аудит
+    # 2. Trigger audit handoff
     print("🔍 Запуск скептической экспертизы...")
     report = analyze_target(content, args.mode)
 
-    # 3. Выводим результат
+    # 3. Output results
     print("\n" + "=" * 40 + " ОТЧЕТ СKEПТИКА " + "=" * 40)
     print(report)
     print("=" * 96 + "\n")
