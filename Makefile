@@ -12,7 +12,7 @@ format:
 check:
 	uv run ruff check .
 	uv run ruff format --check .
-	uv run bandit -r . -x ./.venv,./.git -s B101,B110,B112,B310,B311,B404,B603,B607
+	"/Users/rus/ai-tools/.venv/bin/python" -m bandit -r . -x ./.venv,./.git -s B101,B110,B112,B310,B311,B404,B603,B607
 
 
 test:

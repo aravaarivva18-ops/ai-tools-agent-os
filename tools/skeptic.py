@@ -93,10 +93,10 @@ CONTENT TO ANALYZE:
 
     # Inform the agent they need to fulfill this request.
     print("\n[AGY-SKEPTIC] Ожидание генерации вердикта от агента Antigravity...")
-    
+
     # In interactive/CLI mode, we instruct the agent directly:
     print("Пожалуйста, выполните анализ контента в соответствии с системным промптом режима.")
-    
+
     return "Запрос на скептический анализ успешно передан исполняющему агенту."
 
 
