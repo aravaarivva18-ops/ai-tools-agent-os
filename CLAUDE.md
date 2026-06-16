@@ -32,6 +32,8 @@
 - **Стандарты фронтенда и верстки (Mobile-First / Accessibility WCAG / Web Vitals)**: См. [skills/frontend-standards/SKILL.md](file:///Users/rus/ai-tools/skills/frontend-standards/SKILL.md)
 - **Адаптивная память агентов (Scoping / Consolidation Decision Engine)**: См. [skills/agent-memory/SKILL.md](file:///Users/rus/ai-tools/skills/agent-memory/SKILL.md)
 - **Разработка промптов и контекст (XML Delimiters / CoT / ReAct / Caching)**: См. [skills/prompt-engineering/SKILL.md](file:///Users/rus/ai-tools/skills/prompt-engineering/SKILL.md)
+- **Программное видеопроизводство (Remotion)**: См. [.agents/skills/remotion-best-practices/SKILL.md](file:///Users/rus/ai-tools/.agents/skills/remotion-best-practices/SKILL.md)
+
 
 ## 💻 Команды сборки и разработки (Makefile CLI)
 - **Синхронизация зависимостей**: `make sync`

@@ -1,10 +1,11 @@
-import pytest
 import os
 import sys
 
+import pytest
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from lead_swarm import Lead, LeadScorer, LeadRouter, LeadAggregator
+from lead_swarm import Lead, LeadAggregator, LeadRouter, LeadScorer
 
 
 def test_lead_creation():
