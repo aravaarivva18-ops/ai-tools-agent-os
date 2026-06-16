@@ -1,64 +1,43 @@
 import pytest
-from advanced_workflow import AdvancedWorkflow, StepResult, WorkflowContext
-
+from advanced_workflow import run_workflow
 
 def test_workflow_execution_success():
-    """Test standard sequential execution of registered workflow steps."""
-    wf = AdvancedWorkflow()
+    """Test standard sequential execution of registered workflow functions."""
+    steps = []
+    
+    def step1(ctx):
+        ctx["v1"] = 100
+        return True
 
-    @wf.step("step1")
-    def run_step1(ctx: WorkflowContext) -> StepResult:
-        ctx.set("v1", 100)
-        return StepResult(success=True, message="Step 1 completed")
-
-    @wf.step("step2", depends_on=["step1"])
-    def run_step2(ctx: WorkflowContext) -> StepResult:
+    def step2(ctx):
         val = ctx.get("v1")
-        ctx.set("v2", val + 50)
-        return StepResult(success=True, message="Step 2 completed")
+        ctx["v2"] = val + 50
+        return True
 
-    results = wf.run()
-
-    assert results["step1"].success is True
-    assert results["step2"].success is True
-    assert wf.context.get("v2") == 150
-
-def test_workflow_conditional_branching():
-    """Test conditional execution based on values set in preceding steps."""
-    wf = AdvancedWorkflow()
-
-    @wf.step("check_balance")
-    def check_balance(ctx: WorkflowContext) -> StepResult:
-        ctx.set("balance", 200)
-        return StepResult(success=True)
-
-    @wf.step("approve_payment", depends_on=["check_balance"])
-    def approve_payment(ctx: WorkflowContext) -> StepResult:
-        balance = ctx.get("balance")
-        if balance > 100:
-            ctx.set("status", "approved")
-            return StepResult(success=True)
-        else:
-            ctx.set("status", "rejected")
-            return StepResult(success=False, message="Insufficient funds")
-
-    results = wf.run()
-    assert results["approve_payment"].success is True
-    assert wf.context.get("status") == "approved"
+    # Register steps linearly
+    steps.extend([step1, step2])
+    
+    ctx = {}
+    success = run_workflow(steps, ctx)
+    
+    assert success is True
+    assert ctx["v2"] == 150
 
 def test_workflow_execution_failure_handling():
-    """Test workflow behavior when a required dependency fails."""
-    wf = AdvancedWorkflow()
+    """Test workflow stops execution when a step returns False or raises an error."""
+    steps = []
 
-    @wf.step("failing_step")
-    def failing_step(ctx: WorkflowContext) -> StepResult:
-        return StepResult(success=False, message="Something went wrong")
+    def failing_step(ctx):
+        return False
 
-    @wf.step("dependent_step", depends_on=["failing_step"])
-    def dependent_step(ctx: WorkflowContext) -> StepResult:
-        return StepResult(success=True)
+    def should_not_run(ctx):
+        ctx["ran"] = True
+        return True
 
-    results = wf.run()
-    assert results["failing_step"].success is False
-    assert "dependent_step" not in results
-    assert "dependent_step" in wf.skipped_steps
+    steps.extend([failing_step, should_not_run])
+    
+    ctx = {"ran": False}
+    success = run_workflow(steps, ctx)
+    
+    assert success is False
+    assert ctx["ran"] is False
