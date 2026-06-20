@@ -7,7 +7,6 @@ from pathlib import Path
 try:
     from tools.collect_handoffs import collect
 except ImportError:
-    # If run directly without module path
     try:
         from collect_handoffs import collect
     except ImportError:
@@ -16,9 +15,7 @@ except ImportError:
 
 def generate_research_queries(category: str, issue_content: str) -> list:
     """Генерирует целевые поисковые запросы для GitHub/arXiv/Web на основе описания проблемы."""
-    # Очищаем текст от спецсимволов для формирования чистого поискового запроса
     clean_text = "".join(c if c.isalnum() or c.isspace() else " " for c in issue_content).strip()
-    # Берем первые несколько значимых слов (длиной > 3 символов)
     words = [w for w in clean_text.split() if len(w) > 3][:6]
     keywords = " ".join(words)
 
@@ -49,15 +46,12 @@ def detect_tool_conflicts(logs: list) -> list:
 
 def optimize_prompt_for_speed(category: str, issue_content: str) -> str:
     """Создает оптимизированный сжатый промпт для устранения указанной проблемы."""
-    # Извлекаем первую непустую строку контента
     lines = [line.strip() for line in issue_content.splitlines() if line.strip()]
     first_line = lines[0] if lines else ""
 
-    # Очищаем от спецсимволов и берем первые 10 слов
     clean_line = "".join(c if c.isalnum() or c.isspace() else " " for c in first_line).strip()
     summary = " ".join(clean_line.split()[:10])
 
-    # Формируем компактный промпт
     return f"Исправь {category}: {summary}. Используй TDD, YAGNI (max 3 levels) и Solo Loop."
 
 
@@ -79,13 +73,103 @@ def analyze_self_healing_needs(issue_content: str) -> str:
     return "💡 Проблема решается стандартным редактированием через `replace_file_content`."
 
 
+def _parse_logs_data(logs_sorted: list) -> tuple:
+    """Parses sorted logs to extract counts, categories, deltas, and saved time."""
+    total_friction_points = 0
+    issues_by_category = {}
+    stealth_stops_count = 0
+    loc_deltas = []
+    time_saved_total = 0
+
+    for log in logs_sorted:
+        metrics = log.get("metrics", {})
+        if metrics.get("stealth_stop"):
+            stealth_stops_count += 1
+        if metrics.get("loc_delta") is not None:
+            loc_deltas.append(metrics.get("loc_delta"))
+        if metrics.get("time_saved_min") is not None:
+            time_saved_total += metrics.get("time_saved_min")
+
+        friction_points = log.get("friction_points", [])
+        total_friction_points += len(friction_points)
+        for pt in friction_points:
+            heading = pt.get("heading", "General")
+            content = pt.get("content", "")
+            issues_by_category.setdefault(heading, []).append(
+                {
+                    "session_id": log.get("session_id"),
+                    "date": log.get("date"),
+                    "content": content,
+                    "stealth_stop": metrics.get("stealth_stop", False)
+                }
+            )
+
+    return total_friction_points, stealth_stops_count, loc_deltas, time_saved_total, issues_by_category
+
+
+def _compute_delta_metrics(logs_sorted: list) -> str:
+    """Computes friction delta metrics trend from sorted logs."""
+    if len(logs_sorted) < 2:
+        return "Недостаточно данных для тренда"
+
+    half = len(logs_sorted) // 2
+    earlier_logs = logs_sorted[:half]
+    later_logs = logs_sorted[half:]
+
+    earlier_frictions = sum(len(x.get("friction_points", [])) for x in earlier_logs)
+    later_frictions = sum(len(x.get("friction_points", [])) for x in later_logs)
+
+    if earlier_frictions > 0:
+        delta_percentage = ((earlier_frictions - later_frictions) / earlier_frictions) * 100.0
+        if delta_percentage > 0:
+            return f"Улучшение на {delta_percentage:.1f}% (количество ошибок падает)"
+        elif delta_percentage < 0:
+            return f"Ухудшение на {abs(delta_percentage):.1f}% (количество ошибок растет)"
+        return "Стабильно"
+
+    if later_frictions > 0:
+        return "Новые ошибки зафиксированы"
+    return "Ошибок не обнаружено"
+
+
+def _build_priority_queue(issues_by_category: dict) -> tuple:
+    """Builds error registry and auto-heal priority queue."""
+    error_registry = []
+    for category, items in issues_by_category.items():
+        has_stealth = any(item["stealth_stop"] for item in items)
+        error_registry.append({
+            "category": category,
+            "frequency": len(items),
+            "has_stealth": has_stealth
+        })
+
+    priority_queue = []
+    for reg in error_registry:
+        cat_lower = reg["category"].lower()
+        weight = 3
+        if any(k in cat_lower for k in ["oom", "memory", "памят", "leak"]):
+            weight = 10
+        elif any(k in cat_lower for k in ["тест", "assert", "fail", "syntax", "healer"]):
+            weight = 7
+
+        if reg["has_stealth"]:
+            weight += 5
+
+        score = weight * reg["frequency"]
+        priority_queue.append({
+            "category": reg["category"],
+            "score": score,
+            "action": suggest_tool_combinations(reg["category"])
+        })
+    priority_queue = sorted(priority_queue, key=lambda x: x["score"], reverse=True)
+
+    return error_registry, priority_queue
+
+
 def generate_improvement_report(
     friction_logs_path: Path, output_path: Path
 ) -> dict:
-    """
-    Reads friction logs, aggregates issues, and writes a self-improvement report.
-    Returns metrics dict.
-    """
+    """Reads friction logs, aggregates issues, and writes a self-improvement report with advanced metrics."""
     if not friction_logs_path.exists():
         if collect:
             print("Friction logs not found. Running collect_handoffs first...")
@@ -100,71 +184,78 @@ def generate_improvement_report(
         return {"error": f"Failed to read friction logs: {e}"}
 
     total_sessions = len(logs)
-    total_friction_points = 0
-    issues_by_category = {}
+    logs_sorted = sorted(logs, key=lambda x: x.get("date", ""))
 
-    for log in logs:
-        friction_points = log.get("friction_points", [])
-        total_friction_points += len(friction_points)
-        for pt in friction_points:
-            heading = pt.get("heading", "General")
-            content = pt.get("content", "")
-            issues_by_category.setdefault(heading, []).append(
-                {
-                    "session_id": log.get("session_id"),
-                    "date": log.get("date"),
-                    "content": content,
-                }
-            )
+    (total_friction_points, stealth_stops_count, _loc_deltas,
+     time_saved_total, issues_by_category) = _parse_logs_data(logs_sorted)
 
-    # Generate markdown report
+    trend_direction = _compute_delta_metrics(logs_sorted)
+    error_registry, priority_queue = _build_priority_queue(issues_by_category)
+
+    # Generate report markdown
     report_lines = [
         "# ⚡ Отчет системы самообучения агента (Self-Improvement Report)",
         f"**Дата генерации**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         "",
         "## 📊 Метрики сессий",
-        f"- **Проанализировано сессий**: {total_sessions}",
+        f"- **Проанализировано сессий (лимит 5)**: {total_sessions}",
         f"- **Выявлено точек трения (friction points)**: {total_friction_points}",
+        f"- **Зафиксировано Stealth Stop**: {stealth_stops_count}",
+        f"- **Суммарно сэкономлено времени**: {time_saved_total} мин.",
         "",
+        "## 📈 Дельта-метрики сессий (Delta Metrics)",
+        f"- **Трендовое направление**: {trend_direction}",
+        "",
+        "## 🚨 Реестр паттернов ошибок (Error Pattern Registry)",
+        "| Категория ошибки | Частота | Stealth Stop |",
+        "| :--- | :---: | :---: |",
+    ]
+
+    for reg in error_registry:
+        stealth_str = "⚠️ Да" if reg["has_stealth"] else "Нет"
+        report_lines.append(f"| {reg['category']} | {reg['frequency']} | {stealth_str} |")
+    report_lines.append("")
+
+    report_lines.extend([
+        "## 📋 Очередь авто-исправления (Auto-Heal Priority Queue)",
+        "| Приоритет | Категория ошибки | Балл приоритета | Рекомендуемый инструмент |",
+        "| :---: | :--- | :---: | :--- |",
+    ])
+
+    for i, item in enumerate(priority_queue, 1):
+        report_lines.append(f"| {i} | {item['category']} | {item['score']} | {item['action']} |")
+    report_lines.append("")
+
+    report_lines.extend([
         "## 🔍 Детальный анализ проблем по категориям",
         "",
-    ]
+    ])
 
     if not issues_by_category:
         report_lines.append("🎉 Точки трения не обнаружены! Все системы работают в режиме YAGNI.")
     else:
-        # Prioritize high-impact issues (OOM, memory leaks, critical errors)
-        sorted_categories = sorted(
-            issues_by_category.keys(),
-            key=lambda cat: 0 if any(k in cat.lower() for k in ["oom", "memory", "критич", "ошибка"]) else 1
-        )
-        for category in sorted_categories:
+        for category in issues_by_category.keys():
             items = issues_by_category[category]
             report_lines.append(f"### 🛑 Категория: {category}")
             for item in items:
                 report_lines.append(
                     f"- **Сессия [{item['session_id']}]** ({item['date']}):"
                 )
-                # Indent content lines for blockquote format
                 content_lines = item["content"].splitlines()
                 for line in content_lines:
                     report_lines.append(f"  > {line}")
 
-                # Karpathy-style research queries generator
                 queries = generate_research_queries(category, item["content"])
                 report_lines.append("  * 🔍 *Рекомендуемые запросы для исследования (Karpathy Research Step)*:")
                 for q in queries:
                     report_lines.append(f"    - `{q}`")
 
-                # Speed-optimized prompt generator
                 opt_prompt = optimize_prompt_for_speed(category, item["content"])
                 report_lines.append(f"  * ⚡ *Оптимизированный промпт для исправления:* `{opt_prompt}`")
 
-                # Tool combinations suggestion
                 tools_comb = suggest_tool_combinations(category)
                 report_lines.append(f"  * 🛠️ *Рекомендуемые инструменты:* {tools_comb}")
 
-                # Self-healing needs analysis
                 healing_need = analyze_self_healing_needs(item["content"])
                 report_lines.append(f"  * {healing_need}")
                 report_lines.append("")
@@ -229,7 +320,6 @@ def main() -> None:
     output_report_path = target_dir / "self_improvement_report.md"
     handoff_notes_path = Path("/Users/rus/ai-tools/handoff_notes.md")
 
-    # If vault/handoffs directory doesn't exist, collect first
     if not target_dir.exists():
         if collect:
             collect()

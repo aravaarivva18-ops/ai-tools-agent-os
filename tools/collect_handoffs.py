@@ -69,6 +69,43 @@ def extract_friction_blocks(file_path: Path) -> list[dict]:
     return blocks
 
 
+def parse_stealth_stop_and_metrics(file_path: Path) -> dict:
+    """Parses HANDOFF.md for stealth-stop triggers and delta-metrics."""
+    try:
+        content = file_path.read_text(encoding="utf-8")
+    except Exception:
+        return {"stealth_stop": False, "loc_delta": 0, "time_saved_min": 0}
+
+    content_lower = content.lower()
+
+    # Detect stealth stop
+    stealth_stop = any(kw in content_lower for kw in ["stealth stop", "stealth-stop", "лимит 3", "зацикливание"])
+
+    # Extract LOC delta
+    loc_delta = 0
+    loc_match = re.search(r'(?:loc changed|loc delta|изменено строк)[:\s]*([+-]?\d+)', content_lower)
+    if loc_match:
+        try:
+            loc_delta = int(loc_match.group(1))
+        except ValueError:
+            pass
+
+    # Extract time saved
+    time_saved = 0
+    time_match = re.search(r'(?:time saved|сэкономлено времени|сэкономлено)[:\s]*(\d+)', content_lower)
+    if time_match:
+        try:
+            time_saved = int(time_match.group(1))
+        except ValueError:
+            pass
+
+    return {
+        "stealth_stop": stealth_stop,
+        "loc_delta": loc_delta,
+        "time_saved_min": time_saved
+    }
+
+
 def collect() -> None:
     brain_dir = "/Users/rus/.gemini/antigravity-cli/brain"
     target_dir = "/Users/rus/ai-tools/vault/handoffs"
@@ -78,7 +115,11 @@ def collect() -> None:
     print(f"Collecting handoffs into folder: {target_dir}...\n")
 
     # Find all HANDOFF.md in session directories
-    handoff_paths = glob.glob(os.path.join(brain_dir, "**/HANDOFF.md"), recursive=True)
+    raw_handoff_paths = glob.glob(os.path.join(brain_dir, "**/HANDOFF.md"), recursive=True)
+
+    # Sort by modification time descending and limit to last 5 sessions
+    sorted_raw_paths = sorted(raw_handoff_paths, key=os.path.getmtime, reverse=True)
+    handoff_paths = sorted_raw_paths[:5]
 
     copied_count = 0
     friction_logs = []
@@ -99,15 +140,17 @@ def collect() -> None:
         print(f"✅ Copied raw handoff: {new_name}")
         copied_count += 1
 
-        # Extract friction points
+        # Extract friction points and metrics
         blocks = extract_friction_blocks(path)
-        if blocks:
-            friction_logs.append({
-                "session_id": session_id,
-                "date": dt.strftime("%Y-%m-%d"),
-                "source_file": new_name,
-                "friction_points": blocks
-            })
+        meta = parse_stealth_stop_and_metrics(path)
+
+        friction_logs.append({
+            "session_id": session_id,
+            "date": dt.strftime("%Y-%m-%d"),
+            "source_file": new_name,
+            "friction_points": blocks,
+            "metrics": meta
+        })
 
     # Also parse and copy global handoff_notes.md
     global_notes_str = "/Users/rus/ai-tools/handoff_notes.md"
@@ -123,13 +166,15 @@ def collect() -> None:
         copied_count += 1
 
         blocks = extract_friction_blocks(global_notes_path)
-        if blocks:
-            friction_logs.append({
-                "session_id": "global",
-                "date": dt.strftime("%Y-%m-%d"),
-                "source_file": new_name,
-                "friction_points": blocks
-            })
+        meta = parse_stealth_stop_and_metrics(global_notes_path)
+
+        friction_logs.append({
+            "session_id": "global",
+            "date": dt.strftime("%Y-%m-%d"),
+            "source_file": new_name,
+            "friction_points": blocks,
+            "metrics": meta
+        })
 
     # Save friction logs to JSON file
     try:
