@@ -11,7 +11,7 @@ import pytest
 # Ensure tools/ is importable
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from obsidian_sync import ObsidianVaultManager
+from tools.obsidian.obsidian_sync import ObsidianVaultManager
 
 
 @pytest.fixture

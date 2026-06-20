@@ -29,7 +29,7 @@ def match_fuzzy(content, search_block, threshold=0.8):
         return None, None, 0.0
 
     best_ratio = 0.0
-    best_range = (None, None)
+    best_range: tuple[int | None, int | None] = (None, None)
 
     n_search = len(search_lines)
     n_content = len(content_lines)
@@ -126,7 +126,6 @@ def apply_blocks(content, blocks, fuzzy_threshold=0.8):
 
 
 if __name__ == "__main__":
-    import py_compile
     import sys
 
     if len(sys.argv) < 3:
@@ -171,15 +170,18 @@ if __name__ == "__main__":
     with open(target_path, "w", encoding="utf-8") as f:
         f.write(new_content)
 
-    # Проверка синтаксиса для Python файлов
+    # Проверка синтаксиса для Python файлов через AST (без компиляции в .pyc файлы)
     if target_path.endswith(".py"):
         try:
-            py_compile.compile(target_path, doraise=True)
-            print(f"Success: Patch applied cleanly to {target_path} and verified.")
+            import ast
+
+            with open(target_path, encoding="utf-8") as f:
+                ast.parse(f.read())
+            print(f"Success: Patch applied cleanly to {target_path} and AST verified.")
             if os.path.exists(backup_path):
                 os.remove(backup_path)  # Удаляем бэкап при успехе
         except Exception as e:
-            print(f"Error: Compiled check failed after patch: {e}")
+            print(f"Error: AST syntax check failed after patch: {e}")
             # Восстанавливаем из бэкапа
             os.replace(backup_path, target_path)
             sys.exit(1)

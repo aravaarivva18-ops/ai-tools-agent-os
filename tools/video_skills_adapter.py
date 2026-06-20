@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Video Skills Adapter for Remotion programming video production ecosystem."""
 
+import logging
 import os
 import subprocess  # nosec B404
-from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 
 class VideoSkillsAdapter:
@@ -31,7 +33,8 @@ class VideoSkillsAdapter:
                 check=False,
             )
             return result.returncode == 0
-        except Exception:
+        except Exception as e:
+            logger.debug("Remotion validate failed for %s: %s", self.workspace_path, e)
             return False
 
     def configure_composition(
@@ -82,9 +85,7 @@ export const RemotionRoot = () => {{
             f.write(content)
         return True
 
-    def render_video(
-        self, project_path: str, comp_id: str, output_path: str
-    ) -> bool:
+    def render_video(self, project_path: str, comp_id: str, output_path: str) -> bool:
         """Renders the video composition using Remotion CLI."""
         cmd = ["npx", "remotion", "render", comp_id, output_path]
         try:
@@ -96,7 +97,8 @@ export const RemotionRoot = () => {{
                 check=False,
             )
             return result.returncode == 0
-        except Exception:
+        except Exception as e:
+            logger.debug("Remotion render failed for %s: %s", comp_id, e)
             return False
 
     def render_still(
@@ -120,7 +122,8 @@ export const RemotionRoot = () => {{
                 check=False,
             )
             return result.returncode == 0
-        except Exception:
+        except Exception as e:
+            logger.debug("Remotion still render failed for %s: %s", comp_id, e)
             return False
 
 

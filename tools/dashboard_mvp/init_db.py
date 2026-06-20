@@ -5,7 +5,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dashboard_mvp.db import Base, SessionLocal, engine
-from dashboard_mvp.models import User
+from dashboard_mvp.models import Source, User
 from dashboard_mvp.security_utils import get_password_hash
 
 
@@ -31,6 +31,17 @@ def init_database():
             print("Администратор создан: admin@targetmedia.ru / admin12345")
         else:
             print("Администратор уже существует.")
+
+        # Автоматическое создание дефолтных источников
+        yandex_source = db.query(Source).filter(Source.name == "yandex").first()
+        if not yandex_source:
+            print("Создаем дефолтный источник 'yandex'...")
+            yandex_source = Source(name="yandex")
+            db.add(yandex_source)
+            db.commit()
+            print("Источник 'yandex' создан.")
+        else:
+            print("Источник 'yandex' уже существует.")
     except Exception as e:
         print(f"Ошибка при инициализации данных: {e}")
         db.rollback()

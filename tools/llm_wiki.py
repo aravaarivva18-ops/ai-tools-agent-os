@@ -12,8 +12,6 @@ import sys
 from pathlib import Path
 
 
-
-
 class LLMWiki:
     def __init__(self, root_dir: str | Path | None = None):
         """Initializes directories relative to the root directory."""
@@ -41,7 +39,7 @@ class LLMWiki:
                 "# LLM Knowledge Wiki Index\n\n"
                 "Welcome to the knowledge core. Below are the key entry points:\n\n"
                 "- [[Log]] - Modification and ingestion history\n",
-                encoding="utf-8"
+                encoding="utf-8",
             )
 
         log_file = self.wiki_dir / "Log.md"
@@ -50,7 +48,7 @@ class LLMWiki:
                 "# Wiki Log\n\n"
                 "System history and updates tracker:\n\n"
                 f"- **{datetime.date.today().isoformat()}**: Knowledge wiki initialized.\n",
-                encoding="utf-8"
+                encoding="utf-8",
             )
 
     @staticmethod
@@ -99,9 +97,8 @@ class LLMWiki:
             stub_path = self.wiki_dir / f"{link}.md"
             if not stub_path.is_file():
                 stub_path.write_text(
-                    f"# {link}\n\n"
-                    "This is an automatically generated stub note.\n",
-                    encoding="utf-8"
+                    f"# {link}\n\nThis is an automatically generated stub note.\n",
+                    encoding="utf-8",
                 )
 
         # Update index.md
@@ -147,7 +144,9 @@ class LLMWiki:
                     return
 
             content = node_file.read_text(encoding="utf-8")
-            context_parts.append(f"--- START NOTE: {node_name} ---\n{content}\n--- END NOTE: {node_name} ---")
+            context_parts.append(
+                f"--- START NOTE: {node_name} ---\n{content}\n--- END NOTE: {node_name} ---"
+            )
 
             links = self.extract_wiki_links(content)
             for link in links:
@@ -161,10 +160,7 @@ class LLMWiki:
         Lint the wiki database.
         Finds broken links (links pointing to files that do not exist).
         """
-        report: dict[str, list] = {
-            "broken_links": [],
-            "orphaned_notes": []
-        }
+        report: dict[str, list] = {"broken_links": [], "orphaned_notes": []}
 
         all_notes = {p.stem for p in self.wiki_dir.glob("*.md")}
         linked_notes: set[str] = set()
@@ -187,14 +183,22 @@ class LLMWiki:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="LLM Wiki knowledge core command line interface.")
+    parser = argparse.ArgumentParser(
+        description="LLM Wiki knowledge core command line interface."
+    )
     subparsers = parser.add_subparsers(dest="command", help="Wiki workflow commands")
 
     subparsers.add_parser("injest", help="Injest raw files into the wiki")
 
-    query_parser = subparsers.add_parser("query", help="Query the wiki starting from a node")
-    query_parser.add_argument("start_node", type=str, help="Name of the starting note/node")
-    query_parser.add_argument("--depth", type=int, default=2, help="Depth of recursive link traversal")
+    query_parser = subparsers.add_parser(
+        "query", help="Query the wiki starting from a node"
+    )
+    query_parser.add_argument(
+        "start_node", type=str, help="Name of the starting note/node"
+    )
+    query_parser.add_argument(
+        "--depth", type=int, default=2, help="Depth of recursive link traversal"
+    )
 
     subparsers.add_parser("lint", help="Lint wiki structural integrity")
 

@@ -1,15 +1,19 @@
+import os
 from datetime import date, datetime, timedelta
 
+import gspread
 import httpx
 import openpyxl
 from dashboard_mvp.models import (
-    ChangeLog,
-    DailyStat,
+    Changelog,
     Integration,
-    KPIPlan,
+    MarketingFact,
+    MarketingPlan,
     Project,
+    Source,
     SourceMapping,
 )
+from google.oauth2.service_account import Credentials
 from sqlalchemy.orm import Session
 
 
@@ -73,6 +77,14 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
 
     token = integration.access_token if integration else None
 
+    # Убедимся, что источник yandex существует
+    yandex_source = db.query(Source).filter(Source.name == "yandex").first()
+    if not yandex_source:
+        yandex_source = Source(name="yandex")
+        db.add(yandex_source)
+        db.commit()
+        db.refresh(yandex_source)
+
     # Режим имитации данных
     if not token or token == "mock_token":
         print(f"[SYNC MOCK] Синхронизация проекта {project_id} в режиме имитации.")
@@ -81,9 +93,10 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
 
         for dt, stats in mock_data.items():
             # Ищем или создаем запись статистики на этот день
-            stat = db.query(DailyStat).filter(
-                DailyStat.project_id == project_id,
-                DailyStat.date == dt
+            stat = db.query(MarketingFact).filter(
+                MarketingFact.project_id == project_id,
+                MarketingFact.date == dt,
+                MarketingFact.source_id == yandex_source.id
             ).first()
 
             # Учет НДС
@@ -100,22 +113,23 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
             if stat:
                 stat.impressions = stats["impressions"]
                 stat.clicks = stats["clicks"]
-                stat.spent = spent
-                stat.leads = stats["leads"]
-                stat.qualified_leads = stats["qualified_leads"]
+                stat.spend = spent
+                stat.leads_primary = stats["leads"]
+                stat.leads_qualified = stats["qualified_leads"]
                 stat.ctr = round(ctr, 2)
                 stat.cpc = round(cpc, 2)
                 stat.cpl = round(cpl, 2)
                 stat.cpl_qualified = round(cpl_qualified, 2)
             else:
-                stat = DailyStat(
+                stat = MarketingFact(
                     project_id=project_id,
+                    source_id=yandex_source.id,
                     date=dt,
                     impressions=stats["impressions"],
                     clicks=stats["clicks"],
-                    spent=spent,
-                    leads=stats["leads"],
-                    qualified_leads=stats["qualified_leads"],
+                    spend=spent,
+                    leads_primary=stats["leads"],
+                    leads_qualified=stats["qualified_leads"],
                     ctr=round(ctr, 2),
                     cpc=round(cpc, 2),
                     cpl=round(cpl, 2),
@@ -214,13 +228,13 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
                 for row in metrika_data.get("data", []):
                     dt_str = row["dimensions"][0]["name"]
                     dt = datetime.strptime(dt_str, "%Y-%m-%d").date()
-                    
+
                     # Разделяем метрики на обычные и квал-лиды
                     metrics_vals = [float(val) for val in row["metrics"]]
-                    
+
                     leads_sum = sum(metrics_vals[i] for i in range(len(goals))) if goals else 0.0
                     qual_leads_sum = sum(metrics_vals[len(goals) + i] for i in range(len(qual_goals))) if qual_goals else 0.0
-                    
+
                     metrika_stats[dt] = {
                         "leads": int(leads_sum),
                         "qualified_leads": int(qual_leads_sum)
@@ -232,9 +246,10 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
             d_stat = direct_stats.get(dt, {"impressions": 0, "clicks": 0, "spent": 0.0})
             m_stat = metrika_stats.get(dt, {"leads": 0, "qualified_leads": 0})
 
-            stat = db.query(DailyStat).filter(
-                DailyStat.project_id == project_id,
-                DailyStat.date == dt
+            stat = db.query(MarketingFact).filter(
+                MarketingFact.project_id == project_id,
+                MarketingFact.date == dt,
+                MarketingFact.source_id == yandex_source.id
             ).first()
 
             ctr = (d_stat["clicks"] / d_stat["impressions"] * 100) if d_stat["impressions"] > 0 else 0
@@ -245,22 +260,23 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
             if stat:
                 stat.impressions = d_stat["impressions"]
                 stat.clicks = d_stat["clicks"]
-                stat.spent = d_stat["spent"]
-                stat.leads = m_stat["leads"]
-                stat.qualified_leads = m_stat["qualified_leads"]
+                stat.spend = d_stat["spent"]
+                stat.leads_primary = m_stat["leads"]
+                stat.leads_qualified = m_stat["qualified_leads"]
                 stat.ctr = round(ctr, 2)
                 stat.cpc = round(cpc, 2)
                 stat.cpl = round(cpl, 2)
                 stat.cpl_qualified = round(cpl_qualified, 2)
             else:
-                stat = DailyStat(
+                stat = MarketingFact(
                     project_id=project_id,
+                    source_id=yandex_source.id,
                     date=dt,
                     impressions=d_stat["impressions"],
                     clicks=d_stat["clicks"],
-                    spent=d_stat["spent"],
-                    leads=m_stat["leads"],
-                    qualified_leads=m_stat["qualified_leads"],
+                    spend=d_stat["spent"],
+                    leads_primary=m_stat["leads"],
+                    leads_qualified=m_stat["qualified_leads"],
                     ctr=round(ctr, 2),
                     cpc=round(cpc, 2),
                     cpl=round(cpl, 2),
@@ -312,9 +328,9 @@ def sync_excel_data(db: Session, file_path: str):
                 continue
 
             # Ищем существующий план
-            plan = db.query(KPIPlan).filter(
-                KPIPlan.project_id == project_id,
-                KPIPlan.month == month
+            plan = db.query(MarketingPlan).filter(
+                MarketingPlan.project_id == project_id,
+                MarketingPlan.month == month
             ).first()
 
             if plan:
@@ -324,7 +340,7 @@ def sync_excel_data(db: Session, file_path: str):
                 plan.qualified_leads_plan = qualified_leads_plan
                 plan.cpl_qualified_plan = cpl_qualified_plan
             else:
-                plan = KPIPlan(
+                plan = MarketingPlan(
                     month=month,
                     project_id=project_id,
                     budget_plan=budget_plan,
@@ -373,22 +389,152 @@ def sync_excel_data(db: Session, file_path: str):
                 continue
 
             # Проверяем, есть ли лог
-            log_exists = db.query(ChangeLog.id).filter(
-                ChangeLog.project_id == project_id,
-                ChangeLog.date == dt,
-                ChangeLog.changes_description == changes
+            log_exists = db.query(Changelog.id).filter(
+                Changelog.project_id == project_id,
+                Changelog.date == dt,
+                Changelog.description == changes
             ).first() is not None
 
             if not log_exists:
-                log = ChangeLog(
+                log = Changelog(
                     date=dt,
                     project_id=project_id,
-                    changes_description=changes,
-                    comment=comment,
+                    description=changes,
+                    reason=comment,
                     expected_effect=expected_effect
                 )
                 db.add(log)
         db.commit()
         print("[SYNC EXCEL] Логи изменений успешно импортированы.")
+
+    return True
+
+
+def get_gspread_client(credentials_path: str):
+    """Авторизуется в Google API и возвращает клиент gspread."""
+    scopes = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+    credentials = Credentials.from_service_account_file(credentials_path, scopes=scopes)
+    return gspread.authorize(credentials)
+
+
+def sync_google_sheets_data(db: Session, spreadsheet_id: str, credentials_path: str):
+    """Считывает планы KPI и логи изменений из Google Таблицы по API и импортирует в БД."""
+    try:
+        if not spreadsheet_id or not credentials_path or not os.path.exists(credentials_path):
+            print(f"[SYNC GOOGLE] Пропуск. Отсутствует GOOGLE_SPREADSHEET_ID или файл ключей: {credentials_path}")
+            return False
+
+        client = get_gspread_client(credentials_path)
+        sh = client.open_by_key(spreadsheet_id)
+    except Exception as e:
+        print(f"Не удалось подключиться к Google Таблице: {e}")
+        return False
+
+    # --- 1. Импорт Плана KPI ---
+    try:
+        sheet = sh.worksheet("04_План_KPI")
+        rows = sheet.get_all_values()
+        if len(rows) > 1:
+            # Данные начинаются со 2-й строки
+            for row in rows[1:]:
+                if not row or not row[0] or row[0] == "Месяц":
+                    continue
+                month = str(row[0]).strip() # Месяц (например, '2026-06')
+                project_id_str = row[2]
+
+                # Приводим типы к нужным, если ячейки не пустые
+                budget_plan = float(str(row[4]).replace(" ", "").replace(",", ".")) if (len(row) > 4 and row[4]) else 0.0
+                leads_plan = int(str(row[5]).replace(" ", "")) if (len(row) > 5 and row[5]) else 0
+                cpl_plan = float(str(row[6]).replace(" ", "").replace(",", ".")) if (len(row) > 6 and row[6]) else 0.0
+
+                qualified_leads_plan = int(str(row[7]).replace(" ", "")) if (len(row) > 7 and row[7]) else 0
+                cpl_qualified_plan = float(str(row[8]).replace(" ", "").replace(",", ".")) if (len(row) > 8 and row[8]) else 0.0
+
+                try:
+                    project_id = int(project_id_str.split('-')[-1]) if '-' in str(project_id_str) else int(project_id_str)
+                except ValueError:
+                    continue
+
+                project_exists = db.query(Project.id).filter(Project.id == project_id).first() is not None
+                if not project_exists:
+                    continue
+
+                plan = db.query(MarketingPlan).filter(
+                    MarketingPlan.project_id == project_id,
+                    MarketingPlan.month == month
+                ).first()
+
+                if plan:
+                    plan.budget_plan = budget_plan
+                    plan.leads_plan = leads_plan
+                    plan.cpl_plan = cpl_plan
+                    plan.qualified_leads_plan = qualified_leads_plan
+                    plan.cpl_qualified_plan = cpl_qualified_plan
+                else:
+                    plan = MarketingPlan(
+                        month=month,
+                        project_id=project_id,
+                        budget_plan=budget_plan,
+                        leads_plan=leads_plan,
+                        cpl_plan=cpl_plan,
+                        qualified_leads_plan=qualified_leads_plan,
+                        cpl_qualified_plan=cpl_qualified_plan
+                    )
+                    db.add(plan)
+            db.commit()
+            print("[SYNC GOOGLE] Планы KPI успешно импортированы.")
+    except Exception as e:
+        print(f"Ошибка при импорте планов KPI из Google Sheets: {e}")
+
+    # --- 2. Импорт Лога изменений ---
+    try:
+        sheet = sh.worksheet("05_Лог_изменений")
+        rows = sheet.get_all_values()
+        if len(rows) > 1:
+            for row in rows[1:]:
+                if not row or not row[0] or row[0] == "Дата":
+                    continue
+
+                row_date = str(row[0]).strip()
+                try:
+                    dt = datetime.strptime(row_date, "%Y-%m-%d").date()
+                except ValueError:
+                    continue
+
+                project_id_str = row[2]
+                try:
+                    project_id = int(project_id_str.split('-')[-1]) if '-' in str(project_id_str) else int(project_id_str)
+                except ValueError:
+                    continue
+
+                changes = str(row[4]).strip()
+                expected_effect = str(row[6]).strip() if (len(row) > 6 and row[6]) else ""
+                comment = str(row[7]).strip() if (len(row) > 7 and row[7]) else ""
+
+                if not db.query(Project.id).filter(Project.id == project_id).first() is not None:
+                    continue
+
+                log_exists = db.query(Changelog.id).filter(
+                    Changelog.project_id == project_id,
+                    Changelog.date == dt,
+                    Changelog.description == changes
+                ).first() is not None
+
+                if not log_exists:
+                    log = Changelog(
+                        date=dt,
+                        project_id=project_id,
+                        description=changes,
+                        reason=comment,
+                        expected_effect=expected_effect
+                    )
+                    db.add(log)
+            db.commit()
+            print("[SYNC GOOGLE] Логи изменений успешно импортированы.")
+    except Exception as e:
+        print(f"Ошибка при импорте логов изменений из Google Sheets: {e}")
 
     return True

@@ -27,51 +27,147 @@ JOURNEY_TEMPLATES = {
         "stages": [
             {
                 "name": "Awareness",
-                "actions": ["Searches for solution online", "Reads blog post or review", "Sees ad or recommendation"],
-                "touchpoints": ["Google Search", "Blog", "Social Media", "Peer referral"],
+                "actions": [
+                    "Searches for solution online",
+                    "Reads blog post or review",
+                    "Sees ad or recommendation",
+                ],
+                "touchpoints": [
+                    "Google Search",
+                    "Blog",
+                    "Social Media",
+                    "Peer referral",
+                ],
                 "emotions": {"score": 3, "label": "Curious but skeptical"},
-                "pain_points": ["Too many options", "Hard to tell products apart", "Unclear pricing"],
-                "opportunities": ["SEO-optimized comparison content", "Clear value proposition on landing page"],
+                "pain_points": [
+                    "Too many options",
+                    "Hard to tell products apart",
+                    "Unclear pricing",
+                ],
+                "opportunities": [
+                    "SEO-optimized comparison content",
+                    "Clear value proposition on landing page",
+                ],
             },
             {
                 "name": "Evaluation",
-                "actions": ["Visits website", "Reads features page", "Compares with competitors", "Watches demo"],
-                "touchpoints": ["Website", "Demo video", "Pricing page", "Competitor sites"],
+                "actions": [
+                    "Visits website",
+                    "Reads features page",
+                    "Compares with competitors",
+                    "Watches demo",
+                ],
+                "touchpoints": [
+                    "Website",
+                    "Demo video",
+                    "Pricing page",
+                    "Competitor sites",
+                ],
                 "emotions": {"score": 4, "label": "Interested, comparing options"},
-                "pain_points": ["Complex pricing tiers", "No free trial visible", "Feature comparison is hard"],
-                "opportunities": ["Interactive product tour", "Side-by-side comparison tool", "Social proof placement"],
+                "pain_points": [
+                    "Complex pricing tiers",
+                    "No free trial visible",
+                    "Feature comparison is hard",
+                ],
+                "opportunities": [
+                    "Interactive product tour",
+                    "Side-by-side comparison tool",
+                    "Social proof placement",
+                ],
             },
             {
                 "name": "Signup",
                 "actions": ["Creates account", "Enters payment info", "Verifies email"],
                 "touchpoints": ["Registration form", "Email", "Payment processor"],
                 "emotions": {"score": 3, "label": "Cautious, wants quick setup"},
-                "pain_points": ["Too many form fields", "Unclear what happens after signup", "Forced credit card"],
-                "opportunities": ["Single-field signup", "Show value before requiring payment", "Progress indicator"],
+                "pain_points": [
+                    "Too many form fields",
+                    "Unclear what happens after signup",
+                    "Forced credit card",
+                ],
+                "opportunities": [
+                    "Single-field signup",
+                    "Show value before requiring payment",
+                    "Progress indicator",
+                ],
             },
             {
                 "name": "Onboarding",
-                "actions": ["Completes setup wizard", "Imports data", "Invites team members", "Completes first task"],
-                "touchpoints": ["Setup wizard", "Import tool", "Email invites", "In-app tutorial"],
+                "actions": [
+                    "Completes setup wizard",
+                    "Imports data",
+                    "Invites team members",
+                    "Completes first task",
+                ],
+                "touchpoints": [
+                    "Setup wizard",
+                    "Import tool",
+                    "Email invites",
+                    "In-app tutorial",
+                ],
                 "emotions": {"score": 2, "label": "Overwhelmed, needs guidance"},
-                "pain_points": ["Too many steps", "Data import fails", "No clear next step", "Empty state is confusing"],
-                "opportunities": ["Guided quick-start (<5 min to value)", "Pre-populated sample data", "Contextual tips"],
+                "pain_points": [
+                    "Too many steps",
+                    "Data import fails",
+                    "No clear next step",
+                    "Empty state is confusing",
+                ],
+                "opportunities": [
+                    "Guided quick-start (<5 min to value)",
+                    "Pre-populated sample data",
+                    "Contextual tips",
+                ],
             },
             {
                 "name": "Adoption",
-                "actions": ["Uses core features daily", "Discovers advanced features", "Customizes workflow"],
-                "touchpoints": ["Product UI", "Help center", "In-app notifications", "Email tips"],
+                "actions": [
+                    "Uses core features daily",
+                    "Discovers advanced features",
+                    "Customizes workflow",
+                ],
+                "touchpoints": [
+                    "Product UI",
+                    "Help center",
+                    "In-app notifications",
+                    "Email tips",
+                ],
                 "emotions": {"score": 4, "label": "Gaining confidence, seeing value"},
-                "pain_points": ["Hard to discover features", "Missing integrations", "Performance issues"],
-                "opportunities": ["Feature discovery prompts", "Integration marketplace", "Workflow templates"],
+                "pain_points": [
+                    "Hard to discover features",
+                    "Missing integrations",
+                    "Performance issues",
+                ],
+                "opportunities": [
+                    "Feature discovery prompts",
+                    "Integration marketplace",
+                    "Workflow templates",
+                ],
             },
             {
                 "name": "Advocacy",
-                "actions": ["Recommends to peers", "Writes review", "Shares on social", "Expands usage"],
-                "touchpoints": ["Review sites", "Social media", "Word of mouth", "Referral program"],
+                "actions": [
+                    "Recommends to peers",
+                    "Writes review",
+                    "Shares on social",
+                    "Expands usage",
+                ],
+                "touchpoints": [
+                    "Review sites",
+                    "Social media",
+                    "Word of mouth",
+                    "Referral program",
+                ],
                 "emotions": {"score": 5, "label": "Satisfied, wants to share"},
-                "pain_points": ["No easy way to refer", "No recognition for loyalty", "Feature requests ignored"],
-                "opportunities": ["Referral program with rewards", "Customer advisory board", "Public feature roadmap"],
+                "pain_points": [
+                    "No easy way to refer",
+                    "No recognition for loyalty",
+                    "Feature requests ignored",
+                ],
+                "opportunities": [
+                    "Referral program with rewards",
+                    "Customer advisory board",
+                    "Public feature roadmap",
+                ],
             },
         ],
     },
@@ -82,43 +178,123 @@ JOURNEY_TEMPLATES = {
         "stages": [
             {
                 "name": "Discovery",
-                "actions": ["Searches for product", "Browses categories", "Sees recommendation"],
-                "touchpoints": ["Search engine", "Social media", "Email newsletter", "Marketplace"],
+                "actions": [
+                    "Searches for product",
+                    "Browses categories",
+                    "Sees recommendation",
+                ],
+                "touchpoints": [
+                    "Search engine",
+                    "Social media",
+                    "Email newsletter",
+                    "Marketplace",
+                ],
                 "emotions": {"score": 3, "label": "Browsing, open to options"},
-                "pain_points": ["Search returns irrelevant results", "Category structure is confusing"],
-                "opportunities": ["Personalized recommendations", "Smart search with filters"],
+                "pain_points": [
+                    "Search returns irrelevant results",
+                    "Category structure is confusing",
+                ],
+                "opportunities": [
+                    "Personalized recommendations",
+                    "Smart search with filters",
+                ],
             },
             {
                 "name": "Consideration",
-                "actions": ["Views product details", "Reads reviews", "Compares options", "Checks sizing/specs"],
-                "touchpoints": ["Product page", "Reviews section", "Size guide", "Comparison tool"],
+                "actions": [
+                    "Views product details",
+                    "Reads reviews",
+                    "Compares options",
+                    "Checks sizing/specs",
+                ],
+                "touchpoints": [
+                    "Product page",
+                    "Reviews section",
+                    "Size guide",
+                    "Comparison tool",
+                ],
                 "emotions": {"score": 4, "label": "Interested, needs reassurance"},
-                "pain_points": ["Insufficient product images", "Fake or unhelpful reviews", "No size guidance"],
-                "opportunities": ["360-degree product views", "Verified purchase reviews", "AR try-on"],
+                "pain_points": [
+                    "Insufficient product images",
+                    "Fake or unhelpful reviews",
+                    "No size guidance",
+                ],
+                "opportunities": [
+                    "360-degree product views",
+                    "Verified purchase reviews",
+                    "AR try-on",
+                ],
             },
             {
                 "name": "Purchase",
-                "actions": ["Adds to cart", "Applies coupon", "Enters shipping info", "Completes payment"],
-                "touchpoints": ["Cart", "Checkout flow", "Payment processor", "Order confirmation"],
+                "actions": [
+                    "Adds to cart",
+                    "Applies coupon",
+                    "Enters shipping info",
+                    "Completes payment",
+                ],
+                "touchpoints": [
+                    "Cart",
+                    "Checkout flow",
+                    "Payment processor",
+                    "Order confirmation",
+                ],
                 "emotions": {"score": 3, "label": "Anxious about commitment"},
-                "pain_points": ["Unexpected shipping costs", "Too many checkout steps", "Limited payment options"],
-                "opportunities": ["One-page checkout", "Free shipping threshold", "Guest checkout option"],
+                "pain_points": [
+                    "Unexpected shipping costs",
+                    "Too many checkout steps",
+                    "Limited payment options",
+                ],
+                "opportunities": [
+                    "One-page checkout",
+                    "Free shipping threshold",
+                    "Guest checkout option",
+                ],
             },
             {
                 "name": "Delivery",
                 "actions": ["Tracks order", "Receives package", "Inspects product"],
-                "touchpoints": ["Tracking page", "Email updates", "SMS notifications", "Package"],
+                "touchpoints": [
+                    "Tracking page",
+                    "Email updates",
+                    "SMS notifications",
+                    "Package",
+                ],
                 "emotions": {"score": 4, "label": "Excited, anticipating"},
-                "pain_points": ["No tracking updates", "Delayed delivery", "Damaged packaging"],
-                "opportunities": ["Real-time delivery tracking", "Proactive delay notifications"],
+                "pain_points": [
+                    "No tracking updates",
+                    "Delayed delivery",
+                    "Damaged packaging",
+                ],
+                "opportunities": [
+                    "Real-time delivery tracking",
+                    "Proactive delay notifications",
+                ],
             },
             {
                 "name": "Post-Purchase",
-                "actions": ["Uses product", "Writes review", "Contacts support if needed", "Considers reorder"],
-                "touchpoints": ["Product", "Review prompt email", "Support chat", "Reorder email"],
+                "actions": [
+                    "Uses product",
+                    "Writes review",
+                    "Contacts support if needed",
+                    "Considers reorder",
+                ],
+                "touchpoints": [
+                    "Product",
+                    "Review prompt email",
+                    "Support chat",
+                    "Reorder email",
+                ],
                 "emotions": {"score": 4, "label": "Satisfied or seeking resolution"},
-                "pain_points": ["Product doesn't match description", "Difficult return process"],
-                "opportunities": ["Easy self-service returns", "Post-purchase care emails", "Loyalty program"],
+                "pain_points": [
+                    "Product doesn't match description",
+                    "Difficult return process",
+                ],
+                "opportunities": [
+                    "Easy self-service returns",
+                    "Post-purchase care emails",
+                    "Loyalty program",
+                ],
             },
         ],
     },
@@ -129,43 +305,123 @@ JOURNEY_TEMPLATES = {
         "stages": [
             {
                 "name": "Discovery",
-                "actions": ["Finds app in store", "Reads description and reviews", "Views screenshots"],
-                "touchpoints": ["App Store", "Google Play", "Social media", "Word of mouth"],
+                "actions": [
+                    "Finds app in store",
+                    "Reads description and reviews",
+                    "Views screenshots",
+                ],
+                "touchpoints": [
+                    "App Store",
+                    "Google Play",
+                    "Social media",
+                    "Word of mouth",
+                ],
                 "emotions": {"score": 3, "label": "Curious, evaluating quickly"},
-                "pain_points": ["Too many similar apps", "Misleading screenshots", "Bad reviews"],
-                "opportunities": ["App Store optimization", "Video preview", "Respond to reviews"],
+                "pain_points": [
+                    "Too many similar apps",
+                    "Misleading screenshots",
+                    "Bad reviews",
+                ],
+                "opportunities": [
+                    "App Store optimization",
+                    "Video preview",
+                    "Respond to reviews",
+                ],
             },
             {
                 "name": "Install & First Open",
-                "actions": ["Downloads app", "Opens for first time", "Grants permissions", "Views onboarding"],
-                "touchpoints": ["App Store", "System permissions", "Onboarding screens"],
+                "actions": [
+                    "Downloads app",
+                    "Opens for first time",
+                    "Grants permissions",
+                    "Views onboarding",
+                ],
+                "touchpoints": [
+                    "App Store",
+                    "System permissions",
+                    "Onboarding screens",
+                ],
                 "emotions": {"score": 3, "label": "Impatient, wants quick value"},
-                "pain_points": ["Large download size", "Too many permission requests", "Long onboarding"],
-                "opportunities": ["<50MB download", "Progressive permissions", "3-screen onboarding max"],
+                "pain_points": [
+                    "Large download size",
+                    "Too many permission requests",
+                    "Long onboarding",
+                ],
+                "opportunities": [
+                    "<50MB download",
+                    "Progressive permissions",
+                    "3-screen onboarding max",
+                ],
             },
             {
                 "name": "First Value",
-                "actions": ["Completes first core action", "Sees result", "Understands benefit"],
+                "actions": [
+                    "Completes first core action",
+                    "Sees result",
+                    "Understands benefit",
+                ],
                 "touchpoints": ["Core feature", "Success state", "Tutorial overlay"],
                 "emotions": {"score": 4, "label": "Pleasantly surprised or frustrated"},
-                "pain_points": ["Can't find main feature", "First action fails", "No clear path"],
-                "opportunities": ["Guided first action", "Instant gratification moment", "Sample content"],
+                "pain_points": [
+                    "Can't find main feature",
+                    "First action fails",
+                    "No clear path",
+                ],
+                "opportunities": [
+                    "Guided first action",
+                    "Instant gratification moment",
+                    "Sample content",
+                ],
             },
             {
                 "name": "Habit Formation",
-                "actions": ["Returns within 24 hours", "Uses 3+ times per week", "Enables notifications"],
-                "touchpoints": ["Push notifications", "App icon", "Widgets", "Email digest"],
+                "actions": [
+                    "Returns within 24 hours",
+                    "Uses 3+ times per week",
+                    "Enables notifications",
+                ],
+                "touchpoints": [
+                    "Push notifications",
+                    "App icon",
+                    "Widgets",
+                    "Email digest",
+                ],
                 "emotions": {"score": 4, "label": "Building routine"},
-                "pain_points": ["Annoying notifications", "App is slow", "Battery/data concerns"],
-                "opportunities": ["Smart notification timing", "Offline mode", "Streaks or progress tracking"],
+                "pain_points": [
+                    "Annoying notifications",
+                    "App is slow",
+                    "Battery/data concerns",
+                ],
+                "opportunities": [
+                    "Smart notification timing",
+                    "Offline mode",
+                    "Streaks or progress tracking",
+                ],
             },
             {
                 "name": "Power Usage",
-                "actions": ["Discovers advanced features", "Customizes settings", "Shares with others"],
-                "touchpoints": ["Settings", "Share flow", "Advanced features", "In-app community"],
+                "actions": [
+                    "Discovers advanced features",
+                    "Customizes settings",
+                    "Shares with others",
+                ],
+                "touchpoints": [
+                    "Settings",
+                    "Share flow",
+                    "Advanced features",
+                    "In-app community",
+                ],
                 "emotions": {"score": 5, "label": "Invested, advocates"},
-                "pain_points": ["Feature bloat", "Settings are buried", "No social features"],
-                "opportunities": ["Progressive disclosure", "Share rewards", "Community features"],
+                "pain_points": [
+                    "Feature bloat",
+                    "Settings are buried",
+                    "No social features",
+                ],
+                "opportunities": [
+                    "Progressive disclosure",
+                    "Share rewards",
+                    "Community features",
+                ],
             },
         ],
     },
@@ -181,11 +437,13 @@ def calculate_journey_metrics(stages: list[dict]) -> dict:
     for i in range(1, len(emotion_scores)):
         diff = emotion_scores[i] - emotion_scores[i - 1]
         if diff < 0:
-            drops.append({
-                "from_stage": stages[i - 1]["name"],
-                "to_stage": stages[i]["name"],
-                "drop": abs(diff),
-            })
+            drops.append(
+                {
+                    "from_stage": stages[i - 1]["name"],
+                    "to_stage": stages[i]["name"],
+                    "drop": abs(diff),
+                }
+            )
 
     drops.sort(key=lambda x: -x["drop"])
 
@@ -201,8 +459,12 @@ def calculate_journey_metrics(stages: list[dict]) -> dict:
     return {
         "total_stages": len(stages),
         "avg_emotion_score": round(sum(emotion_scores) / len(emotion_scores), 1),
-        "lowest_emotion_stage": stages[emotion_scores.index(min(emotion_scores))]["name"],
-        "highest_emotion_stage": stages[emotion_scores.index(max(emotion_scores))]["name"],
+        "lowest_emotion_stage": stages[emotion_scores.index(min(emotion_scores))][
+            "name"
+        ],
+        "highest_emotion_stage": stages[emotion_scores.index(max(emotion_scores))][
+            "name"
+        ],
         "biggest_drops": drops[:3],
         "total_pain_points": len(all_pain_points),
         "total_opportunities": total_opportunities,
@@ -261,7 +523,9 @@ def format_human_output(journey: dict, metrics: dict) -> str:
     if metrics["biggest_drops"]:
         lines.append("\n  BIGGEST EMOTION DROPS (prioritize these transitions)")
         for drop in metrics["biggest_drops"]:
-            lines.append(f"    {drop['from_stage']} -> {drop['to_stage']} (dropped {drop['drop']} points)")
+            lines.append(
+                f"    {drop['from_stage']} -> {drop['to_stage']} (dropped {drop['drop']} points)"
+            )
 
     return "\n".join(lines)
 
@@ -288,7 +552,12 @@ Available templates: saas, ecommerce, mobile_app
     )
 
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--template", "-t", choices=list(JOURNEY_TEMPLATES.keys()), help="Use pre-built journey template")
+    group.add_argument(
+        "--template",
+        "-t",
+        choices=list(JOURNEY_TEMPLATES.keys()),
+        help="Use pre-built journey template",
+    )
     group.add_argument("--stages", "-s", help="Path to custom stages JSON file")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
 

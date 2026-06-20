@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import httpx
 from dashboard_mvp.config import (
@@ -38,7 +38,7 @@ async def exchange_code_for_tokens(code: str) -> dict:
 
     res_data = response.json()
     expires_in = res_data.get("expires_in", 31536000) # По умолчанию 1 год в секундах
-    expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
+    expires_at = datetime.now(UTC) + timedelta(seconds=expires_in)
 
     return {
         "access_token": res_data["access_token"],
@@ -64,7 +64,7 @@ async def refresh_yandex_token(refresh_token: str) -> dict:
 
     res_data = response.json()
     expires_in = res_data.get("expires_in", 31536000)
-    expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
+    expires_at = datetime.now(UTC) + timedelta(seconds=expires_in)
 
     return {
         "access_token": res_data["access_token"],

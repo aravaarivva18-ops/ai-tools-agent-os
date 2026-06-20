@@ -217,32 +217,44 @@ def analyze_answers(answers: dict) -> dict:
                 total_checks += 1
                 if cp.get("pass") is True:
                     passed_checks += 1
-                    passes.append({
-                        "heuristic_id": heuristic["id"],
-                        "heuristic_name": heuristic["name"],
-                        "checkpoint": cp["check"],
-                    })
+                    passes.append(
+                        {
+                            "heuristic_id": heuristic["id"],
+                            "heuristic_name": heuristic["name"],
+                            "checkpoint": cp["check"],
+                        }
+                    )
                 elif cp.get("pass") is False:
                     severity = cp.get("severity", 1)
-                    issues.append({
-                        "heuristic_id": heuristic["id"],
-                        "heuristic_name": heuristic["name"],
-                        "checkpoint": cp["check"],
-                        "severity": severity,
-                        "severity_label": SEVERITY_LEVELS.get(severity, SEVERITY_LEVELS[1])["label"],
-                        "action": SEVERITY_LEVELS.get(severity, SEVERITY_LEVELS[1])["action"],
-                        "notes": cp.get("notes", ""),
-                    })
+                    issues.append(
+                        {
+                            "heuristic_id": heuristic["id"],
+                            "heuristic_name": heuristic["name"],
+                            "checkpoint": cp["check"],
+                            "severity": severity,
+                            "severity_label": SEVERITY_LEVELS.get(
+                                severity, SEVERITY_LEVELS[1]
+                            )["label"],
+                            "action": SEVERITY_LEVELS.get(severity, SEVERITY_LEVELS[1])[
+                                "action"
+                            ],
+                            "notes": cp.get("notes", ""),
+                        }
+                    )
 
     # Sort issues by severity (highest first)
     issues.sort(key=lambda x: -x["severity"])
 
     # Calculate scores
-    compliance_score = round((passed_checks / total_checks) * 100, 1) if total_checks > 0 else 0
+    compliance_score = (
+        round((passed_checks / total_checks) * 100, 1) if total_checks > 0 else 0
+    )
 
     severity_counts = {v["label"]: 0 for v in SEVERITY_LEVELS.values()}
     for issue in issues:
-        severity_counts[issue["severity_label"]] = severity_counts.get(issue["severity_label"], 0) + 1
+        severity_counts[issue["severity_label"]] = (
+            severity_counts.get(issue["severity_label"], 0) + 1
+        )
 
     # Overall grade
     if compliance_score >= 90 and severity_counts.get("Critical", 0) == 0:
@@ -277,11 +289,17 @@ def format_checklist_output(checklist: dict) -> str:
     lines.append("=" * 60)
     lines.append("DESIGN CRITIQUE CHECKLIST")
     lines.append("=" * 60)
-    lines.append("\nFill in pass (true/false), severity (0-3), and notes for each checkpoint.")
-    lines.append("Save as JSON and run: python design_critique.py --answers answers.json\n")
+    lines.append(
+        "\nFill in pass (true/false), severity (0-3), and notes for each checkpoint."
+    )
+    lines.append(
+        "Save as JSON and run: python design_critique.py --answers answers.json\n"
+    )
 
     for section in ["heuristics", "accessibility"]:
-        section_label = "NIELSEN'S 10 HEURISTICS" if section == "heuristics" else "ACCESSIBILITY"
+        section_label = (
+            "NIELSEN'S 10 HEURISTICS" if section == "heuristics" else "ACCESSIBILITY"
+        )
         lines.append(f"\n  {section_label}")
         lines.append("  " + "-" * 50)
 
@@ -302,8 +320,12 @@ def format_report_output(report: dict) -> str:
     lines.append("DESIGN CRITIQUE REPORT")
     lines.append("=" * 60)
 
-    lines.append(f"\n  COMPLIANCE SCORE: {s['compliance_score']}%  (Grade: {s['grade']})")
-    lines.append(f"  Checks: {s['passed']} passed / {s['failed']} failed / {s['total_checks']} total")
+    lines.append(
+        f"\n  COMPLIANCE SCORE: {s['compliance_score']}%  (Grade: {s['grade']})"
+    )
+    lines.append(
+        f"  Checks: {s['passed']} passed / {s['failed']} failed / {s['total_checks']} total"
+    )
 
     lines.append("\n  SEVERITY DISTRIBUTION")
     for label, count in s["severity_distribution"].items():
@@ -314,8 +336,12 @@ def format_report_output(report: dict) -> str:
         lines.append("\n  TOP PRIORITIES (fix first)")
         lines.append("  " + "-" * 50)
         for i, issue in enumerate(report["top_priorities"], 1):
-            lines.append(f"  {i}. [{issue['severity_label'].upper()}] {issue['checkpoint']}")
-            lines.append(f"     Heuristic: {issue['heuristic_id']} - {issue['heuristic_name']}")
+            lines.append(
+                f"  {i}. [{issue['severity_label'].upper()}] {issue['checkpoint']}"
+            )
+            lines.append(
+                f"     Heuristic: {issue['heuristic_id']} - {issue['heuristic_name']}"
+            )
             lines.append(f"     Action: {issue['action']}")
             if issue["notes"]:
                 lines.append(f"     Notes: {issue['notes']}")
@@ -356,7 +382,11 @@ Examples:
     )
 
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--checklist", action="store_true", help="Generate empty checklist for evaluation")
+    group.add_argument(
+        "--checklist",
+        action="store_true",
+        help="Generate empty checklist for evaluation",
+    )
     group.add_argument("--answers", help="Path to completed checklist JSON file")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
 

@@ -17,26 +17,21 @@ exclude = [
     "__pypackages__",
     "build",
     "dist",
+    ".agent",
+    ".gemini",
 ]
+
 
 [lint]
 # Enable standard Pyflakes (F), Pycodestyle (E, W), Isort (I), and Pydantic (PD) checks
 select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "PT", "ARG", "PD", "RUF", "S", "D", "C90"]
 ignore = [
     "E501",    # Line too long (managed by ruff format)
-    "S310",    # Audit URL open for urllib (will be replaced by requests/curl_cffi/selectolax)
-    "S110",    # try-except-pass
-    "S112",    # try-except-continue
     "B007",    # Unused loop control variable
-    "F401",    # Unused imports in legacy files
     "RUF013",  # Implicit Optional
     "C403",    # Unnecessary list comprehension
-    "E741",    # Ambiguous variable name
-    "F841",    # Unused local variables in legacy files
-    "E722",    # Bare except in legacy files
-    "ARG001",  # Unused arguments in legacy files
     "B905",    # zip() strict parameter
-    "D1",      # Ignore missing docstrings entirely, only check format of existing docstrings
+    "D1",      # Missing docstrings (enforced only for new code via per-file-ignores)
     "D205",    # 1 blank line required between summary line and description
     "D209",    # Multi-line docstring closing quotes should be on a separate line
     "D212",    # Multi-line docstring summary should start at the first line
@@ -45,6 +40,7 @@ ignore = [
     "RUF002",  # Docstring contains ambiguous Cyrillic characters
     "RUF003",  # Comment contains ambiguous Cyrillic characters
     "S311",    # Standard pseudo-random generators (used for simple text humanizer variations, not crypto)
+    "S310",    # Audit URL open for urllib (used across marketing/sales scripts)
     "S603",    # subprocess check (used for executing test processes locally)
     "S607",    # subprocess partial path (used for pytest execution in tests)
 ]
@@ -57,14 +53,46 @@ unfixable = []
 convention = "google"
 
 [lint.mccabe]
-max-complexity = 35
+max-complexity = 20
 
 [lint.per-file-ignores]
-"**/tests/*" = ["S101"]
-"**/test_*.py" = ["S101"]
+"**/tests/*" = ["S101", "S108", "ARG001", "ARG002"]
+"**/test_*.py" = ["S101", "S108", "ARG001", "ARG002"]
+# Legacy files: temporary ignores for known issues (to be cleaned up)
+"ai-legal/generate_sample_contract.py" = ["F841"]
+"ai-marketing/scripts/analyze_page.py" = ["C901"]
+"ai-marketing/scripts/competitor_scanner.py" = ["C901", "F841"]
+"ai-sales/scripts/analyze_prospect.py" = ["C901"]
+"geo-seo/scripts/fetch_page.py" = ["C901"]
+"geo-seo/scripts/citability_scorer.py" = ["C901", "E741"]
+"geo-seo/scripts/llmstxt_generator.py" = ["C901", "E741"]
+"geo-seo/scripts/crm_dashboard.py" = ["E722", "F401", "F841", "ARG001"]
+"tools/bitrix_healer.py" = ["E722", "F401", "F841", "ARG001"]
+"tools/lead_swarm.py" = ["E722", "F401", "F841", "ARG001"]
+"tools/llm_wiki.py" = ["E722", "F401", "F841", "ARG001"]
+"tools/diff_applier.py" = ["E741"]
+"tools/dashboard_mvp/*.py" = ["C408", "E741", "S105", "S106", "B904", "S110", "F841", "W293"]
+"**/dashboard_mvp/*.py" = ["C408", "E741", "S105", "S106", "B904", "S110", "F841", "W293"]
+"**/dashboard_mvp/tests/*.py" = ["S101", "S108", "ARG001", "ARG002", "S105", "S106"]
+"tools/security/security_scanner.py" = ["C901"]
 
 [format]
 quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "lf"
+
+[lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.params.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.File",
+    "fastapi.Form",
+    "fastapi.Security",
+    "fastapi.Depends",
+]

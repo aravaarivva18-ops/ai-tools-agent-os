@@ -7,10 +7,8 @@ Provides connection capability to a running Obsidian instance with Local REST AP
 import argparse
 import json
 import ssl
-import sys
 import urllib.request
 from typing import Any
-
 
 
 class ObsidianCLI:
@@ -30,10 +28,13 @@ class ObsidianCLI:
         protocol = "https" if use_https else "http"
         self.base_url = f"{protocol}://{host}:{port}"
 
-        # Bypass SSL verification if using self-signed cert on localhost
-        self.ctx = ssl.create_default_context()
-        self.ctx.check_hostname = False
-        self.ctx.verify_mode = ssl.CERT_NONE
+        self.ctx: ssl.SSLContext | None = None
+        # Bypass SSL verification only if using self-signed cert on localhost
+        if self.use_https:
+            self.ctx = ssl.create_default_context()
+            if self.host in ("127.0.0.1", "localhost"):
+                self.ctx.check_hostname = False
+                self.ctx.verify_mode = ssl.CERT_NONE
 
     def _request(
         self,
@@ -52,8 +53,13 @@ class ObsidianCLI:
 
         req = urllib.request.Request(url, data=body, headers=headers, method=method)
         try:
-            with urllib.request.urlopen(req, context=self.ctx) as response:  # nosec B310
+            # Pass SSL context only if initialized (HTTPS mode)
+            if self.ctx is not None:
+                response_ctx = urllib.request.urlopen(req, context=self.ctx)
+            else:
+                response_ctx = urllib.request.urlopen(req)
 
+            with response_ctx as response:  # nosec B310
                 return response.status, response.read()
         except urllib.error.HTTPError as e:
             return e.code, e.read()
@@ -77,9 +83,7 @@ class ObsidianCLI:
     def append_daily_note(self, content: str) -> bool:
         """Appends line or entry to the active daily note."""
         # Endpoint for daily note append
-        status, _ = self._request(
-            "POST", "/periodic/daily/", content.encode("utf-8")
-        )
+        status, _ = self._request("POST", "/periodic/daily/", content.encode("utf-8"))
         return status in (200, 204)
 
     def search(self, query: str) -> list[dict[str, Any]]:
@@ -115,18 +119,24 @@ def main() -> None:
     parser.add_argument("--token", required=True, help="Authorization API Token")
     parser.add_argument("--host", default="127.0.0.1", help="API server address")
     parser.add_argument("--port", type=int, default=27124, help="API server port")
-    parser.add_argument("--https", action="store_true", help="Use HTTPS instead of HTTP")
+    parser.add_argument(
+        "--https", action="store_true", help="Use HTTPS instead of HTTP"
+    )
 
     subparsers = parser.add_subparsers(dest="command", help="Obsidian API operations")
 
     create_parser = subparsers.add_parser("create", help="Create/replace a note")
-    create_parser.add_argument("path", help="Relative path inside the vault (e.g. Note.md)")
+    create_parser.add_argument(
+        "path", help="Relative path inside the vault (e.g. Note.md)"
+    )
     create_parser.add_argument("content", help="Markdown body text")
 
     get_parser = subparsers.add_parser("get", help="Fetch note contents")
     get_parser.add_argument("path", help="Relative path to note")
 
-    append_parser = subparsers.add_parser("append-daily", help="Append content to Daily Note")
+    append_parser = subparsers.add_parser(
+        "append-daily", help="Append content to Daily Note"
+    )
     append_parser.add_argument("content", help="Content to append")
 
     search_parser = subparsers.add_parser("search", help="Search notes in vault")
@@ -135,7 +145,9 @@ def main() -> None:
     subparsers.add_parser("tasks", help="Retrieve todo tasks")
 
     args = parser.parse_args()
-    cli = ObsidianCLI(token=args.token, host=args.host, port=args.port, use_https=args.https)
+    cli = ObsidianCLI(
+        token=args.token, host=args.host, port=args.port, use_https=args.https
+    )
 
     if args.command == "create":
         if cli.create_note(args.path, args.content):

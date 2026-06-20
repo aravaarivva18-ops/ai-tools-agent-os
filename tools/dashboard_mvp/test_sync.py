@@ -4,12 +4,13 @@ from datetime import datetime
 import pytest
 from dashboard_mvp.db import Base
 from dashboard_mvp.models import (
-    ChangeLog,
+    Changelog,
     Client,
-    DailyStat,
     Integration,
-    KPIPlan,
+    MarketingFact,
+    MarketingPlan,
     Project,
+    Source,
     SourceMapping,
 )
 from dashboard_mvp.sync import sync_excel_data, sync_yandex_data
@@ -35,6 +36,11 @@ def run_around_tests():
 
     # Инициализация тестовой структуры
     db = TestingSessionLocal()
+
+    # Создаем дефолтный источник yandex
+    yandex_source = Source(id=1, name="yandex")
+    db.add(yandex_source)
+
     client = Client(id=1, name="Парковка Уфа", status="active")
     db.add(client)
 
@@ -78,19 +84,19 @@ async def test_sync_yandex_mock_data():
     assert result is True
 
     # Проверяем, что в БД записались данные
-    stats = db.query(DailyStat).filter(DailyStat.project_id == 1).all()
+    stats = db.query(MarketingFact).filter(MarketingFact.project_id == 1).all()
     assert len(stats) == 10
 
     # Проверим конкретный день
-    first_day = db.query(DailyStat).filter(
-        DailyStat.project_id == 1,
-        DailyStat.date == datetime.strptime("2026-06-01", "%Y-%m-%d").date()
+    first_day = db.query(MarketingFact).filter(
+        MarketingFact.project_id == 1,
+        MarketingFact.date == datetime.strptime("2026-06-01", "%Y-%m-%d").date()
     ).first()
 
     assert first_day is not None
     assert first_day.impressions > 0
     assert first_day.clicks > 0
-    assert first_day.spent > 0
+    assert first_day.spend > 0
     assert first_day.ctr > 0
     assert first_day.cpc > 0
     db.close()
@@ -104,15 +110,15 @@ def test_sync_excel_data():
     assert result is True
 
     # Проверяем импортированные планы KPI
-    plans = db.query(KPIPlan).filter(KPIPlan.project_id == 1).all()
+    plans = db.query(MarketingPlan).filter(MarketingPlan.project_id == 1).all()
     assert len(plans) > 0
-    plan_june = db.query(KPIPlan).filter(KPIPlan.project_id == 1, KPIPlan.month == "2026-06").first()
+    plan_june = db.query(MarketingPlan).filter(MarketingPlan.project_id == 1, MarketingPlan.month == "2026-06").first()
     assert plan_june is not None
     assert plan_june.budget_plan == 40000.0
     assert plan_june.leads_plan == 100
     assert plan_june.cpl_plan == 400.0
 
     # Проверяем импортированные логи изменений
-    logs = db.query(ChangeLog).filter(ChangeLog.project_id == 1).all()
+    logs = db.query(Changelog).filter(Changelog.project_id == 1).all()
     assert len(logs) > 0
     db.close()

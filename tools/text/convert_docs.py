@@ -3,7 +3,6 @@
 import argparse
 import sys
 from pathlib import Path
-from typing import Optional
 
 
 def convert_document(input_path: Path, output_path: Path | None = None) -> None:
@@ -42,7 +41,7 @@ def convert_document(input_path: Path, output_path: Path | None = None) -> None:
             elif suffix == ".docx":
                 import docx
 
-                doc = docx.Document(input_path)
+                doc = docx.Document(str(input_path))
                 paras = [p.text for p in doc.paragraphs]
                 markdown_text = "\n\n".join(paras)
             elif suffix in (".xlsx", ".xls"):

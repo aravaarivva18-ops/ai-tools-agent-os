@@ -1,6 +1,5 @@
 """Unit tests for tools/skeptic.py."""
 
-import json
 import os
 import sys
 from pathlib import Path
@@ -9,7 +8,7 @@ from unittest.mock import patch
 # Ensure tools/ is importable
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from tools.skeptic import analyze_target
+from tools.scraping.skeptic import analyze_target
 
 
 def test_analyze_target_mock_env(tmp_path):

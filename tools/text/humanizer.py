@@ -1,8 +1,6 @@
 import logging
-import os
 import random
 import re
-from typing import Optional
 
 # Настройка логирования
 logger = logging.getLogger("humanizer")

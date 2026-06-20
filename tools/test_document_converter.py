@@ -9,7 +9,7 @@ import pytest
 # Ensure tools/ is importable
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from document_converter import (
+from tools.text.document_converter import (
     convert_docx_to_markdown,
     convert_pdf_to_markdown,
     convert_pptx_to_markdown,
@@ -168,7 +168,7 @@ def test_convert_pptx(mock_presentation):
 def test_convert_to_markdown_routing():
     """Verify extension routing throws on unknown files."""
     with patch(
-        "document_converter.convert_pdf_to_markdown", return_value="PDF"
+        "tools.text.document_converter.convert_pdf_to_markdown", return_value="PDF"
     ) as mock_pdf:
         assert convert_to_markdown("test.pdf") == "PDF"
         mock_pdf.assert_called_once_with("test.pdf")

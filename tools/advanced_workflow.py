@@ -11,7 +11,9 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
-def run_workflow(steps: list[Callable[[dict[str, Any]], bool]], context: dict[str, Any]) -> bool:
+def run_workflow(
+    steps: list[Callable[[dict[str, Any]], bool]], context: dict[str, Any]
+) -> bool:
     """
     Executes a list of step functions sequentially passing a shared context.
     Aborts and returns False on first step failure or uncaught exception.
@@ -27,5 +29,5 @@ def run_workflow(steps: list[Callable[[dict[str, Any]], bool]], context: dict[st
         except Exception as e:
             logger.error("Exception in step %s: %s", step_name, e)
             return False
-            
+
     return True

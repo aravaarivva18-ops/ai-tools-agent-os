@@ -1,8 +1,6 @@
 import csv
-import json
 import os
 import subprocess  # nosec B404
-from typing import Any, Optional
 
 
 class UUPMAdapter:
@@ -10,9 +8,12 @@ class UUPMAdapter:
     Adapter for UI/UX Pro Max design intelligence system.
     Interfaces with uipro-cli assets installed under .agent/skills/ui-ux-pro-max/data/
     """
+
     def __init__(self, workspace_path: str = "/Users/rus/ai-tools"):
         self.workspace_path = workspace_path
-        self.skills_path = os.path.join(workspace_path, "tools", ".agent", "skills", "ui-ux-pro-max")
+        self.skills_path = os.path.join(
+            workspace_path, "tools", ".agent", "skills", "ui-ux-pro-max"
+        )
         self.data_path = os.path.join(self.skills_path, "data")
 
     def init_environment(self, force: bool = False) -> bool:
@@ -27,9 +28,12 @@ class UUPMAdapter:
                 cwd=os.path.join(self.workspace_path, "tools"),
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
-            return "success" in result.stdout.lower() or "installed successfully" in result.stdout.lower()
+            return (
+                "success" in result.stdout.lower()
+                or "installed successfully" in result.stdout.lower()
+            )
         except subprocess.SubprocessError:
             return False
 
@@ -58,8 +62,10 @@ class UUPMAdapter:
         """Retrieves typography pairings for fonts and headings."""
         pairings = self.load_csv_data("typography.csv")
         for tp in pairings:
-            if (category_or_name.lower() in tp.get("Font Pairing Name", "").lower() or
-                category_or_name.lower() in tp.get("Category", "").lower()):
+            if (
+                category_or_name.lower() in tp.get("Font Pairing Name", "").lower()
+                or category_or_name.lower() in tp.get("Category", "").lower()
+            ):
                 return tp
         return None
 
@@ -73,7 +79,9 @@ class UUPMAdapter:
                 matches.append(g)
         return matches
 
-    def generate_typst_design_block(self, product_type: str, typography_name: str) -> str:
+    def generate_typst_design_block(
+        self, product_type: str, typography_name: str
+    ) -> str:
         """Generates Typst design block variables code for integration with Typst reports."""
         palette = self.get_color_palette(product_type)
         typo = self.get_typography_pairing(typography_name)
@@ -81,7 +89,9 @@ class UUPMAdapter:
         primary = palette.get("Primary (Hex)", "#000000") if palette else "#1a365d"
         secondary = palette.get("Secondary (Hex)", "#000000") if palette else "#2c5282"
         cta = palette.get("CTA (Hex)", "#000000") if palette else "#f97316"
-        background = palette.get("Background (Hex)", "#ffffff") if palette else "#f7fafc"
+        background = (
+            palette.get("Background (Hex)", "#ffffff") if palette else "#f7fafc"
+        )
         text_val = palette.get("Text (Hex)", "#000000") if palette else "#2d3748"
         border = palette.get("Border (Hex)", "#e2e8f0") if palette else "#e2e8f0"
 

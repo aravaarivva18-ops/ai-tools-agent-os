@@ -1,8 +1,6 @@
 import os
 import sys
 
-import pytest
-
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from lead_swarm import Lead, LeadAggregator, LeadRouter, LeadScorer
@@ -30,7 +28,9 @@ def test_lead_creation():
 
 def test_lead_scorer_junk_detection():
     """Test that low budget leads and leads with stop words are qualified as junk."""
-    scorer = LeadScorer(min_budget=5000.0, stop_words=["диплом", "курсовая", "бесплатно"])
+    scorer = LeadScorer(
+        min_budget=5000.0, stop_words=["диплом", "курсовая", "бесплатно"]
+    )
 
     # Too low budget
     cheap_lead = Lead(

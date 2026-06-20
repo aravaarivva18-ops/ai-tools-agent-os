@@ -157,10 +157,12 @@ def load_sus_csv(filepath: str) -> list[dict]:
             responses = []
             for i in range(1, 11):
                 responses.append(int(row.get(f"q{i}", 3)))
-            rows.append({
-                "participant": row.get("participant", f"P{len(rows)+1}"),
-                "responses": responses,
-            })
+            rows.append(
+                {
+                    "participant": row.get("participant", f"P{len(rows) + 1}"),
+                    "responses": responses,
+                }
+            )
     return rows
 
 
@@ -173,13 +175,16 @@ def load_task_csv(filepath: str) -> list[dict]:
     with open(filepath) as f:
         reader = csv.DictReader(f)
         for row in reader:
-            rows.append({
-                "participant": row.get("participant", "Unknown"),
-                "task": row.get("task", "Unknown"),
-                "completed": row.get("completed", "true").lower() in ("true", "1", "yes"),
-                "time_seconds": float(row.get("time_seconds", 0)),
-                "errors": int(row.get("errors", 0)),
-            })
+            rows.append(
+                {
+                    "participant": row.get("participant", "Unknown"),
+                    "task": row.get("task", "Unknown"),
+                    "completed": row.get("completed", "true").lower()
+                    in ("true", "1", "yes"),
+                    "time_seconds": float(row.get("time_seconds", 0)),
+                    "errors": int(row.get("errors", 0)),
+                }
+            )
     return rows
 
 
@@ -242,7 +247,9 @@ def format_sus_report(participants: list[dict], aggregate: dict) -> str:
     lines.append(f"  Benchmark:       {interp['benchmark']} (industry average)")
     lines.append(f"  Participants:    {aggregate['count']}")
     lines.append(f"  Std Deviation:   {aggregate['std_dev']}")
-    lines.append(f"  Range:           {aggregate['min_score']} - {aggregate['max_score']}")
+    lines.append(
+        f"  Range:           {aggregate['min_score']} - {aggregate['max_score']}"
+    )
 
     # Score visualization
     lines.append("\n  SCORE SCALE")
@@ -257,19 +264,25 @@ def format_sus_report(participants: list[dict], aggregate: dict) -> str:
     # Per-participant
     lines.append("\n  INDIVIDUAL SCORES")
     lines.append(f"  {'Participant':<15} {'Score':>7} {'Grade':>6}")
-    lines.append(f"  {'-'*15} {'-'*7} {'-'*6}")
+    lines.append(f"  {'-' * 15} {'-' * 7} {'-' * 6}")
     for p in participants:
-        lines.append(f"  {p['participant']:<15} {p['score']:>7} {p['interpretation']['grade']:>6}")
+        lines.append(
+            f"  {p['participant']:<15} {p['score']:>7} {p['interpretation']['grade']:>6}"
+        )
 
     # Question analysis
     if participants:
         lines.append("\n  QUESTION ANALYSIS (avg per question)")
         lines.append(f"  {'#':<4} {'Avg':>5} {'Question'}")
-        lines.append(f"  {'-'*4} {'-'*5} {'-'*50}")
+        lines.append(f"  {'-' * 4} {'-' * 5} {'-' * 50}")
         for qi in range(10):
-            avg_q = round(sum(p["responses"][qi] for p in participants) / len(participants), 1)
+            avg_q = round(
+                sum(p["responses"][qi] for p in participants) / len(participants), 1
+            )
             direction = "(+)" if (qi + 1) % 2 == 1 else "(-)"
-            lines.append(f"  Q{qi+1:<3} {avg_q:>5} {direction} {SUS_QUESTIONS[qi][:50]}")
+            lines.append(
+                f"  Q{qi + 1:<3} {avg_q:>5} {direction} {SUS_QUESTIONS[qi][:50]}"
+            )
 
     return "\n".join(lines)
 
@@ -281,8 +294,10 @@ def format_task_report(task_results: dict) -> str:
     lines.append("TASK PERFORMANCE REPORT")
     lines.append("=" * 60)
 
-    lines.append(f"\n  {'Task':<25} {'Completion':>12} {'Avg Time':>10} {'Avg Errors':>11} {'Severity':<10}")
-    lines.append(f"  {'-'*25} {'-'*12} {'-'*10} {'-'*11} {'-'*10}")
+    lines.append(
+        f"\n  {'Task':<25} {'Completion':>12} {'Avg Time':>10} {'Avg Errors':>11} {'Severity':<10}"
+    )
+    lines.append(f"  {'-' * 25} {'-' * 12} {'-' * 10} {'-' * 11} {'-' * 10}")
 
     for task_name, metrics in task_results.items():
         lines.append(
@@ -318,8 +333,13 @@ Examples:
     )
 
     parser.add_argument("action", nargs="?", help='"sample" to create sample files')
-    parser.add_argument("--sus-responses", help="CSV with SUS responses (participant, q1-q10)")
-    parser.add_argument("--task-data", help="CSV with task data (participant, task, completed, time_seconds, errors)")
+    parser.add_argument(
+        "--sus-responses", help="CSV with SUS responses (participant, q1-q10)"
+    )
+    parser.add_argument(
+        "--task-data",
+        help="CSV with task data (participant, task, completed, time_seconds, errors)",
+    )
     parser.add_argument("--json", action="store_true", help="Output as JSON")
 
     args = parser.parse_args()
@@ -330,7 +350,9 @@ Examples:
 
     if not args.sus_responses and not args.task_data:
         parser.print_help()
-        print("\nError: Provide --sus-responses and/or --task-data, or use 'sample' to create test files")
+        print(
+            "\nError: Provide --sus-responses and/or --task-data, or use 'sample' to create test files"
+        )
         sys.exit(1)
 
     output = {}
@@ -340,12 +362,14 @@ Examples:
         participants = []
         for p in raw:
             score = calculate_sus_score(p["responses"])
-            participants.append({
-                "participant": p["participant"],
-                "responses": p["responses"],
-                "score": score,
-                "interpretation": interpret_sus_score(score),
-            })
+            participants.append(
+                {
+                    "participant": p["participant"],
+                    "responses": p["responses"],
+                    "score": score,
+                    "interpretation": interpret_sus_score(score),
+                }
+            )
 
         scores = [p["score"] for p in participants]
         mean = round(sum(scores) / len(scores), 1)

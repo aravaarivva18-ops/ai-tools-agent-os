@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 # Ensure tools/ is importable
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from wb_parser import WildberriesParser
+from tools.scraping.wb_parser import WildberriesParser
 
 
 @patch("curl_cffi.requests.get")

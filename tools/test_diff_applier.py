@@ -1,12 +1,11 @@
 import os
 import sys
-import tempfile
 import unittest
 
 # Добавляем текущую директорию scratch в path, чтобы импортировать тестируемый модуль
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from diff_applier import apply_blocks, match_fuzzy, parse_blocks
+from diff_applier import apply_blocks, parse_blocks
 
 
 class TestDiffApplier(unittest.TestCase):

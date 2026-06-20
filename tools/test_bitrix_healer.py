@@ -31,6 +31,7 @@ EventManager::getInstance()->addEventHandler("main", "OnPageStart", function() {
     # Import should remain as is
     assert "use Bitrix\\Main\\EventManager;" in healed_content
 
+
 def test_heal_file_duplicate_imports(tmp_path):
     # Setup test file with duplicate EventManager imports
     test_php = tmp_path / "init.php"
@@ -51,6 +52,7 @@ EventManager::getInstance();
     healed_content = test_php.read_text(encoding="utf-8")
     assert "// use Bitrix\\Main\\EventManager as EventManager;" in healed_content
     assert "\\Bitrix\\Main\\EventManager::getInstance();" in healed_content
+
 
 def test_heal_file_non_existent():
     with pytest.raises(FileNotFoundError):

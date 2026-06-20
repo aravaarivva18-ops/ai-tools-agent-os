@@ -7,7 +7,6 @@ the absolute virtual environment path of Python.
 import os
 import subprocess  # nosec B404
 import sys
-from typing import Optional
 
 
 def get_verified_python_path() -> str:

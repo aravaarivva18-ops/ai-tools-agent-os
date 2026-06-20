@@ -1,10 +1,12 @@
 """Wildberries product parser. Extracts product details, pricing, stock and reviews using public API."""
 
-import json
+import logging
 from typing import Any
 from urllib.parse import urlencode
 
 from curl_cffi import requests
+
+logger = logging.getLogger(__name__)
 
 
 class WildberriesParser:
@@ -39,7 +41,8 @@ class WildberriesParser:
                 if products:
                     return products[0]
             return None
-        except Exception:
+        except Exception as e:
+            logger.debug("WB product fetch failed for article %s: %s", article, e)
             return None
 
     def parse_product(self, article: int | str) -> dict[str, Any]:

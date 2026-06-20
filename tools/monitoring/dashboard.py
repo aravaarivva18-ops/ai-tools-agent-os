@@ -7,7 +7,7 @@ Provides real-time monitoring of web crawling, SEO scoring, and PDF report gener
 from datetime import datetime
 
 from textual.app import App, ComposeResult
-from textual.containers import Grid, Horizontal, Vertical
+from textual.containers import Grid, Vertical
 from textual.widgets import DataTable, Footer, Header, Static
 
 

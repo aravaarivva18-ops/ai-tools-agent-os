@@ -1,13 +1,14 @@
-import json
 from unittest.mock import MagicMock, patch
 
 import pytest
-from obsidian_cli import ObsidianCLI
+
+from tools.obsidian.obsidian_cli import ObsidianCLI
 
 
 @pytest.fixture
 def cli():
     import os
+
     mock_token = os.getenv("OBSIDIAN_TEST_TOKEN", "mocked-token")
     return ObsidianCLI(token=mock_token, host="127.0.0.1", port=27124, use_https=False)
 
@@ -32,6 +33,7 @@ def test_create_note_success(mock_urlopen, cli):
     assert req.headers.get("Content-type") == "text/markdown"
     assert req.data == b"Note Content"
 
+
 @patch("urllib.request.urlopen")
 def test_get_note_success(mock_urlopen, cli):
     """Test getting note content."""
@@ -42,6 +44,7 @@ def test_get_note_success(mock_urlopen, cli):
 
     content = cli.get_note("test.md")
     assert content == "Hello Obsidian"
+
 
 @patch("urllib.request.urlopen")
 def test_append_daily_note_success(mock_urlopen, cli):
@@ -72,12 +75,15 @@ def test_search_notes(mock_urlopen, cli):
     assert len(results) == 1
     assert results[0]["path"] == "target.md"
 
+
 @patch("urllib.request.urlopen")
 def test_get_tasks(mock_urlopen, cli):
     """Test retrieving tasks from Vault."""
     mock_response = MagicMock()
     mock_response.status = 200
-    mock_response.read.return_value = b'{"tasks": [{"task": "Buy milk", "status": "todo"}]}'
+    mock_response.read.return_value = (
+        b'{"tasks": [{"task": "Buy milk", "status": "todo"}]}'
+    )
     mock_urlopen.return_value.__enter__.return_value = mock_response
 
     tasks = cli.get_tasks()

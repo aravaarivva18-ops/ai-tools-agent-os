@@ -1,7 +1,6 @@
 """Document Converter module for transforming PDF, DOCX, XLSX, PPTX to Markdown."""
 
 import os
-from typing import Any
 
 import docx
 import openpyxl
@@ -12,7 +11,8 @@ import pypdf
 def convert_pdf_to_markdown(filepath: str | os.PathLike[str]) -> str:
     """Extracts text from a PDF file and formats it as Markdown."""
     markdown_lines = []
-    reader = pypdf.PdfReader(filepath)
+    # Convert PathLike to string for pypdf
+    reader = pypdf.PdfReader(str(filepath))
     total_pages = len(reader.pages)
     for i, page in enumerate(reader.pages):
         text = page.extract_text() or ""
@@ -24,19 +24,21 @@ def convert_pdf_to_markdown(filepath: str | os.PathLike[str]) -> str:
 
 def convert_docx_to_markdown(filepath: str | os.PathLike[str]) -> str:
     """Extracts text, headers, and tables from a DOCX file into Markdown."""
-    doc = docx.Document(filepath)
+    from docx.text.paragraph import Paragraph
+
+    doc = docx.Document(str(filepath))
     markdown_lines = []
 
     for element in doc.element.body:
         # Check if element is a paragraph
         if element.tag.endswith("p"):
-            p = docx.text.paragraph.Paragraph(element, doc)
+            p = Paragraph(element, doc)
             text = p.text.strip()
             if not text:
                 continue
 
             # Determine paragraph style / heading level
-            style_name = p.style.name.lower()
+            style_name = (p.style.name or "").lower() if p.style else ""
             if "heading 1" in style_name:
                 markdown_lines.append(f"\n# {text}\n")
             elif "heading 2" in style_name:
@@ -55,7 +57,7 @@ def convert_docx_to_markdown(filepath: str | os.PathLike[str]) -> str:
             for i, row in enumerate(table.rows):
                 row_cells = [cell.text.replace("\n", " ").strip() for cell in row.cells]
                 # Filter out adjacent duplicate cells (docx merged cells artifact)
-                cleaned_cells = []
+                cleaned_cells: list[str] = []
                 for cell in row_cells:
                     if not cleaned_cells or cleaned_cells[-1] != cell:
                         cleaned_cells.append(cell)
@@ -112,7 +114,7 @@ def convert_xlsx_to_markdown(filepath: str | os.PathLike[str]) -> str:
 
 def convert_pptx_to_markdown(filepath: str | os.PathLike[str]) -> str:
     """Extracts text content and structures from PowerPoint slides into Markdown."""
-    prs = pptx.Presentation(filepath)
+    prs = pptx.Presentation(str(filepath))
     markdown_lines = []
 
     for i, slide in enumerate(prs.slides):

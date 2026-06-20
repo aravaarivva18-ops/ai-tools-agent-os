@@ -5,9 +5,10 @@ import pytest
 from dashboard_mvp.db import Base, get_db
 from dashboard_mvp.main import app
 from dashboard_mvp.models import (
-    DailyStat,
     Integration,
-    KPIPlan,
+    MarketingFact,
+    MarketingPlan,
+    Source,
     User,
 )
 from dashboard_mvp.security_utils import get_password_hash
@@ -44,7 +45,7 @@ def run_around_tests():
     # Создаем таблицы
     Base.metadata.create_all(bind=engine)
 
-    # Добавляем тестового администратора
+    # Добавляем тестового администратора и дефолтный источник yandex
     db = TestingSessionLocal()
     admin = User(
         email="test_admin@targetmedia.ru",
@@ -52,6 +53,10 @@ def run_around_tests():
         role="admin"
     )
     db.add(admin)
+
+    yandex_source = Source(name="yandex")
+    db.add(yandex_source)
+
     db.commit()
     db.close()
 
@@ -65,6 +70,7 @@ def run_around_tests():
         except PermissionError:
             pass
 
+# Пересоздаем клиент для тестов
 client = TestClient(app)
 
 def test_read_root():
@@ -130,13 +136,15 @@ def test_get_project_detail():
 
     # Добавим одну запись статистики напрямую в бд для теста
     db = TestingSessionLocal()
-    stat = DailyStat(
+    yandex_source = db.query(Source).filter(Source.name == "yandex").first()
+    stat = MarketingFact(
         project_id=1,
+        source_id=yandex_source.id,
         date=date.today(),
         impressions=1000,
         clicks=50,
-        spent=1000.0,
-        leads=5,
+        spend=1000.0,
+        leads_primary=5,
         ctr=5.0,
         cpc=20.0,
         cpl=200.0
@@ -145,7 +153,7 @@ def test_get_project_detail():
 
     # Добавим план
     current_month = date.today().strftime("%Y-%m")
-    plan = KPIPlan(
+    plan = MarketingPlan(
         month=current_month,
         project_id=1,
         budget_plan=40000,
@@ -197,4 +205,3 @@ def test_cron_sync_all():
     data = response.json()
     assert data["status"] == "completed"
     assert "Парковка Уфа" in data["results"]
-

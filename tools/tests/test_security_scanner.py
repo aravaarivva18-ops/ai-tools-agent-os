@@ -1,11 +1,9 @@
 import os
 import sys
 
-import pytest
-
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from security_scanner import (
+from tools.security.security_scanner import (
     build_bandit_command,
     get_verified_python_path,
     run_security_scan,
@@ -26,10 +24,7 @@ def test_build_bandit_command_structure():
     skip_tests = ["B101", "B310"]
 
     cmd = build_bandit_command(
-        targets=targets,
-        exclude_dirs=exclude_dirs,
-        skip_tests=skip_tests,
-        quiet=True
+        targets=targets, exclude_dirs=exclude_dirs, skip_tests=skip_tests, quiet=True
     )
 
     assert cmd[0] == "/Users/rus/ai-tools/.venv/bin/python"
@@ -50,10 +45,7 @@ def test_run_security_scan_success(tmp_path):
     temp_file.write_text("def main():\n    pass\n")
 
     returncode, stdout, stderr = run_security_scan(
-        targets=[str(temp_file)],
-        exclude_dirs=None,
-        skip_tests=None,
-        quiet=True
+        targets=[str(temp_file)], exclude_dirs=None, skip_tests=None, quiet=True
     )
 
     # It should run bandit successfully and return 0 (no issues found)
@@ -66,8 +58,8 @@ def test_run_security_scan_with_invalid_python(monkeypatch):
     """Test that if python path is invalid, run_security_scan returns 127 without shell errors."""
     # Force get_verified_python_path to return a non-existent path
     monkeypatch.setattr(
-        "security_scanner.get_verified_python_path",
-        lambda: "/invalid/path/to/python"
+        "tools.security.security_scanner.get_verified_python_path",
+        lambda: "/invalid/path/to/python",
     )
 
     returncode, stdout, stderr = run_security_scan(targets=["."])

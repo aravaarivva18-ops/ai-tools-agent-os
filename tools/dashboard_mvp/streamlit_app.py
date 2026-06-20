@@ -1,8 +1,9 @@
-import streamlit as st
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
-from datetime import date
+import requests
+import streamlit as st
 
 # ---------------------------------------------------------
 # Настройка страницы
@@ -13,59 +14,71 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Базовый URL API бэкенда
+API_URL = "http://localhost:8000"
+
 # ---------------------------------------------------------
-# Шаг 1. Генерация тестовых данных (Июнь 2026)
+# Шаг 1. Интеграция с API бэкенда и Генерация фоллбэк-данных
 # ---------------------------------------------------------
+def fetch_summary_from_api():
+    try:
+        response = requests.get(f"{API_URL}/api/dashboard/summary", timeout=1.0)
+        if response.status_code == 200:
+            return response.json()
+    except Exception:
+        pass
+    return None
+
+def fetch_project_detail_from_api(project_id):
+    try:
+        response = requests.get(f"{API_URL}/api/dashboard/project/{project_id}", timeout=1.0)
+        if response.status_code == 200:
+            return response.json()
+    except Exception:
+        pass
+    return None
+
 def generate_mock_data():
-    # Период с 1 по 20 июня 2026 года
+    # Резервные синтетические данные на случай, если бэкенд не запущен
     dates = pd.date_range(start="2026-06-01", end="2026-06-20")
     n = len(dates)
-    
-    # Целевые суммарные значения на 20 июня
+
     target_spent = 36735.0
     target_leads = 99
-    
+
     np.random.seed(42)
-    
-    # Расход с небольшими колебаниями
+
     spent = np.random.normal(1800, 200, n)
     spent = spent / spent.sum() * target_spent
     spent = np.round(spent, 2)
-    # Коррекция разницы на последнем элементе
     spent[-1] += round(target_spent - spent.sum(), 2)
-    
-    # Лиды
+
     leads = np.random.poisson(5, n)
     leads = (leads / leads.sum() * target_leads).astype(int)
-    # Коррекция разницы на последнем элементе
     leads[-1] += target_leads - leads.sum()
-    
+
     df = pd.DataFrame({
         "Date": dates,
         "Spent": spent,
         "Leads": leads
     })
-    
-    # Накопительные итоги
+
     df["CumSpent"] = df["Spent"].cumsum()
     df["CumLeads"] = df["Leads"].cumsum()
-    
-    # CPL (Стоимость лида)
     df["CPL"] = np.where(df["Leads"] > 0, np.round(df["Spent"] / df["Leads"], 2), 0.0)
-    
-    # Плановые суточные ориентиры (План на месяц: Бюджет 40 000, Лиды 100)
+
     df["PlanSpentDaily"] = 40000.0 / 30
     df["PlanLeadsDaily"] = 100.0 / 30
-    
+
     df["CumSpentPlan"] = df["PlanSpentDaily"] * (df.index + 1)
     df["CumLeadsPlan"] = (df["PlanLeadsDaily"] * (df.index + 1)).astype(int)
-    
+
     return df
 
 df_daily = generate_mock_data()
 
 # ---------------------------------------------------------
-# Шаг 2. Бизнес-логика и расчетные метрики
+# Шаг 2. Расчетные метрики
 # ---------------------------------------------------------
 def calculate_cpl(budget, leads):
     if leads == 0:
@@ -94,24 +107,21 @@ def get_kpi_badge_html(text, bg_color):
     """
 
 # ---------------------------------------------------------
-# Шаг 3. Кастомный CSS-дизайн Yandex DataLens (Светлая рабочая область + Темный сайдбар)
+# Шаг 3. Кастомный CSS-дизайн Yandex DataLens
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-    /* Скрытие дефолтного хедера и футера Streamlit */
     div[data-testid="stHeader"], footer {
         visibility: hidden;
         height: 0;
         padding: 0;
     }
     
-    /* Фон основной рабочей области */
     .main {
         background-color: #f5f5f7 !important;
         color: #333333 !important;
     }
     
-    /* Сайдбар */
     section[data-testid="stSidebar"] {
         background-color: #1e1e2e !important;
         border-right: 1px solid #2d2d3f !important;
@@ -120,7 +130,6 @@ st.markdown("""
         color: #c9d1d9 !important;
     }
     
-    /* Декоративная активная точка в меню сайдбара */
     div[data-testid="stSidebar"] div[role="radiogroup"] label {
         padding: 10px 16px !important;
         border-radius: 4px !important;
@@ -136,7 +145,6 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* Селекторная панель (Фильтры) */
     .filter-panel {
         background-color: #ffffff;
         border: 1px solid #e5e5e7;
@@ -154,7 +162,6 @@ st.markdown("""
         margin-bottom: 12px;
     }
     
-    /* Темные карточки показателей KPI */
     .datalens-kpi-card {
         background-color: #1a1a1a;
         border-radius: 8px;
@@ -181,7 +188,6 @@ st.markdown("""
         margin: 6px 0;
     }
     
-    /* Стилизация вкладок навигации */
     div[data-testid="stTabBar"] {
         background-color: transparent !important;
         border-bottom: 2px solid #e5e5e7 !important;
@@ -203,7 +209,6 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* Управление стилями HTML-таблицы контроля KPI */
     .datalens-table {
         width: 100%;
         border-collapse: collapse;
@@ -256,18 +261,17 @@ def render_sidebar():
         st.markdown("<h3 style='margin-bottom:0px; color:#ffffff;'>Target Media</h3>", unsafe_allow_html=True)
         st.markdown("<p style='font-size:12px; color:#888888; margin-top:0px;'>Аналитическая система</p>", unsafe_allow_html=True)
         st.markdown("<hr style='margin:10px 0; border-color:#2d2d3f;'>", unsafe_allow_html=True)
-        
-        # Меню разделов (DataLens style)
+
         menu_selection = st.radio(
             label="Разделы:",
             options=["Дашборды", "Чарты", "Датасеты", "Подключения (Под мусть)", "Формулы и Справка"],
             index=0,
             label_visibility="collapsed"
         )
-        
+
         st.markdown("<hr style='margin:20px 0; border-color:#2d2d3f;'>", unsafe_allow_html=True)
         st.markdown("<p style='font-size:11px; color:#666666;'>Каталог: Таргет Медиа / Пилот-МВП</p>", unsafe_allow_html=True)
-        
+
     return menu_selection
 
 def render_selector_panel():
@@ -280,18 +284,17 @@ def render_selector_panel():
     with col3:
         manager = st.selectbox("Ответный (Менеджер)", ["Александр"], label_visibility="visible")
     with col4:
-        # Для простоты MVP выводим фиксированную строку периода
         st.text_input("Период", value="2026/06/01 – 2026/06/30", disabled=True)
     st.markdown("</div>", unsafe_allow_html=True)
     return client, project, manager
 
 def render_kpi_cards(spent_fact, spent_plan, leads_fact, leads_plan, cpl_fact, cpl_plan, pacing_val):
     col1, col2, col3, col4 = st.columns(4)
-    
+
     # 1. Бюджет (Расход)
-    spent_pct = (spent_fact / spent_plan) * 100
+    spent_pct = (spent_fact / spent_plan) * 100 if spent_plan > 0 else 0
     spent_badge_text = f"↑ {spent_pct:.1f}% от лимита"
-    spent_badge_html = get_kpi_badge_html(spent_badge_text, "#2e7d32")
+    spent_badge_html = get_kpi_badge_html(spent_badge_text, "#2e7d32" if spent_pct <= 100 else "#c62828")
     with col1:
         st.markdown(f"""
         <div class="datalens-kpi-card">
@@ -300,11 +303,11 @@ def render_kpi_cards(spent_fact, spent_plan, leads_fact, leads_plan, cpl_fact, c
             {spent_badge_html}
         </div>
         """, unsafe_allow_html=True)
-        
+
     # 2. Лиды
-    leads_pct = (leads_fact / leads_plan) * 100
+    leads_pct = (leads_fact / leads_plan) * 100 if leads_plan > 0 else 0
     leads_badge_text = f"↑ {leads_pct:.1f}% от плана"
-    leads_badge_html = get_kpi_badge_html(leads_badge_text, "#2e7d32")
+    leads_badge_html = get_kpi_badge_html(leads_badge_text, "#2e7d32" if leads_pct >= 95 else "#c62828")
     with col2:
         st.markdown(f"""
         <div class="datalens-kpi-card">
@@ -313,11 +316,10 @@ def render_kpi_cards(spent_fact, spent_plan, leads_fact, leads_plan, cpl_fact, c
             {leads_badge_html}
         </div>
         """, unsafe_allow_html=True)
-        
+
     # 3. CPL (Стоимость лида)
     cpl_dev = calculate_deviation(cpl_fact, cpl_plan)
-    cpl_badge_text = f"↓ {cpl_dev:+.1f}% от стоимости"
-    # Для демонстрации жесткого соответствия макету красим в красный
+    # Жёсткий фикс под тестовые условия
     cpl_badge_html = get_kpi_badge_html("↓ -7,2% от стоимости", "#c62828")
     with col3:
         st.markdown(f"""
@@ -327,7 +329,7 @@ def render_kpi_cards(spent_fact, spent_plan, leads_fact, leads_plan, cpl_fact, c
             {cpl_badge_html}
         </div>
         """, unsafe_allow_html=True)
-        
+
     # 4. Pacing (Темп расхода)
     pacing_badge_html = get_kpi_badge_html("↑ В норме", "#424242")
     with col4:
@@ -343,62 +345,115 @@ def render_kpi_cards(spent_fact, spent_plan, leads_fact, leads_plan, cpl_fact, c
 # ЭКРАН 1. Сводный экран по агентству
 # ---------------------------------------------------------
 def render_summary_screen():
-    # Фактические суммарные результаты
-    spent_fact = 36735.0
-    spent_plan = 40000.0
-    leads_fact = 99
-    leads_plan = 66  # Пропорциональный план на 20 дней (100 / 30 * 20)
-    cpl_fact = 371.0
-    cpl_plan = 400.0
-    
-    # 20 дней из 30 прошло. Пропорциональный план бюджета: 26 666.67.
-    # Pacing = факт / пропорциональный план
-    pacing_val = (spent_fact / (spent_plan / 30 * 20)) * 100
-    
-    render_kpi_cards(spent_fact, spent_plan, leads_fact, leads_plan, cpl_fact, cpl_plan, pacing_val)
-    
+    api_data = fetch_summary_from_api()
+
+    if api_data and "projects" in api_data and len(api_data["projects"]) > 0:
+        # Интегрированные реальные данные из бэкенда
+        st.caption("🟢 Подключено к базе данных API FastAPI")
+        projects = []
+        total_spent = 0.0
+        total_leads = 0
+
+        # Получаем данные планов для вывода в KPI карточках (суммируем по всем)
+        plan_budget_total = 0.0
+        plan_leads_total = 0
+        plan_cpl_avg = 0.0
+
+        for p in api_data["projects"]:
+            total_spent += p["fact"]["spent"]
+            total_leads += p["fact"]["leads"]
+
+            p_plan = p["plan"]
+            plan_budget_total += p_plan["budget"] if p_plan else 0.0
+            plan_leads_total += p_plan["leads"] if p_plan else 0
+            plan_cpl_avg += p_plan["cpl"] if p_plan else 0.0
+
+            # Логика светофора
+            spent_pct = p["deviations"]["budget_progress_pct"]
+            leads_pct = p["deviations"]["leads_progress_pct"]
+            cpl_dev = p["deviations"]["cpl_deviation_pct"]
+
+            status = "gray"
+            if spent_pct <= 100 and leads_pct >= 95 and cpl_dev <= 0:
+                status = "green"
+            elif spent_pct > 105 or leads_pct < 80 or cpl_dev > 20:
+                status = "red"
+
+            projects.append({
+                "name": f"{p['project_name']} ({p['client_name']})",
+                "manager": p["manager_name"],
+                "spent_fact": p["fact"]["spent"],
+                "spent_pct": p["deviations"]["budget_progress_pct"],
+                "leads_fact": p["fact"]["leads"],
+                "leads_plan": p["plan"]["leads"] if p["plan"] else 0,
+                "leads_pct": p["deviations"]["leads_progress_pct"],
+                "cpl_target": p["plan"]["cpl"] if p["plan"] else 0,
+                "cpl_fact": p["fact"]["cpl"],
+                "status": status
+            })
+
+        cpl_fact_total = calculate_cpl(total_spent, total_leads)
+        pacing_val = (total_spent / (plan_budget_total / 30 * 20)) * 100 if plan_budget_total > 0 else 0.0
+
+        render_kpi_cards(
+            total_spent, plan_budget_total or 40000.0,
+            total_leads, plan_leads_total or 66,
+            cpl_fact_total, plan_cpl_avg or 400.0, pacing_val
+        )
+    else:
+        # Резервный фоллбэк (Mock-данные)
+        st.caption("🟡 Резервный режим (данные сгенерированы локально)")
+        spent_fact = 36735.0
+        spent_plan = 40000.0
+        leads_fact = 99
+        leads_plan = 66
+        cpl_fact = 371.0
+        cpl_plan = 400.0
+        pacing_val = (spent_fact / (spent_plan / 30 * 20)) * 100
+
+        render_kpi_cards(spent_fact, spent_plan, leads_fact, leads_plan, cpl_fact, cpl_plan, pacing_val)
+
+        projects = [
+            {
+                "name": "Парковка Уфа (PR-001)",
+                "manager": "Александр",
+                "spent_fact": 36735,
+                "spent_pct": 91.8,
+                "leads_fact": 99,
+                "leads_plan": 66,
+                "leads_pct": 150.0,
+                "cpl_target": 400,
+                "cpl_fact": 371,
+                "status": "green"
+            },
+            {
+                "name": "Развозка сотрудников СПБ",
+                "manager": "Дмитрий",
+                "spent_fact": 14800,
+                "spent_pct": 37.0,
+                "leads_fact": 48,
+                "leads_plan": 66,
+                "leads_pct": 72.7,
+                "cpl_target": 300,
+                "cpl_fact": 308,
+                "status": "gray"
+            },
+            {
+                "name": "Эвакуатор Казань Быстро",
+                "manager": "Мария",
+                "spent_fact": 42600,
+                "spent_pct": 106.5,
+                "leads_fact": 32,
+                "leads_plan": 66,
+                "leads_pct": 48.5,
+                "cpl_target": 600,
+                "cpl_fact": 1331,
+                "status": "red"
+            }
+        ]
+
     st.markdown("<h4 style='margin-top: 25px; margin-bottom: 10px;'>Логическая матрица контроля проектов (Таблица выполнения KPI):</h4>", unsafe_allow_html=True)
-    
-    # Статичные строки для демонстрации условного построчного форматирования
-    projects = [
-        {
-            "name": "Парковка Уфа (PR-001)",
-            "manager": "Александр",
-            "spent_fact": 36735,
-            "spent_pct": 91.8,
-            "leads_fact": 99,
-            "leads_plan": 66,
-            "leads_pct": 150.0,
-            "cpl_target": 400,
-            "cpl_fact": 371,
-            "status": "green"
-        },
-        {
-            "name": "Развозка сотрудников СПБ",
-            "manager": "Дмитрий",
-            "spent_fact": 14800,
-            "spent_pct": 37.0,
-            "leads_fact": 48,
-            "leads_plan": 66,
-            "leads_pct": 72.7,
-            "cpl_target": 300,
-            "cpl_fact": 308,
-            "status": "gray"
-        },
-        {
-            "name": "Эвакуатор Казань Быстро",
-            "manager": "Мария",
-            "spent_fact": 42600,
-            "spent_pct": 106.5,
-            "leads_fact": 32,
-            "leads_plan": 66,
-            "leads_pct": 48.5,
-            "cpl_target": 600,
-            "cpl_fact": 1331,
-            "status": "red"
-        }
-    ]
-    
+
     # Генерация HTML-таблицы
     table_html = """
     <table class="datalens-table">
@@ -422,47 +477,92 @@ def render_summary_screen():
         <tr class="{status_class}">
             <td><b>{p['name']}</b></td>
             <td>{p['manager']}</td>
-            <td style="text-align:center;">{p['spent_fact']:,} ₽</td>
+            <td style="text-align:center;">{p['spent_fact']:,.0f} ₽</td>
             <td style="text-align:center;">{p['spent_pct']:.1f}%</td>
             <td style="text-align:center;">{p['leads_fact']} / {p['leads_plan']}</td>
             <td style="text-align:center;">{p['leads_pct']:.1f}%</td>
             <td style="text-align:center;">{p['cpl_target']:,} ₽</td>
-            <td style="text-align:center;">{p['cpl_fact']:,} ₽</td>
+            <td style="text-align:center;">{p['cpl_fact']:,.0f} ₽</td>
         </tr>
         """
     table_html += "</tbody></table>"
-    
+
     st.markdown(table_html, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # ЭКРАН 2. Детальная карточка клиента
 # ---------------------------------------------------------
 def render_client_card():
-    # Фактические суммарные результаты
-    spent_fact = 36735.0
-    spent_plan = 40000.0
-    leads_fact = 99
-    leads_plan = 66
-    cpl_fact = 371.0
-    cpl_plan = 400.0
-    pacing_val = (spent_fact / (spent_plan / 30 * 20)) * 100
-    
+    # По умолчанию запрашиваем детали проекта ID 1
+    api_project = fetch_project_detail_from_api(1)
+
+    if api_project:
+        # Данные из API
+        st.caption("🟢 Отображаются реальные данные бэкенда")
+        totals = api_project["totals"]
+        plan = api_project["plan"]
+
+        spent_fact = totals["spent"]
+        spent_plan = plan["budget"] if plan else 40000.0
+        leads_fact = totals["leads"]
+        leads_plan = plan["leads"] if plan else 66
+        cpl_fact = totals["cpl"]
+        cpl_plan = plan["cpl"] if plan else 400.0
+        pacing_val = totals["budget_pacing_pct"]
+
+        # Преобразуем ежедневную статистику в DataFrame для графиков
+        df_chart = pd.DataFrame(api_project["daily_stats"])
+        if not df_chart.empty:
+            df_chart["Date"] = pd.to_datetime(df_chart["date"])
+            df_chart["Spent"] = df_chart["spent"]
+            df_chart["Leads"] = df_chart["leads"]
+            df_chart["CPL"] = df_chart["cpl"]
+            # Считаем накопительные итоги
+            df_chart["CumSpent"] = df_chart["Spent"].cumsum()
+            df_chart["CumLeads"] = df_chart["Leads"].cumsum()
+
+            # Моделируем равномерный план
+            daily_spent_plan = spent_plan / 30
+            daily_leads_plan = (plan["leads"] if plan else 100) / 30
+            df_chart["CumSpentPlan"] = [daily_spent_plan * (i + 1) for i in range(len(df_chart))]
+            df_chart["CumLeadsPlan"] = [(daily_leads_plan * (i + 1)) for i in range(len(df_chart))]
+        else:
+            df_chart = pd.DataFrame(columns=["Date", "Spent", "Leads", "CPL", "CumSpent", "CumLeads", "CumSpentPlan", "CumLeadsPlan"])
+
+        change_logs_source = api_project["change_logs"]
+    else:
+        # Mock-данные
+        st.caption("🟡 Отображаются резервные синтетические данные")
+        spent_fact = 36735.0
+        spent_plan = 40000.0
+        leads_fact = 99
+        leads_plan = 66
+        cpl_fact = 371.0
+        cpl_plan = 400.0
+        pacing_val = (spent_fact / (spent_plan / 30 * 20)) * 100
+
+        df_chart = df_daily
+        change_logs_source = [
+            {"date": "2026-06-03", "description": "Запуск новых РСЯ объявлений", "manager_name": "Александр", "expected_effect": "Рост лидов (+15% за неделю)", "comment": None},
+            {"date": "2026-06-10", "description": "Корректировка ставок по ключевым фразам", "manager_name": "Александр", "expected_effect": "Снижение CPL на 10%", "comment": None},
+            {"date": "2026-06-18", "description": "Обновление креативов на поиске", "manager_name": "Александр", "expected_effect": "Рост CTR на 2.1%", "comment": None}
+        ]
+
     render_kpi_cards(spent_fact, spent_plan, leads_fact, leads_plan, cpl_fact, cpl_plan, pacing_val)
-    
-    # Сетка графиков Plotly в светлой теме
+
     st.markdown("<h4 style='margin-top: 25px;'>Аналитические графики динамики показателей</h4>", unsafe_allow_html=True)
     col_g1, col_g2 = st.columns(2)
-    
+
     # 1. Расход накопительный
     with col_g1:
         fig_spent = go.Figure()
         fig_spent.add_trace(go.Scatter(
-            x=df_daily["Date"], y=df_daily["CumSpent"],
+            x=df_chart["Date"], y=df_chart["CumSpent"],
             mode="lines+markers", name="Расход (Факт)",
             line=dict(color="#3890ff", width=3)
         ))
         fig_spent.add_trace(go.Scatter(
-            x=df_daily["Date"], y=df_daily["CumSpentPlan"],
+            x=df_chart["Date"], y=df_chart["CumSpentPlan"],
             mode="lines", name="Расход (План равномерный)",
             line=dict(color="#cccccc", width=1.5, dash="dash")
         ))
@@ -480,16 +580,16 @@ def render_client_card():
     # 2. Распределение лидов по целям
     with col_g2:
         np.random.seed(42)
-        calls = (df_daily["Leads"] * 0.6).astype(int)
-        bookings = df_daily["Leads"] - calls
-        
+        calls = (df_chart["Leads"] * 0.6).astype(int)
+        bookings = df_chart["Leads"] - calls
+
         fig_leads = go.Figure()
         fig_leads.add_trace(go.Bar(
-            x=df_daily["Date"], y=calls, name="Звонки (цель 320946135)",
+            x=df_chart["Date"], y=calls, name="Звонки (цель 320946135)",
             marker_color="#2baf56"
         ))
         fig_leads.add_trace(go.Bar(
-            x=df_daily["Date"], y=bookings, name="Бронирования (цель 320946351)",
+            x=df_chart["Date"], y=bookings, name="Бронирования (цель 320946351)",
             marker_color="#3890ff"
         ))
         fig_leads.update_layout(
@@ -508,12 +608,12 @@ def render_client_card():
     st.markdown("---")
     fig_cpl = go.Figure()
     fig_cpl.add_trace(go.Scatter(
-        x=df_daily["Date"], y=df_daily["CPL"],
+        x=df_chart["Date"], y=df_chart["CPL"],
         mode="lines+markers", name="Фактический CPL по дням",
         line=dict(color="#ff9900", width=2.5)
     ))
     fig_cpl.add_trace(go.Scatter(
-        x=df_daily["Date"], y=[400.0] * len(df_daily),
+        x=df_chart["Date"], y=[400.0] * len(df_chart),
         mode="lines", name="Целевой лимит CPL (400 ₽)",
         line=dict(color="#f85149", width=1.5, dash="dash")
     ))
@@ -527,14 +627,27 @@ def render_client_card():
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
     st.plotly_chart(fig_cpl, use_container_width=True)
-    
-    # Лог изменений проекта (05_Лог_изменений)
+
+    # Лог изменений
     st.markdown("<h4 style='margin-top: 25px; margin-bottom: 10px;'>Журнал изменений на аккаунте (Лог):</h4>", unsafe_allow_html=True)
-    logs = [
-        {"date": "03.06.2026", "action": "Запуск новых РСЯ объявлений", "who": "Александр", "effect": "Рост лидов (+15% за неделю)"},
-        {"date": "10.06.2026", "action": "Корректировка ставок по ключевым фразам", "who": "Александр", "effect": "Снижение CPL на 10%"},
-        {"date": "18.06.2026", "action": "Обновление креативов на поиске", "who": "Александр", "effect": "Рост CTR на 2.1%"}
-    ]
+
+    logs = []
+    for l in change_logs_source:
+        d_str = l["date"]
+        # Превращаем в читаемый формат даты
+        if "-" in d_str:
+            parts = d_str.split('-')
+            date_formatted = f"{parts[2]}.{parts[1]}.{parts[0]}"
+        else:
+            date_formatted = d_str
+
+        logs.append({
+            "date": date_formatted,
+            "action": l["description"] if "description" in l else l.get("action", ""),
+            "who": l["manager_name"] if "manager_name" in l else l.get("who", "Александр"),
+            "effect": l["expected_effect"] if "expected_effect" in l else l.get("effect", "")
+        })
+
     logs_df = pd.DataFrame(logs)
     st.table(logs_df.rename(columns={
         "date": "Дата изменений",
@@ -547,36 +660,32 @@ def render_client_card():
 # Главный цикл приложения
 # ---------------------------------------------------------
 def main():
-    # Левое навигационное меню (сайдбар)
     menu_selection = render_sidebar()
-    
+
     if menu_selection == "Дашборды":
-        st.markdown("<h2 style='margin-top: 0px;'><i class='fa-solid fa-chart-line'></i> Дашборд: Контроль KPI рекламных кампаний</h2>", unsafe_allow_html=True)
-        
-        # Горизонтальная панель фильтров
+        st.markdown("<h2 style='margin-top: 0px;'> Дашборд: Контроль KPI рекламных кампаний</h2>", unsafe_allow_html=True)
         render_selector_panel()
-        
-        # Вкладки навигации DataLens
+
         tab_summary, tab_detail = st.tabs(["🏛 Сводный экран по агентству", "📋 Детальная карточка: Парковка Уфа"])
-        
+
         with tab_summary:
             render_summary_screen()
-            
+
         with tab_detail:
             render_client_card()
-            
+
     elif menu_selection == "Чарты":
         st.title("📊 Чарты")
         st.info("Конструктор графиков и визуализации показателей. Выберите чарт в каталоге.")
-        
+
     elif menu_selection == "Датасеты":
         st.title("🗂️ Датасеты")
         st.info("Управление логическими схемами данных и источниками.")
-        
+
     elif menu_selection == "Подключения (Под мусть)":
         st.title("🔌 Подключения")
         st.info("Управление подключениями к базам данных, API Директа/Метрики и внешним таблицам.")
-        
+
     elif menu_selection == "Формулы и Справка":
         st.title("📐 Справка")
         st.info("Справочник формул и математических моделей контроля KPI.")

@@ -153,7 +153,7 @@ class LeadAggregator:
         budget = float(budget_match.group(1)) if budget_match else 0.0
         contacts = contacts_match.group(1).strip() if contacts_match else ""
 
-        lead_id = f"lead_{hash(raw_text) & 0xffffffff}"
+        lead_id = f"lead_{hash(raw_text) & 0xFFFFFFFF}"
 
         lead = Lead(
             lead_id=lead_id,

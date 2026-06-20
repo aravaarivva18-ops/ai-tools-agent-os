@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from fetch_page import fetch_page
 
-from tools.obsidian_sync import ObsidianVaultManager
+from tools.obsidian.obsidian_sync import ObsidianVaultManager
 
 
 def run_pipeline(target_url: str):

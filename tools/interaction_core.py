@@ -1,4 +1,3 @@
-import math
 from typing import Any
 
 
@@ -15,7 +14,7 @@ class InteractionCore:
         mass: float = 1.0,
         initial_velocity: float = 0.0,
         duration_steps: int = 100,
-        time_step: float = 0.016  # ~60fps step duration in seconds
+        time_step: float = 0.016,  # ~60fps step duration in seconds
     ) -> list[float]:
         """
         Calculates spring trajectory using Hooke's Law and Euler integration.
@@ -58,38 +57,38 @@ class InteractionCore:
                 "stiffness": 300.0,
                 "damping": 15.0,
                 "mass": 0.8,
-                "description": "Energetic scale up/down with subtle overshoot"
+                "description": "Energetic scale up/down with subtle overshoot",
             },
             "smooth": {
                 "stiffness": 120.0,
                 "damping": 20.0,
                 "mass": 1.0,
-                "description": "Highly dampened elegant slide/fade transition"
+                "description": "Highly dampened elegant slide/fade transition",
             },
             "snappy": {
                 "stiffness": 210.0,
                 "damping": 20.0,
                 "mass": 0.5,
-                "description": "Quick UI responses like switches or tabs"
+                "description": "Quick UI responses like switches or tabs",
             },
             "bouncy": {
                 "stiffness": 180.0,
                 "damping": 12.0,
                 "mass": 1.0,
-                "description": "Playful spring response with noticeable overshoot"
-            }
+                "description": "Playful spring response with noticeable overshoot",
+            },
         }
 
         selected = presets.get(preset_name.lower())
         if not selected:
-            raise ValueError(f"Unknown preset name: {preset_name}. Available: {list(presets.keys())}")
+            raise ValueError(
+                f"Unknown preset name: {preset_name}. Available: {list(presets.keys())}"
+            )
         return selected
 
     @classmethod
     def generate_ui_config(
-        cls,
-        preset_name: str,
-        element_type: str = "button"
+        cls, preset_name: str, element_type: str = "button"
     ) -> dict[str, Any]:
         """
         Generates full CSS / Tailwind UI configuration block including Spring parameters,
@@ -99,12 +98,14 @@ class InteractionCore:
         trajectory = cls.calculate_spring_physics(
             stiffness=preset["stiffness"],
             damping=preset["damping"],
-            mass=preset["mass"]
+            mass=preset["mass"],
         )
 
         # Calculate ideal motion blur filter strength based on speed/damping profile
         # Snappy animations can afford higher blur to feel smooth, smooth animations need less.
-        max_velocity = max(abs(trajectory[i] - trajectory[i-1]) for i in range(1, len(trajectory)))
+        max_velocity = max(
+            abs(trajectory[i] - trajectory[i - 1]) for i in range(1, len(trajectory))
+        )
         blur_strength = round(max_velocity * 40, 2)
 
         config = {
@@ -113,18 +114,18 @@ class InteractionCore:
             "physics": {
                 "stiffness": preset["stiffness"],
                 "damping": preset["damping"],
-                "mass": preset["mass"]
+                "mass": preset["mass"],
             },
             "css_variables": {
                 "--spring-duration": "0.35s",
                 "--spring-timing-curve": f"linear({', '.join(map(str, trajectory))})",
                 "--motion-blur": f"blur({blur_strength}px)",
-                "--scale-active": "0.95" if element_type == "button" else "1.0"
+                "--scale-active": "0.95" if element_type == "button" else "1.0",
             },
             "best_practices": [
                 "Always apply 'will-change: transform' to avoid layout shifts",
                 "Ensure transition-property is limited to transform and opacity",
-                "Use hardware accelerated composite layers"
-            ]
+                "Use hardware accelerated composite layers",
+            ],
         }
         return config

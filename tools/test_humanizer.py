@@ -1,4 +1,4 @@
-from tools.humanizer import LocalTextHumanizer
+from tools.text.humanizer import LocalTextHumanizer
 
 
 def test_humanizer_ru():
