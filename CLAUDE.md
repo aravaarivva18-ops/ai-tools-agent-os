@@ -35,10 +35,8 @@
 - **Проверка качества кода**: `make check`
 - **Юнит-тестирование**: `make test`
 - **Очистка кэша**: `make clean`
-- **Конвертация документов в MD**: `uv run python tools/convert_docs.py <путь_к_файлу> [-o <выходной_файл>]`
 - **Импорт документов в Wiki**: `uv run python tools/llm_wiki.py injest`
 - **Запрос из Wiki**: `uv run python tools/llm_wiki.py query <заметка> [--depth <глубина>]`
-- **Логирование в Obsidian Daily Note**: `uv run python tools/obsidian_cli.py --token <токен> append-daily "<текст>"`
 
 
 

@@ -8,6 +8,7 @@ WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 RULES_FILES = [
     WORKSPACE_ROOT / "CLAUDE.md",
     WORKSPACE_ROOT / "AGENTS.md",
+    WORKSPACE_ROOT / ".cursorrules",
 ]
 
 def check_file_links() -> bool:
