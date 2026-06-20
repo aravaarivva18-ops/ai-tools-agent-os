@@ -96,12 +96,22 @@ async function handleRoute() {
     document.getElementById("project-detail-view").classList.add("hidden");
     
     if (hash === "#/" || hash === "#") {
+        const startInput = document.getElementById("filter-start-date");
+        const endInput = document.getElementById("filter-end-date");
+        if (startInput) startInput.value = "";
+        if (endInput) endInput.value = "";
+
         document.getElementById("summary-view").classList.remove("hidden");
         await loadSummary();
     } else if (hash.startsWith("#/project/")) {
         const parts = hash.split("/");
         const projectId = parseInt(parts[2]);
         if (projectId) {
+            const startInput = document.getElementById("filter-start-date");
+            const endInput = document.getElementById("filter-end-date");
+            if (startInput) startInput.value = "";
+            if (endInput) endInput.value = "";
+
             document.getElementById("project-detail-view").classList.remove("hidden");
             await loadProjectDetail(projectId);
         }
@@ -112,7 +122,7 @@ async function handleRoute() {
 
 async function loadSummary() {
     const tableBody = document.getElementById("projects-table-body");
-    tableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Загрузка проектов...</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Загрузка проектов...</td></tr>`;
     
     try {
         const data = await request(`${API_BASE}/api/dashboard/summary`);
@@ -124,7 +134,7 @@ async function loadSummary() {
         document.getElementById("current-month-badge").textContent = formattedMonth;
         
         if (!data.projects || data.projects.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">Нет активных проектов. Нажмите кнопку "Создать тест-проект", чтобы наполнить базу.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500">Нет активных проектов. Нажмите кнопку "Создать тест-проект", чтобы наполнить базу.</td></tr>`;
             updateSummaryCards(0, 0, 0);
             return;
         }
@@ -140,7 +150,9 @@ async function loadSummary() {
             // Вычисляем стили светофора
             let budgetClass = "text-slate-300";
             let leadsClass = "text-slate-300";
+            let qualLeadsClass = "text-slate-300";
             let cplClass = "text-slate-300";
+            let pacingClass = "text-slate-300";
             
             if (p.plan) {
                 // Бюджет (расход)
@@ -162,6 +174,16 @@ async function loadSummary() {
                 } else {
                     leadsClass = "bg-red-500/10 text-red-400 border border-red-500/20";
                 }
+
+                // Квал-лиды
+                const qualLeadsPct = p.deviations.qual_leads_progress_pct;
+                if (qualLeadsPct >= 90) {
+                    qualLeadsClass = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                } else if (qualLeadsPct >= 75) {
+                    qualLeadsClass = "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20";
+                } else {
+                    qualLeadsClass = "bg-red-500/10 text-red-400 border border-red-500/20";
+                }
                 
                 // CPL
                 const cplPct = p.deviations.cpl_deviation_pct;
@@ -171,6 +193,16 @@ async function loadSummary() {
                     cplClass = "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20";
                 } else {
                     cplClass = "bg-red-500/10 text-red-400 border border-red-500/20";
+                }
+
+                // Pacing
+                const pacingPct = p.deviations.budget_pacing_pct;
+                if (pacingPct > 110) {
+                    pacingClass = "bg-red-500/10 text-red-400 border border-red-500/20";
+                } else if (pacingPct >= 90) {
+                    pacingClass = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                } else {
+                    pacingClass = "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20";
                 }
             }
             
@@ -191,8 +223,16 @@ async function loadSummary() {
                     ${p.plan ? `<div class="text-xs text-slate-500 mt-0.5">План: ${p.plan.leads}</div><span class="inline-block mt-1.5 px-2 py-0.5 text-2xs rounded-full font-medium ${leadsClass}">${p.deviations.leads_progress_pct}%</span>` : `<span class="text-xs text-slate-600">—</span>`}
                 </td>
                 <td class="py-4 px-6 text-center">
+                    <div class="font-medium text-white">${p.fact.qualified_leads}</div>
+                    ${p.plan ? `<div class="text-xs text-slate-500 mt-0.5">План: ${p.plan.qualified_leads}</div><span class="inline-block mt-1.5 px-2 py-0.5 text-2xs rounded-full font-medium ${qualLeadsClass}">${p.deviations.qual_leads_progress_pct}%</span>` : `<span class="text-xs text-slate-600">—</span>`}
+                </td>
+                <td class="py-4 px-6 text-center">
                     <div class="font-medium text-white">${formatCurrency(p.fact.cpl)}</div>
                     ${p.plan ? `<div class="text-xs text-slate-500 mt-0.5">План: ${formatCurrency(p.plan.cpl)}</div><span class="inline-block mt-1.5 px-2 py-0.5 text-2xs rounded-full font-medium ${cplClass}">${p.deviations.cpl_deviation_pct > 0 ? '+' : ''}${p.deviations.cpl_deviation_pct}%</span>` : `<span class="text-xs text-slate-600">—</span>`}
+                </td>
+                <td class="py-4 px-6 text-center">
+                    <div class="font-medium text-white">${p.deviations.budget_pacing_pct}%</div>
+                    ${p.plan ? `<span class="inline-block mt-1.5 px-2 py-0.5 text-2xs rounded-full font-medium ${pacingClass}">${p.deviations.budget_pacing_pct > 110 ? 'Перерасход' : (p.deviations.budget_pacing_pct >= 90 ? 'Норма' : 'Недорасход')}</span>` : `<span class="text-xs text-slate-600">—</span>`}
                 </td>
                 <td class="py-4 px-6 text-center">
                     <a href="#/project/${p.id}" class="py-1.5 px-3 rounded-lg bg-slate-850 hover:bg-slate-800 text-slate-200 hover:text-white font-medium text-xs transition btn-spring inline-flex items-center gap-1 border border-slate-800">
@@ -206,7 +246,7 @@ async function loadSummary() {
         updateSummaryCards(data.projects.length, totalSpent, totalLeads);
         
     } catch (error) {
-        tableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-red-400"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Ошибка загрузки: ${error.message}</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-red-400"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Ошибка загрузки: ${error.message}</td></tr>`;
     }
 }
 
@@ -220,8 +260,32 @@ function updateSummaryCards(count, spent, leads) {
 
 async function loadProjectDetail(projectId) {
     try {
-        const data = await request(`${API_BASE}/api/dashboard/project/${projectId}`);
+        // Проверяем инпуты дат
+        const startDateInput = document.getElementById("filter-start-date");
+        const endDateInput = document.getElementById("filter-end-date");
+        
+        let url = `${API_BASE}/api/dashboard/project/${projectId}`;
+        const params = [];
+        if (startDateInput && startDateInput.value) {
+            params.push(`start_date=${startDateInput.value}`);
+        }
+        if (endDateInput && endDateInput.value) {
+            params.push(`end_date=${endDateInput.value}`);
+        }
+        if (params.length > 0) {
+            url += `?${params.join("&")}`;
+        }
+
+        const data = await request(url);
         state.currentProject = data;
+        
+        // Устанавливаем даты в инпуты, если они пришли от бэкенда и пустые в инпутах
+        if (startDateInput && !startDateInput.value) {
+            startDateInput.value = data.period.start_date;
+        }
+        if (endDateInput && !endDateInput.value) {
+            endDateInput.value = data.period.end_date;
+        }
         
         // Заполняем текстовые поля
         document.getElementById("project-detail-title").textContent = data.project.name;
@@ -244,11 +308,35 @@ async function loadProjectDetail(projectId) {
         document.getElementById("detail-leads").textContent = data.totals.leads;
         document.getElementById("detail-leads-progress").textContent = data.plan ? `План: ${data.plan.leads}` : "План: не установлен";
         
+        document.getElementById("detail-qual-leads").textContent = data.totals.qualified_leads;
+        document.getElementById("detail-qual-leads-progress").textContent = data.plan ? `План: ${data.plan.qualified_leads}` : "План: не установлен";
+        
         document.getElementById("detail-cpl").textContent = `${formatCurrency(data.totals.cpl)} ₽`;
         document.getElementById("detail-cpl-progress").textContent = data.plan ? `План: ${formatCurrency(data.plan.cpl)} ₽` : "План: не установлен";
         
-        document.getElementById("detail-efficiency").textContent = `${data.totals.ctr}% / ${formatCurrency(data.totals.cpc)} ₽`;
-        document.getElementById("detail-clicks").textContent = `Клики: ${data.totals.clicks} | Показы: ${data.totals.impressions}`;
+        document.getElementById("detail-cpl-qual").textContent = `${formatCurrency(data.totals.cpl_qualified)} ₽`;
+        document.getElementById("detail-cpl-qual-progress").textContent = data.plan ? `План: ${formatCurrency(data.plan.cpl_qualified)} ₽` : "План: не установлен";
+        
+        document.getElementById("detail-pacing").textContent = `${data.totals.budget_pacing_pct}%`;
+        
+        // Цвета карточки pacing
+        const pacingProgress = document.getElementById("detail-pacing-progress");
+        const pacingVal = data.totals.budget_pacing_pct;
+        if (data.plan) {
+            if (pacingVal > 110) {
+                pacingProgress.textContent = "Превышение нормы!";
+                pacingProgress.className = "text-xs mt-2 pt-2 border-t border-slate-800 text-red-450 font-semibold";
+            } else if (pacingVal >= 90) {
+                pacingProgress.textContent = "В рамках нормы";
+                pacingProgress.className = "text-xs mt-2 pt-2 border-t border-slate-800 text-emerald-400 font-semibold";
+            } else {
+                pacingProgress.textContent = "Недорасход бюджета";
+                pacingProgress.className = "text-xs mt-2 pt-2 border-t border-slate-800 text-yellow-450 font-semibold";
+            }
+        } else {
+            pacingProgress.textContent = "Норма: 100%";
+            pacingProgress.className = "text-xs mt-2 pt-2 border-t border-slate-800 text-slate-500";
+        }
         
         // Рендерим логи изменений
         renderChangeLogs(data.change_logs);
@@ -320,11 +408,21 @@ function renderChart() {
         label = "Лиды (шт)";
         borderColor = "#10b981";
         backgroundColor = "rgba(16, 185, 129, 0.1)";
+    } else if (state.activeChartTab === "qual_leads") {
+        chartData = data.daily_stats.map(s => s.qualified_leads);
+        label = "Квалифицированные лиды (шт)";
+        borderColor = "#059669";
+        backgroundColor = "rgba(5, 150, 105, 0.1)";
     } else if (state.activeChartTab === "cpl") {
         chartData = data.daily_stats.map(s => s.cpl);
         label = "Стоимость лида CPL (₽)";
         borderColor = "#8b5cf6";
         backgroundColor = "rgba(139, 92, 246, 0.1)";
+    } else if (state.activeChartTab === "cpl_qualified") {
+        chartData = data.daily_stats.map(s => s.cpl_qualified);
+        label = "CPL квалифицированного лида (₽)";
+        borderColor = "#d946ef";
+        backgroundColor = "rgba(217, 70, 239, 0.1)";
     }
     
     if (state.chart) {
@@ -503,6 +601,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
     
+    // 8. Кнопка применить фильтр дат
+    document.getElementById("apply-filter-btn").addEventListener("click", async () => {
+        if (!state.currentProject) return;
+        const projectId = state.currentProject.project.id;
+        await loadProjectDetail(projectId);
+    });
+
     // Запускаем роутинг при старте
     handleRoute();
 });
