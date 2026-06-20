@@ -30,6 +30,23 @@ def generate_research_queries(category: str, issue_content: str) -> list:
     return queries
 
 
+def detect_tool_conflicts(logs: list) -> list:
+    """Анализирует логи трения на наличие конфликтов инструментов."""
+    conflicts = []
+    for log in logs:
+        for pt in log.get("friction_points", []):
+            content = pt.get("content", "").lower()
+            if "subagent" in content or "субагент" in content or "sub-agent" in content:
+                conflicts.append(
+                    f"Session {log.get('session_id')}: Найдено упоминание субагентов. Убедитесь, что используется Solo Loop по умолчанию."
+                )
+            if "diff_applier" in content or "diff_applier.py" in content:
+                conflicts.append(
+                    f"Session {log.get('session_id')}: Использован diff_applier.py. По возможности используйте нативный replace_file_content."
+                )
+    return list(set(conflicts))
+
+
 def generate_improvement_report(
     friction_logs_path: Path, output_path: Path
 ) -> dict:
@@ -107,6 +124,17 @@ def generate_improvement_report(
                 for q in queries:
                     report_lines.append(f"    - `{q}`")
                 report_lines.append("")
+
+    # Detect tool conflicts
+    conflicts = detect_tool_conflicts(logs)
+    if conflicts:
+        report_lines.extend([
+            "## ⚠️ Конфликты инструментов (Tool Conflicts)",
+            "",
+        ])
+        for conf in conflicts:
+            report_lines.append(f"- ⚠️ {conf}")
+        report_lines.append("")
 
     report_lines.extend(
         [
