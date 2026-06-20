@@ -52,11 +52,11 @@ def optimize_prompt_for_speed(category: str, issue_content: str) -> str:
     # Извлекаем первую непустую строку контента
     lines = [line.strip() for line in issue_content.splitlines() if line.strip()]
     first_line = lines[0] if lines else ""
-    
+
     # Очищаем от спецсимволов и берем первые 10 слов
     clean_line = "".join(c if c.isalnum() or c.isspace() else " " for c in first_line).strip()
     summary = " ".join(clean_line.split()[:10])
-    
+
     # Формируем компактный промпт
     return f"Исправь {category}: {summary}. Используй TDD, YAGNI (max 3 levels) и Solo Loop."
 
@@ -155,15 +155,15 @@ def generate_improvement_report(
                 report_lines.append("  * 🔍 *Рекомендуемые запросы для исследования (Karpathy Research Step)*:")
                 for q in queries:
                     report_lines.append(f"    - `{q}`")
-                
+
                 # Speed-optimized prompt generator
                 opt_prompt = optimize_prompt_for_speed(category, item["content"])
                 report_lines.append(f"  * ⚡ *Оптимизированный промпт для исправления:* `{opt_prompt}`")
-                
+
                 # Tool combinations suggestion
                 tools_comb = suggest_tool_combinations(category)
                 report_lines.append(f"  * 🛠️ *Рекомендуемые инструменты:* {tools_comb}")
-                
+
                 # Self-healing needs analysis
                 healing_need = analyze_self_healing_needs(item["content"])
                 report_lines.append(f"  * {healing_need}")
