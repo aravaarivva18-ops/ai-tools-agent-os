@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Подробная стилизация интерфейса под Yandex DataLens
+# Подробная стилизация интерфейса под Yandex DataLens без небезопасных React-элементов
 st.markdown("""
 <style>
     /* Базовые цвета Yandex DataLens */
@@ -37,27 +37,20 @@ st.markdown("""
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
-    /* Левая панель навигации (DataLens Sidebar) */
+    /* Сайдбар */
     section[data-testid="stSidebar"] {
         background-color: #0c0f14 !important;
         border-right: 1px solid var(--dl-border) !important;
-        width: 220px !important;
-    }
-    
-    section[data-testid="stSidebar"] .block-container {
-        padding-top: 2rem !important;
     }
 
-    /* Стилизация панелей (дашлетов) */
-    .datalens-dashlet {
-        background-color: #161b22;
-        border: 1px solid var(--dl-border);
-        border-radius: 4px;
-        padding: 16px;
-        margin-bottom: 16px;
+    /* Карточки KPI и контейнеры border=True в стиле DataLens */
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #161b22 !important;
+        border: 1px solid var(--dl-border) !important;
+        border-radius: 4px !important;
+        padding: 16px !important;
     }
 
-    /* Карточки KPI (Селекторы/Индикаторы) */
     div[data-testid="stMetric"] {
         background-color: #161b22 !important;
         border: 1px solid var(--dl-border) !important;
@@ -79,7 +72,7 @@ st.markdown("""
         font-weight: 600 !important;
     }
 
-    /* Кнопки в стиле Yandex Cloud */
+    /* Кнопки Yandex Cloud */
     .stButton>button {
         background-color: var(--dl-blue) !important;
         color: #ffffff !important;
@@ -87,7 +80,7 @@ st.markdown("""
         border-radius: 4px !important;
         font-size: 0.85rem !important;
         font-weight: 500 !important;
-        padding: 6px 16px !important;
+        padding: 6px 12px !important;
         transition: background-color 0.15s ease !important;
     }
     
@@ -97,7 +90,7 @@ st.markdown("""
     }
 
     /* Заголовки */
-    h1, h2, h3 {
+    h1, h2, h3, h4 {
         color: var(--dl-text-light) !important;
         font-weight: 500 !important;
     }
@@ -106,29 +99,6 @@ st.markdown("""
     .dataframe {
         border: 1px solid var(--dl-border) !important;
         background-color: #161b22 !important;
-    }
-
-    /* Кастомная панель навигации в сайдбаре */
-    .nav-item {
-        display: flex;
-        align-items: center;
-        padding: 10px 16px;
-        color: var(--dl-text-main);
-        text-decoration: none;
-        border-radius: 4px;
-        margin-bottom: 4px;
-        font-size: 0.9rem;
-        cursor: pointer;
-    }
-    .nav-item:hover {
-        background-color: rgba(255,255,255,0.05);
-        color: var(--dl-text-light);
-    }
-    .nav-item.active {
-        background-color: rgba(56, 144, 255, 0.15);
-        color: var(--dl-blue);
-        font-weight: 500;
-        border-left: 3px solid var(--dl-blue);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -216,31 +186,21 @@ change_logs["Date"] = pd.to_datetime(change_logs["Date"])
 # ---------------------------------------------------------
 
 with st.sidebar:
-    # Имитация брендинга Яндекс Облака / DataLens
-    st.markdown("""
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
-        <div style="background-color: #3890ff; width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.1rem;">
-            DL
-        </div>
-        <div>
-            <div style="font-weight: 500; font-size: 0.95rem; color: #f0f6fc; line-height: 1.2;">Yandex DataLens</div>
-            <div style="font-size: 0.7rem; color: #8b949e;">Аналитическая система</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.title("☁️ Yandex DataLens")
+    st.caption("Аналитическая система")
+    st.markdown("---")
     
-    # Пункты меню как в оригинальном DataLens
+    # Пункты меню в сайдбаре
     menu_selection = st.radio(
         "Разделы:",
         ["Дашборды", "Чарты", "Датасеты", "Подключения", "Формулы и Справка"],
-        index=0,
-        label_visibility="collapsed"
+        index=0
     )
     
     st.markdown("---")
     st.markdown("""
     <div style="font-size: 0.8rem; color: #8b949e; padding: 10px 0;">
-        <b>Текущий каталог:</b><br>
+        <b>Каталог:</b><br>
         Target Media / pilot-mvp
     </div>
     """, unsafe_allow_html=True)
@@ -251,69 +211,54 @@ with st.sidebar:
 
 if menu_selection == "Подключения":
     st.title("🔌 Подключения (Connections)")
-    st.subheader("Управление источниками данных рекламного агентства")
+    st.subheader("Источники данных рекламного агентства")
     
-    st.markdown("Здесь настраиваются интеграции с рекламными кабинетами, счетчиками аналитики и ручными таблицами.")
+    st.markdown("Управление подключениями к рекламным API и внешним таблицам.")
     
-    # Сетка подключений
+    # Сетка подключений на стандартных st.container
     col_conn1, col_conn2, col_conn3 = st.columns(3)
     
     with col_conn1:
-        st.markdown("""
-        <div class="datalens-dashlet">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                <div style="font-size: 2rem;">🛡️</div>
-                <div>
-                    <h4 style="margin: 0; font-size: 1.05rem; color: #f0f6fc;">Yandex.Direct API</h4>
-                    <span style="font-size: 0.75rem; color: #2baf56; font-weight: 600;">АКТИВНО (OAuth)</span>
-                </div>
-            </div>
-            <p style="font-size: 0.8rem; color: #8b949e;">Логин кабинета: <b>e-17390364</b><br>НДС: <b>Включен (20%)</b><br>Период: Авто-обновление</p>
-            <hr style="border-color: #21262d; margin: 12px 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.75rem; color: #8b949e;">Обновлено 4 часа назад</span>
-                <span style="color: #3890ff; font-size: 0.8rem; font-weight: 500; cursor: pointer;">Настроить</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("#### 🛡️ Yandex.Direct API")
+            st.markdown("🟢 **ПОДКЛЮЧЕНО (OAuth)**")
+            st.markdown("""
+            * Логин: `e-17390364`
+            * НДС: **Включен (20%)**
+            * Режим: **Авто-обновление**
+            """)
+            st.markdown("---")
+            col_b1, col_b2 = st.columns([3, 2])
+            col_b1.caption("Обновлено 4ч назад")
+            col_b2.button("Настроить", key="btn_conn_direct")
         
     with col_conn2:
-        st.markdown("""
-        <div class="datalens-dashlet">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                <div style="font-size: 2rem;">📈</div>
-                <div>
-                    <h4 style="margin: 0; font-size: 1.05rem; color: #f0f6fc;">Yandex.Metrika API</h4>
-                    <span style="font-size: 0.75rem; color: #2baf56; font-weight: 600;">АКТИВНО</span>
-                </div>
-            </div>
-            <p style="font-size: 0.8rem; color: #8b949e;">Счетчик: <b>96109777</b><br>Цели: <b>320946135, 320946351</b><br>Считать лидом: <b>Да</b></p>
-            <hr style="border-color: #21262d; margin: 12px 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.75rem; color: #8b949e;">Обновлено 4 часа назад</span>
-                <span style="color: #3890ff; font-size: 0.8rem; font-weight: 500; cursor: pointer;">Настроить</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("#### 📈 Yandex.Metrika API")
+            st.markdown("🟢 **ПОДКЛЮЧЕНО**")
+            st.markdown("""
+            * Счетчик: `96109777`
+            * Цели: `320946135`, `320946351`
+            * Лиды: **Считать лидом = Да**
+            """)
+            st.markdown("---")
+            col_b3, col_b4 = st.columns([3, 2])
+            col_b3.caption("Обновлено 4ч назад")
+            col_b4.button("Настроить", key="btn_conn_metrika")
         
     with col_conn3:
-        st.markdown("""
-        <div class="datalens-dashlet">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                <div style="font-size: 2rem;">📁</div>
-                <div>
-                    <h4 style="margin: 0; font-size: 1.05rem; color: #f0f6fc;">Google Sheets / Excel</h4>
-                    <span style="font-size: 0.75rem; color: #2baf56; font-weight: 600;">ЗАГРУЖЕНО</span>
-                </div>
-            </div>
-            <p style="font-size: 0.8rem; color: #8b949e;">Файл: <b>dashboard_input_pack_mvp...xlsx</b><br>План KPI: Лист 04 ( June 2026 )<br>Журнал изменений: Лист 05</p>
-            <hr style="border-color: #21262d; margin: 12px 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.75rem; color: #8b949e;">Обновлено вручную</span>
-                <span style="color: #3890ff; font-size: 0.8rem; font-weight: 500; cursor: pointer;">Загрузить новый</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("#### 📁 Google Sheets / Excel")
+            st.markdown("🟢 **ЗАГРУЖЕНО**")
+            st.markdown("""
+            * Файл: `dashboard_input_pack...xlsx`
+            * Планы: **Лист 04 (June 2026)**
+            * Изменения: **Лист 05 (Лог)**
+            """)
+            st.markdown("---")
+            col_b5, col_b6 = st.columns([3, 2])
+            col_b5.caption("Загружено вручную")
+            col_b6.button("Загрузить", key="btn_conn_excel")
 
     st.markdown("---")
     st.button("+ Создать новое подключение")
@@ -393,28 +338,20 @@ elif menu_selection == "Чарты":
 # ---------------------------------------------------------
 
 elif menu_selection == "Дашборды":
-    # ---------------------------------------------------------
-    # СЕЛЕКТОРЫ И ФИЛЬТРЫ (В соответствии с DataLens - сверху дашборда!)
-    # ---------------------------------------------------------
     st.title("🖥️ Дашборд: Контроль KPI рекламных кампаний")
     
     # Селекторы в один ряд сверху дашборда (Фирменный стиль DataLens!)
-    st.markdown("""
-    <div style="background-color: #161b22; border: 1px solid #21262d; border-radius: 4px; padding: 12px; margin-bottom: 20px;">
-        <span style="font-size: 0.8rem; color: #8b949e; font-weight: 600; text-transform: uppercase;">Панель селекторов (Фильтры)</span>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col_sel1, col_sel2, col_sel3, col_sel4 = st.columns(4)
-    with col_sel1:
-        client_sel = st.selectbox("Клиент (Селектор):", ["ООО Парковка-Уфа"], label_visibility="collapsed")
-    with col_sel2:
-        project_sel = st.selectbox("Проект (Селектор):", ["Парковка Уфа (PR-001)"], label_visibility="collapsed")
-    with col_sel3:
-        manager_sel = st.selectbox("Ответственный (Селектор):", ["Александр"], label_visibility="collapsed")
-    with col_sel4:
-        # Упрощенный выбор периода дат
-        date_sel = st.date_input("Период (Селектор):", value=(date(2026, 6, 1), date(2026, 6, 30)), label_visibility="collapsed")
+    with st.container(border=True):
+        st.caption("Панель селекторов (Фильтры)")
+        col_sel1, col_sel2, col_sel3, col_sel4 = st.columns(4)
+        with col_sel1:
+            client_sel = st.selectbox("Клиент:", ["ООО Парковка-Уфа"])
+        with col_sel2:
+            project_sel = st.selectbox("Проект:", ["Парковка Уфа (PR-001)"])
+        with col_sel3:
+            manager_sel = st.selectbox("Ответственный:", ["Александр"])
+        with col_sel4:
+            date_sel = st.date_input("Период:", value=(date(2026, 6, 1), date(2026, 6, 30)))
         
     # Парсим выбранный диапазон дат
     if isinstance(date_sel, tuple) and len(date_sel) == 2:
@@ -645,7 +582,15 @@ elif menu_selection == "Дашборды":
         st.markdown("#### Операционный таймлайн ( Change Log )")
         
         # Журнал изменений из Excel
-        st.table(change_logs)
+        # Создаем копию для красивого вывода в таблице
+        display_logs = change_logs.copy()
+        display_logs["Date"] = display_logs["Date"].dt.strftime("%d.%m.%Y")
+        st.table(display_logs.rename(columns={
+            "Date": "Дата изменений",
+            "Changes": "Описание изменений на аккаунте",
+            "Expected": "Ожидаемый эффект",
+            "Comment": "Комментарии менеджера"
+        }))
 
 # ---------------------------------------------------------
 # 7. ЭКРАН: СПРАВКА И ФОРМУЛЫ (METRICS EXPLAINER)
@@ -663,12 +608,12 @@ else:
     \end{cases}
     """)
     
-    st.markdown("### Темп расхода рекламного бюджета (Budget Pacing)")
+    st.markdown("### 2. Темп расхода рекламного бюджета (Budget Pacing)")
     st.latex(r"""
     \text{Pacing (\%)} = \frac{\text{Fact Spend}_{\text{daily\_avg}}}{\text{Plan Spend}_{\text{daily\_avg}}} \times 100\% = \frac{\text{Cumulative Fact Spend} / D_{\text{elapsed}}}{\text{Total Monthly Budget Plan} / D_{\text{total}}} \times 100\%
     """)
     
-    st.markdown("### Выполнение планового объема лидов (Lead Pacing)")
+    st.markdown("### 3. Выполнение планового объема лидов (Lead Pacing)")
     st.latex(r"""
     \text{Lead Pacing (\%)} = \frac{\text{Cumulative Fact Leads}}{\text{Expected Cumulative Plan Leads for Current Day}} \times 100\%
     """)
@@ -676,7 +621,7 @@ else:
     \text{Expected Cumulative Plan Leads for Current Day} = \frac{\text{Total Monthly Leads Plan}}{D_{\text{total}}} \times D_{\text{elapsed}}
     """)
     
-    st.markdown("### Исключение НДС из затрат")
+    st.markdown("### 4. Исключение НДС из затрат")
     st.latex(r"""
     \text{Spent}_{\text{ex\_vat}} = \frac{\text{Spent}_{\text{with\_vat}}}{1 + \text{VAT Rate}} = \frac{\text{Spent}_{\text{with\_vat}}}{1.20}
     """)
