@@ -202,6 +202,15 @@ def get_datalens_dataset():
 
 df, budget_plan, leads_plan, cpl_plan = get_datalens_dataset()
 
+# Определение журнала изменений (change_logs)
+change_logs = pd.DataFrame([
+    {"Date": "2026-06-03", "Changes": "Запуск новых РСЯ объявлений", "Expected": "Рост лидов", "Comment": "Добавили 4 новых креатива"},
+    {"Date": "2026-06-10", "Changes": "Корректировка ставок по ключевым фразам", "Expected": "Снижение CPL", "Comment": "Понизили ставки на неконверсионные фразы"},
+    {"Date": "2026-06-18", "Changes": "Обновление баннеров на поиске", "Expected": "Рост CTR", "Comment": "Заменили старые статичные баннеры"},
+    {"Date": "2026-06-25", "Changes": "Добавление минус-слов", "Expected": "Очистка мусорного трафика", "Comment": "Исключили нецелевые запросы из отчета"}
+])
+change_logs["Date"] = pd.to_datetime(change_logs["Date"])
+
 # ---------------------------------------------------------
 # 2. ЛЕВАЯ ПАНЕЛЬ НАВИГАЦИИ (YANDEX DATALENS SIDEBAR)
 # ---------------------------------------------------------
@@ -335,7 +344,7 @@ elif menu_selection == "Датасеты":
     
     st.markdown("---")
     st.write("**Предпросмотр данных (Preview):**")
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df, width="stretch")
 
 # ---------------------------------------------------------
 # 5. ЭКРАН: ЧАРТЫ (CHARTS / CHART BUILDER)
@@ -377,7 +386,7 @@ elif menu_selection == "Чарты":
         template="plotly_dark",
         margin=dict(l=20, r=20, t=40, b=20)
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 # ---------------------------------------------------------
 # 6. ЭКРАН: ДАШБОРДЫ (DASHBOARDS)
@@ -543,7 +552,7 @@ elif menu_selection == "Дашборды":
                     styled_df = styled_df.hide(columns_to_hide)
                 except Exception:
                     pass
-        st.dataframe(styled_df, use_container_width=True)
+        st.dataframe(styled_df, width="stretch")
         
         st.markdown("""
         <div style="font-size: 0.8rem; color: #8b949e; margin-top: 10px;">
@@ -578,7 +587,7 @@ elif menu_selection == "Дашборды":
                 template="plotly_dark",
                 legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
             )
-            st.plotly_chart(fig_spent_cum, use_container_width=True)
+            st.plotly_chart(fig_spent_cum, width="stretch")
             
         with col_c2:
             fig_leads_cum = go.Figure()
@@ -599,7 +608,7 @@ elif menu_selection == "Дашборды":
                 template="plotly_dark",
                 legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
             )
-            st.plotly_chart(fig_leads_cum, use_container_width=True)
+            st.plotly_chart(fig_leads_cum, width="stretch")
             
         st.markdown("---")
         
@@ -614,7 +623,7 @@ elif menu_selection == "Дашборды":
                 color_discrete_sequence=["#3890ff"]
             )
             fig_leads_daily.update_layout(template="plotly_dark")
-            st.plotly_chart(fig_leads_daily, use_container_width=True)
+            st.plotly_chart(fig_leads_daily, width="stretch")
             
         with col_c4:
             fig_cpl_daily = px.line(
@@ -628,7 +637,7 @@ elif menu_selection == "Дашборды":
                 annotation_text=f"Лимит CPL {cpl_plan} ₽", annotation_position="top left"
             )
             fig_cpl_daily.update_layout(template="plotly_dark")
-            st.plotly_chart(fig_cpl_daily, use_container_width=True)
+            st.plotly_chart(fig_cpl_daily, width="stretch")
             
         st.markdown("---")
         
