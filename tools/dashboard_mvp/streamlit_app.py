@@ -131,7 +131,7 @@ st.markdown("""
         border-left: 3px solid var(--dl-blue);
     }
 </style>
-""", unsafe_style_html=True)
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # 1. ГЕНЕРАЦИЯ ДАННЫХ ДЛЯ ДАШБОРДА (ИЮНЬ 2026)
@@ -218,7 +218,7 @@ with st.sidebar:
             <div style="font-size: 0.7rem; color: #8b949e;">Аналитическая система</div>
         </div>
     </div>
-    """, unsafe_style_html=True)
+    """, unsafe_allow_html=True)
     
     # Пункты меню как в оригинальном DataLens
     menu_selection = st.radio(
@@ -234,7 +234,7 @@ with st.sidebar:
         <b>Текущий каталог:</b><br>
         Target Media / pilot-mvp
     </div>
-    """, unsafe_style_html=True)
+    """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # 3. ЭКРАН: ПОДКЛЮЧЕНИЯ (CONNECTIONS)
@@ -266,7 +266,7 @@ if menu_selection == "Подключения":
                 <span style="color: #3890ff; font-size: 0.8rem; font-weight: 500; cursor: pointer;">Настроить</span>
             </div>
         </div>
-        """, unsafe_style_html=True)
+        """, unsafe_allow_html=True)
         
     with col_conn2:
         st.markdown("""
@@ -285,7 +285,7 @@ if menu_selection == "Подключения":
                 <span style="color: #3890ff; font-size: 0.8rem; font-weight: 500; cursor: pointer;">Настроить</span>
             </div>
         </div>
-        """, unsafe_style_html=True)
+        """, unsafe_allow_html=True)
         
     with col_conn3:
         st.markdown("""
@@ -304,7 +304,7 @@ if menu_selection == "Подключения":
                 <span style="color: #3890ff; font-size: 0.8rem; font-weight: 500; cursor: pointer;">Загрузить новый</span>
             </div>
         </div>
-        """, unsafe_style_html=True)
+        """, unsafe_allow_html=True)
 
     st.markdown("---")
     st.button("+ Создать новое подключение")
@@ -394,7 +394,7 @@ elif menu_selection == "Дашборды":
     <div style="background-color: #161b22; border: 1px solid #21262d; border-radius: 4px; padding: 12px; margin-bottom: 20px;">
         <span style="font-size: 0.8rem; color: #8b949e; font-weight: 600; text-transform: uppercase;">Панель селекторов (Фильтры)</span>
     </div>
-    """, unsafe_style_html=True)
+    """, unsafe_allow_html=True)
     
     col_sel1, col_sel2, col_sel3, col_sel4 = st.columns(4)
     with col_sel1:
@@ -531,14 +531,25 @@ elif menu_selection == "Дашборды":
                 color = 'background-color: rgba(43, 175, 86, 0.15); color: #56d364;' # Yandex Green 15% opacity
             return [color] * len(row)
 
-        styled_df = matrix_df.style.apply(dl_style_deviation, axis=1).hide(columns=["_pacing", "_cpl_dev"])
+        styled_df = matrix_df.style.apply(dl_style_deviation, axis=1)
+        columns_to_hide = ["_pacing", "_cpl_dev"]
+        try:
+            styled_df = styled_df.hide(axis="columns", subset=columns_to_hide)
+        except Exception:
+            try:
+                styled_df = styled_df.hide_columns(columns_to_hide)
+            except Exception:
+                try:
+                    styled_df = styled_df.hide(columns_to_hide)
+                except Exception:
+                    pass
         st.dataframe(styled_df, use_container_width=True)
         
         st.markdown("""
         <div style="font-size: 0.8rem; color: #8b949e; margin-top: 10px;">
             ⚠️ <b>Маркеры отклонений:</b> Подсветка строки включается автоматически при перерасходе суточного лимита бюджета на 15% или удорожании CPL на 10%.
         </div>
-        """, unsafe_style_html=True)
+        """, unsafe_allow_html=True)
         
     # --- ВКЛАДКА 2: ДЕТАЛЬНАЯ КАРТОЧКА ---
     with tab_detail:
