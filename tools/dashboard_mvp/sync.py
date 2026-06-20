@@ -39,11 +39,16 @@ def get_mock_yandex_data(start_date_str: str, end_date_str: str):
         # Округлим лиды до целого, минимум 0
         leads = max(0, leads)
 
+        # Квалифицированные лиды (30-60% от лидов)
+        qualified_leads = int(leads * random.uniform(0.3, 0.6))
+        qualified_leads = max(0, qualified_leads)
+
         data[current_date] = {
             "impressions": impressions,
             "clicks": clicks,
             "spent": spent,
-            "leads": leads
+            "leads": leads,
+            "qualified_leads": qualified_leads
         }
         current_date += timedelta(days=1)
 
@@ -72,6 +77,7 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
     if not token or token == "mock_token":
         print(f"[SYNC MOCK] Синхронизация проекта {project_id} в режиме имитации.")
         mock_data = get_mock_yandex_data(start_date_str, end_date_str)
+        project = db.query(Project).filter(Project.id == project_id).first()
 
         for dt, stats in mock_data.items():
             # Ищем или создаем запись статистики на этот день
@@ -80,30 +86,40 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
                 DailyStat.date == dt
             ).first()
 
+            # Учет НДС
+            spent = stats["spent"]
+            if project and project.vat_type == "without_vat":
+                spent = round(spent / (1.0 + project.vat_rate), 2)
+
             # Вычисляем производные показатели
             ctr = (stats["clicks"] / stats["impressions"] * 100) if stats["impressions"] > 0 else 0
-            cpc = (stats["spent"] / stats["clicks"]) if stats["clicks"] > 0 else 0
-            cpl = (stats["spent"] / stats["leads"]) if stats["leads"] > 0 else 0
+            cpc = (spent / stats["clicks"]) if stats["clicks"] > 0 else 0
+            cpl = (spent / stats["leads"]) if stats["leads"] > 0 else 0
+            cpl_qualified = (spent / stats["qualified_leads"]) if stats["qualified_leads"] > 0 else 0
 
             if stat:
                 stat.impressions = stats["impressions"]
                 stat.clicks = stats["clicks"]
-                stat.spent = stats["spent"]
+                stat.spent = spent
                 stat.leads = stats["leads"]
+                stat.qualified_leads = stats["qualified_leads"]
                 stat.ctr = round(ctr, 2)
                 stat.cpc = round(cpc, 2)
                 stat.cpl = round(cpl, 2)
+                stat.cpl_qualified = round(cpl_qualified, 2)
             else:
                 stat = DailyStat(
                     project_id=project_id,
                     date=dt,
                     impressions=stats["impressions"],
                     clicks=stats["clicks"],
-                    spent=stats["spent"],
+                    spent=spent,
                     leads=stats["leads"],
+                    qualified_leads=stats["qualified_leads"],
                     ctr=round(ctr, 2),
                     cpc=round(cpc, 2),
-                    cpl=round(cpl, 2)
+                    cpl=round(cpl, 2),
+                    cpl_qualified=round(cpl_qualified, 2)
                 )
                 db.add(stat)
 
@@ -112,6 +128,7 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
 
     # --- Реальный запрос к API Яндекса (при наличии токена) ---
     print(f"[SYNC] Запуск реальной синхронизации для проекта {project_id} по API.")
+    project = db.query(Project).filter(Project.id == project_id).first()
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept-Language": "ru",
@@ -156,6 +173,11 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
                 dt = datetime.strptime(dt_str, "%Y-%m-%d").date()
                 # Директ возвращает Cost в микро-валюте (умноженной на 1 000 000), делим
                 spent = float(parts[3]) / 1000000.0 if parts[3].isdigit() else 0.0
+
+                # Учет НДС
+                if project and project.vat_type == "without_vat":
+                    spent = spent / (1.0 + project.vat_rate)
+
                 direct_stats[dt] = {
                     "impressions": int(parts[1]) if parts[1].isdigit() else 0,
                     "clicks": int(parts[2]) if parts[2].isdigit() else 0,
@@ -164,12 +186,13 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
 
         # 2. Запрос конверсий из Метрики
         metrika_stats = {}
-        if mapping.metrika_counter_id and mapping.lead_goals_ids:
+        if mapping.metrika_counter_id and (mapping.lead_goals_ids or mapping.qual_goals_ids):
             counter_id = mapping.metrika_counter_id
-            goals = mapping.lead_goals_ids.split(',')
+            goals = mapping.lead_goals_ids.split(',') if mapping.lead_goals_ids else []
+            qual_goals = mapping.qual_goals_ids.split(',') if mapping.qual_goals_ids else []
 
-            # Формируем метрики для достижения целей, например ym:s:goal320946135reaches
-            goal_metrics = [f"ym:s:goal{goal_id}reaches" for goal_id in goals]
+            all_goals = goals + qual_goals
+            goal_metrics = [f"ym:s:goal{goal_id}reaches" for goal_id in all_goals]
             metrics_param = ",".join(goal_metrics)
 
             metrika_url = (
@@ -191,15 +214,23 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
                 for row in metrika_data.get("data", []):
                     dt_str = row["dimensions"][0]["name"]
                     dt = datetime.strptime(dt_str, "%Y-%m-%d").date()
-                    # Суммируем количество достижений всех указанных целей на этот день
-                    leads_sum = sum(float(val) for val in row["metrics"])
-                    metrika_stats[dt] = int(leads_sum)
+                    
+                    # Разделяем метрики на обычные и квал-лиды
+                    metrics_vals = [float(val) for val in row["metrics"]]
+                    
+                    leads_sum = sum(metrics_vals[i] for i in range(len(goals))) if goals else 0.0
+                    qual_leads_sum = sum(metrics_vals[len(goals) + i] for i in range(len(qual_goals))) if qual_goals else 0.0
+                    
+                    metrika_stats[dt] = {
+                        "leads": int(leads_sum),
+                        "qualified_leads": int(qual_leads_sum)
+                    }
 
         # 3. Объединяем и сохраняем данные в БД
         all_dates = set(direct_stats.keys()).union(set(metrika_stats.keys()))
         for dt in all_dates:
             d_stat = direct_stats.get(dt, {"impressions": 0, "clicks": 0, "spent": 0.0})
-            leads = metrika_stats.get(dt, 0)
+            m_stat = metrika_stats.get(dt, {"leads": 0, "qualified_leads": 0})
 
             stat = db.query(DailyStat).filter(
                 DailyStat.project_id == project_id,
@@ -208,16 +239,19 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
 
             ctr = (d_stat["clicks"] / d_stat["impressions"] * 100) if d_stat["impressions"] > 0 else 0
             cpc = (d_stat["spent"] / d_stat["clicks"]) if d_stat["clicks"] > 0 else 0
-            cpl = (d_stat["spent"] / leads) if leads > 0 else 0
+            cpl = (d_stat["spent"] / m_stat["leads"]) if m_stat["leads"] > 0 else 0
+            cpl_qualified = (d_stat["spent"] / m_stat["qualified_leads"]) if m_stat["qualified_leads"] > 0 else 0
 
             if stat:
                 stat.impressions = d_stat["impressions"]
                 stat.clicks = d_stat["clicks"]
                 stat.spent = d_stat["spent"]
-                stat.leads = leads
+                stat.leads = m_stat["leads"]
+                stat.qualified_leads = m_stat["qualified_leads"]
                 stat.ctr = round(ctr, 2)
                 stat.cpc = round(cpc, 2)
                 stat.cpl = round(cpl, 2)
+                stat.cpl_qualified = round(cpl_qualified, 2)
             else:
                 stat = DailyStat(
                     project_id=project_id,
@@ -225,10 +259,12 @@ async def sync_yandex_data(db: Session, project_id: int, start_date_str: str, en
                     impressions=d_stat["impressions"],
                     clicks=d_stat["clicks"],
                     spent=d_stat["spent"],
-                    leads=leads,
+                    leads=m_stat["leads"],
+                    qualified_leads=m_stat["qualified_leads"],
                     ctr=round(ctr, 2),
                     cpc=round(cpc, 2),
-                    cpl=round(cpl, 2)
+                    cpl=round(cpl, 2),
+                    cpl_qualified=round(cpl_qualified, 2)
                 )
                 db.add(stat)
 
@@ -260,6 +296,8 @@ def sync_excel_data(db: Session, file_path: str):
             budget_plan = float(row[4]) if row[4] is not None else 0.0
             leads_plan = int(row[5]) if row[5] is not None else 0
             cpl_plan = float(row[6]) if row[6] is not None else 0.0
+            qualified_leads_plan = int(row[7]) if (len(row) > 7 and row[7] is not None) else 0
+            cpl_qualified_plan = float(row[8]) if (len(row) > 8 and row[8] is not None) else 0.0
 
             # Ищем проект по строковому ID (например PR-001 -> id 1)
             # В MVP просто выделим числовой ID из строки типа PR-001
@@ -283,13 +321,17 @@ def sync_excel_data(db: Session, file_path: str):
                 plan.budget_plan = budget_plan
                 plan.leads_plan = leads_plan
                 plan.cpl_plan = cpl_plan
+                plan.qualified_leads_plan = qualified_leads_plan
+                plan.cpl_qualified_plan = cpl_qualified_plan
             else:
                 plan = KPIPlan(
                     month=month,
                     project_id=project_id,
                     budget_plan=budget_plan,
                     leads_plan=leads_plan,
-                    cpl_plan=cpl_plan
+                    cpl_plan=cpl_plan,
+                    qualified_leads_plan=qualified_leads_plan,
+                    cpl_qualified_plan=cpl_qualified_plan
                 )
                 db.add(plan)
         db.commit()
