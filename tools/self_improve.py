@@ -61,6 +61,24 @@ def optimize_prompt_for_speed(category: str, issue_content: str) -> str:
     return f"Исправь {category}: {summary}. Используй TDD, YAGNI (max 3 levels) и Solo Loop."
 
 
+def suggest_tool_combinations(category: str) -> str:
+    """Рекомендует эффективные комбинации инструментов для решения проблемы."""
+    cat_lower = category.lower()
+    if "oom" in cat_lower or "memory" in cat_lower or "памят" in cat_lower:
+        return "`view_file` (ограничение чтения строк) + `run_command` (очистка памяти/проверка логов)"
+    if "тест" in cat_lower or "ошибк" in cat_lower or "fail" in cat_lower or "error" in cat_lower:
+        return "`replace_file_content` (точечные правки) + `run_command` (запуск тестов) + `tools/test_healer.py` (автоисправление)"
+    return "`search_web` (сбор фактов) + `replace_file_content` (правка) + `make check-rules` (валидация)"
+
+
+def analyze_self_healing_needs(issue_content: str) -> str:
+    """Определяет, нужен ли запуск test_healer.py для самовосстановления."""
+    content_lower = issue_content.lower()
+    if any(k in content_lower for k in ["failed", "assert", "traceback", "syntaxerror", "import"]):
+        return "⚠️ Рекомендуется запуск `tools/test_healer.py` для автоматического исправления тестов/импортов."
+    return "💡 Проблема решается стандартным редактированием через `replace_file_content`."
+
+
 def generate_improvement_report(
     friction_logs_path: Path, output_path: Path
 ) -> dict:
@@ -141,6 +159,14 @@ def generate_improvement_report(
                 # Speed-optimized prompt generator
                 opt_prompt = optimize_prompt_for_speed(category, item["content"])
                 report_lines.append(f"  * ⚡ *Оптимизированный промпт для исправления:* `{opt_prompt}`")
+                
+                # Tool combinations suggestion
+                tools_comb = suggest_tool_combinations(category)
+                report_lines.append(f"  * 🛠️ *Рекомендуемые инструменты:* {tools_comb}")
+                
+                # Self-healing needs analysis
+                healing_need = analyze_self_healing_needs(item["content"])
+                report_lines.append(f"  * {healing_need}")
                 report_lines.append("")
 
     # Detect tool conflicts
