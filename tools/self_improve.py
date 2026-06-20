@@ -15,15 +15,13 @@ except ImportError:
 
 
 def generate_research_queries(category: str, issue_content: str) -> list:
-    """
-    Генерирует целевые поисковые запросы для GitHub/arXiv/Web на основе описания проблемы.
-    """
+    """Генерирует целевые поисковые запросы для GitHub/arXiv/Web на основе описания проблемы."""
     # Очищаем текст от спецсимволов для формирования чистого поискового запроса
     clean_text = "".join(c if c.isalnum() or c.isspace() else " " for c in issue_content).strip()
     # Берем первые несколько значимых слов (длиной > 3 символов)
     words = [w for w in clean_text.split() if len(w) > 3][:6]
     keywords = " ".join(words)
-    
+
     queries = [
         f"site:github.com {category} {keywords}",
         f"site:arxiv.org {category} {keywords}",
@@ -86,7 +84,13 @@ def generate_improvement_report(
     if not issues_by_category:
         report_lines.append("🎉 Точки трения не обнаружены! Все системы работают в режиме YAGNI.")
     else:
-        for category, items in issues_by_category.items():
+        # Prioritize high-impact issues (OOM, memory leaks, critical errors)
+        sorted_categories = sorted(
+            issues_by_category.keys(),
+            key=lambda cat: 0 if any(k in cat.lower() for k in ["oom", "memory", "критич", "ошибка"]) else 1
+        )
+        for category in sorted_categories:
+            items = issues_by_category[category]
             report_lines.append(f"### 🛑 Категория: {category}")
             for item in items:
                 report_lines.append(
@@ -96,7 +100,7 @@ def generate_improvement_report(
                 content_lines = item["content"].splitlines()
                 for line in content_lines:
                     report_lines.append(f"  > {line}")
-                
+
                 # Karpathy-style research queries generator
                 queries = generate_research_queries(category, item["content"])
                 report_lines.append("  * 🔍 *Рекомендуемые запросы для исследования (Karpathy Research Step)*:")
