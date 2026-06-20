@@ -41,7 +41,7 @@ st.markdown("""
         margin-bottom: 20px;
     }
 </style>
-""", unsafe_style_html=True)
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # 1. ГЕНЕРАЦИЯ MOCK-ДАННЫХ (ПАРКОВКА УФА - ИЮНЬ 2026)
