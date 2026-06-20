@@ -14,6 +14,24 @@ except ImportError:
         collect = None
 
 
+def generate_research_queries(category: str, issue_content: str) -> list:
+    """
+    Генерирует целевые поисковые запросы для GitHub/arXiv/Web на основе описания проблемы.
+    """
+    # Очищаем текст от спецсимволов для формирования чистого поискового запроса
+    clean_text = "".join(c if c.isalnum() or c.isspace() else " " for c in issue_content).strip()
+    # Берем первые несколько значимых слов (длиной > 3 символов)
+    words = [w for w in clean_text.split() if len(w) > 3][:6]
+    keywords = " ".join(words)
+    
+    queries = [
+        f"site:github.com {category} {keywords}",
+        f"site:arxiv.org {category} {keywords}",
+        f"best practices {category} {keywords}"
+    ]
+    return queries
+
+
 def generate_improvement_report(
     friction_logs_path: Path, output_path: Path
 ) -> dict:
@@ -78,6 +96,12 @@ def generate_improvement_report(
                 content_lines = item["content"].splitlines()
                 for line in content_lines:
                     report_lines.append(f"  > {line}")
+                
+                # Karpathy-style research queries generator
+                queries = generate_research_queries(category, item["content"])
+                report_lines.append("  * 🔍 *Рекомендуемые запросы для исследования (Karpathy Research Step)*:")
+                for q in queries:
+                    report_lines.append(f"    - `{q}`")
                 report_lines.append("")
 
     report_lines.extend(
