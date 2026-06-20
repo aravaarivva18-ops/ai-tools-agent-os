@@ -9,6 +9,8 @@ RULES_FILES = [
     WORKSPACE_ROOT / "CLAUDE.md",
     WORKSPACE_ROOT / "AGENTS.md",
     WORKSPACE_ROOT / ".cursorrules",
+    Path("/Users/rus/GEMINI_ANTIGRAVITY.md"),
+    Path("/Users/rus/STUDENT_GUIDE.md"),
 ]
 
 def check_file_links() -> bool:
@@ -26,7 +28,8 @@ def check_file_links() -> bool:
         matches = link_pattern.findall(content)
         
         for rel_path_str in matches:
-            # Убираем возможные trailing знаки пунктуации из регулярки
+            # Убираем возможные trailing знаки пунктуации, кавычки и бэктики из регулярки
+            rel_path_str = rel_path_str.rstrip(".,;`*\"'")
             rel_path_str = rel_path_str.split('#')[0] # Игнорируем якоря строк типа #L10
             target_path = WORKSPACE_ROOT / rel_path_str
             
