@@ -18,7 +18,6 @@
 - [ai-marketing/](file:///Users/rus/ai-tools/ai-marketing/) — анализ маркетинговых стратегий и генерация PDF-отчетов.
 - [ai-legal/](file:///Users/rus/ai-tools/ai-legal/) — анализ юридических договоров, генерация типовых контрактов и PDF.
 - [skills/](file:///Users/rus/ai-tools/skills/) — специализированные навыки ИИ-агентов (модульные инструкции).
-- [ollama/](file:///Users/rus/ai-tools/ollama/) — конфигурации Modelfile для локального запуска моделей.
 - [tools/](file:///Users/rus/ai-tools/tools/) — общие утилиты и дашборд мониторинга (`dashboard.py`).
 
 ## 🔌 Подключение навыков по запросу (Just-In-Time Skills)

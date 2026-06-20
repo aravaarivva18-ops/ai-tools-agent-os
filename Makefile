@@ -1,4 +1,4 @@
-.PHONY: sync lint format check test clean
+.PHONY: sync lint format check check-rules check-all test clean
 
 sync:
 	uv sync --all-packages
@@ -9,18 +9,20 @@ lint:
 format:
 	uv run ruff format .
 
-check:
+check-rules:
+	python3 tools/check_rules.py
+
+check: check-rules
 	uv run ruff check .
 	uv run ruff format --check .
-	"/Users/rus/ai-tools/.venv/bin/python" -m bandit -r . -x ./.venv,./.git -s B101,B110,B112,B310,B311,B404,B603,B607
+	uv run mypy tools/ geo-seo/
+	uv run bandit -r . -x ./.venv,./.git,./tools/.venv,./tools/.gemini -s B101,B105,B108,B110,B112,B310,B311,B404,B603,B607
 
+check-all: check test
 
 test:
-	uv run --package geo-seo pytest
-	uv run --package ai-agency pytest ai-agency/
-	uv run pytest tools/
-
-
+	uv run --package geo-seo pytest geo-seo/tests/ -v
+	uv run pytest tools/ tools/tests/ -v
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
