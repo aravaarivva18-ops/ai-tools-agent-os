@@ -13,7 +13,8 @@ st.set_page_config(
 )
 
 # Подробная стилизация интерфейса под Yandex DataLens без небезопасных React-элементов
-st.markdown("""
+st.html("""
+<meta name="google" content="notranslate">
 <style>
     /* Базовые цвета Yandex DataLens */
     :root {
@@ -101,7 +102,7 @@ st.markdown("""
         background-color: #161b22 !important;
     }
 </style>
-""", unsafe_allow_html=True)
+""")
 
 # ---------------------------------------------------------
 # 1. ГЕНЕРАЦИЯ ДАННЫХ ДЛЯ ДАШБОРДА (ИЮНЬ 2026)
@@ -198,12 +199,7 @@ with st.sidebar:
     )
     
     st.markdown("---")
-    st.markdown("""
-    <div style="font-size: 0.8rem; color: #8b949e; padding: 10px 0;">
-        <b>Каталог:</b><br>
-        Target Media / pilot-mvp
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("**Каталог:**\nTarget Media / pilot-mvp")
 
 # ---------------------------------------------------------
 # 3. ЭКРАН: ПОДКЛЮЧЕНИЯ (CONNECTIONS)
@@ -491,11 +487,7 @@ elif menu_selection == "Дашборды":
                     pass
         st.dataframe(styled_df, width="stretch")
         
-        st.markdown("""
-        <div style="font-size: 0.8rem; color: #8b949e; margin-top: 10px;">
-            ⚠️ <b>Маркеры отклонений:</b> Подсветка строки включается автоматически при перерасходе суточного лимита бюджета на 15% или удорожании CPL на 10%.
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("⚠️ **Маркеры отклонений:** Подсветка строки включается автоматически при перерасходе суточного лимита бюджета на 15% или удорожании CPL на 10%.")
         
     # --- ВКЛАДКА 2: ДЕТАЛЬНАЯ КАРТОЧКА ---
     with tab_detail:
