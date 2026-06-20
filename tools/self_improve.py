@@ -47,13 +47,18 @@ def detect_tool_conflicts(logs: list) -> list:
     return list(set(conflicts))
 
 
-def optimize_prompt_for_speed(issue_content: str) -> str:
+def optimize_prompt_for_speed(category: str, issue_content: str) -> str:
     """Создает оптимизированный сжатый промпт для устранения указанной проблемы."""
-    # Очищаем и берем первые 8 значимых слов длиннее 4 символов
-    clean_text = "".join(c if c.isalnum() or c.isspace() else " " for c in issue_content).strip()
-    words = [w for w in clean_text.split() if len(w) > 4][:8]
-    keywords = " ".join(words)
-    return f"Исправь ошибку: {keywords}. Используй TDD, YAGNI (max 3 levels) и Solo Loop. Дай только diff."
+    # Извлекаем первую непустую строку контента
+    lines = [line.strip() for line in issue_content.splitlines() if line.strip()]
+    first_line = lines[0] if lines else ""
+    
+    # Очищаем от спецсимволов и берем первые 10 слов
+    clean_line = "".join(c if c.isalnum() or c.isspace() else " " for c in first_line).strip()
+    summary = " ".join(clean_line.split()[:10])
+    
+    # Формируем компактный промпт
+    return f"Исправь {category}: {summary}. Используй TDD, YAGNI (max 3 levels) и Solo Loop."
 
 
 def generate_improvement_report(
@@ -134,7 +139,7 @@ def generate_improvement_report(
                     report_lines.append(f"    - `{q}`")
                 
                 # Speed-optimized prompt generator
-                opt_prompt = optimize_prompt_for_speed(item["content"])
+                opt_prompt = optimize_prompt_for_speed(category, item["content"])
                 report_lines.append(f"  * ⚡ *Оптимизированный промпт для исправления:* `{opt_prompt}`")
                 report_lines.append("")
 
