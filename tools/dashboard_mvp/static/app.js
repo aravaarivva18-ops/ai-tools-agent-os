@@ -175,7 +175,7 @@ async function loadSummary() {
             }
             
             const tr = document.createElement("tr");
-            tr.className = "hover:bg-slate-900/30 transition border-b border-slate-800/50";
+            tr.className = "table-row-interactive hover:bg-slate-900/30 border-b border-slate-800/50";
             tr.innerHTML = `
                 <td class="py-4 px-6">
                     <a href="#/project/${p.id}" class="font-semibold text-white hover:text-sky-400 transition block text-base">${p.project_name}</a>
@@ -195,7 +195,7 @@ async function loadSummary() {
                     ${p.plan ? `<div class="text-xs text-slate-500 mt-0.5">План: ${formatCurrency(p.plan.cpl)}</div><span class="inline-block mt-1.5 px-2 py-0.5 text-2xs rounded-full font-medium ${cplClass}">${p.deviations.cpl_deviation_pct > 0 ? '+' : ''}${p.deviations.cpl_deviation_pct}%</span>` : `<span class="text-xs text-slate-600">—</span>`}
                 </td>
                 <td class="py-4 px-6 text-center">
-                    <a href="#/project/${p.id}" class="py-1.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-medium text-xs transition inline-flex items-center gap-1 border border-slate-700">
+                    <a href="#/project/${p.id}" class="py-1.5 px-3 rounded-lg bg-slate-850 hover:bg-slate-800 text-slate-200 hover:text-white font-medium text-xs transition btn-spring inline-flex items-center gap-1 border border-slate-800">
                         <i class="fa-solid fa-chart-line text-sky-400"></i> Анализ
                     </a>
                 </td>
@@ -492,11 +492,11 @@ document.addEventListener("DOMContentLoaded", () => {
     tabButtons.forEach(btn => {
         btn.addEventListener("click", (e) => {
             tabButtons.forEach(b => {
-                b.classList.remove("bg-sky-500", "text-white");
+                b.classList.remove("bg-sky-600", "text-white");
                 b.classList.add("bg-slate-800", "text-slate-400");
             });
             btn.classList.remove("bg-slate-800", "text-slate-400");
-            btn.classList.add("bg-sky-500", "text-white");
+            btn.classList.add("bg-sky-600", "text-white");
             
             state.activeChartTab = btn.getAttribute("data-chart");
             renderChart();

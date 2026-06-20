@@ -26,38 +26,110 @@
         }
     </script>
     <style>
-        /* Стилизация с эффектом Glassmorphism */
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        /* Дизайн-токены Yandex DataLens BI */
+        :root {
+            --color-bg: #0b0f17;
+            --color-surface: #141923;
+            --color-surface-hover: #1c2331;
+            --color-border: rgba(255, 255, 255, 0.07);
+            --color-border-focus: #3890ff;
+            
+            --color-primary: #3890ff;
+            --color-primary-hover: #1e70e0;
+            --color-primary-active: #0f54b3;
+            
+            --color-success: #24a148;
+            --color-warning: #f5b041;
+            --color-danger: #da3637;
+            
+            --color-text-main: #f1f5f9;
+            --color-text-muted: #8a94a6;
+            
+            /* Пресеты пружин Эмиля Ковальски */
+            --spring-snappy: cubic-bezier(0.2, 1, 0.2, 1);
+            --spring-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --spring-smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
         }
+
         body {
-            background-color: #0f172a;
-            color: #f1f5f9;
+            background-color: var(--color-bg);
+            color: var(--color-text-main);
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
         }
-        /* Плавные переходы */
-        .fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
+
+        /* Компоненты BI-панели */
+        .bi-panel {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px; /* Умеренное закругление DataLens */
+            transition: border-color 0.2s var(--spring-smooth), background-color 0.2s var(--spring-smooth);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .bi-panel:hover {
+            border-color: rgba(255, 255, 255, 0.12);
         }
+
+        /* Пружинные кнопки по Ковальски */
+        .btn-spring {
+            transition: transform 0.15s var(--spring-snappy), opacity 0.15s var(--spring-smooth), background-color 0.15s var(--spring-smooth);
+            will-change: transform;
+        }
+
+        .btn-spring:active {
+            transform: scale(0.96);
+        }
+
+        /* Интерактивные строки таблицы */
+        .table-row-interactive {
+            transition: background-color 0.15s var(--spring-smooth), transform 0.15s var(--spring-snappy);
+            will-change: transform;
+        }
+
+        .table-row-interactive:hover {
+            background-color: var(--color-surface-hover);
+        }
+
+        /* Вкладки с пружинной анимацией */
+        .tab-spring {
+            transition: transform 0.15s var(--spring-snappy), background-color 0.15s var(--spring-smooth), color 0.15s var(--spring-smooth);
+            will-change: transform;
+        }
+        
+        .tab-spring:active {
+            transform: scale(0.95);
+        }
+
+        /* Плавные переходы страниц */
+        .fade-in-spring {
+            animation: fadeInSpring 0.45s var(--spring-smooth) forwards;
+            will-change: opacity, transform;
+        }
+
+        @keyframes fadeInSpring {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Стильный скроллбар */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
-            background: #0f172a;
+            background: var(--color-bg);
         }
         ::-webkit-scrollbar-thumb {
-            background: #334155;
+            background: #2b354a;
             border-radius: 3px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
+            background: #3e4d6c;
         }
     </style>
 </head>
@@ -65,7 +137,7 @@
 
     <!-- Экран логина (Login Screen) -->
     <div id="login-screen" class="hidden fixed inset-0 flex items-center justify-center bg-[#0b0f19] z-50">
-        <div class="glass-panel w-full max-w-md p-8 rounded-2xl shadow-2xl fade-in mx-4">
+        <div class="bi-panel w-full max-w-md p-8 rounded-lg shadow-xl fade-in-spring mx-4">
             <div class="text-center mb-8">
                 <!-- Логотип Target Media (имитация) -->
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white text-2xl font-bold mb-4 shadow-lg shadow-sky-500/20">
@@ -99,7 +171,7 @@
                         <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:outline-none transition text-white placeholder-slate-500" placeholder="••••••••">
                     </div>
                 </div>
-                <button type="submit" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold transition shadow-lg shadow-sky-500/15 flex items-center justify-center gap-2">
+                <button type="submit" class="w-full py-3 px-4 rounded-lg bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white font-semibold transition btn-spring flex items-center justify-center gap-2">
                     Войти в систему <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </form>
@@ -109,7 +181,7 @@
     <!-- Основной рабочий экран дашборда -->
     <div id="app-container" class="hidden flex-1 flex flex-col">
         <!-- Шапка (Header) -->
-        <header class="glass-panel sticky top-0 z-40 border-b border-slate-800">
+        <header class="bi-panel sticky top-0 z-40 border-b border-slate-800 rounded-none border-t-0 border-x-0">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <a href="#/" class="flex items-center gap-3">
                     <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white font-bold text-lg shadow-md shadow-sky-500/10">
@@ -123,7 +195,7 @@
                         <div id="user-email" class="text-sm font-medium text-slate-200">admin@targetmedia.ru</div>
                         <div id="user-role" class="text-xs text-sky-400 capitalize">Администратор</div>
                     </div>
-                    <button id="logout-btn" class="w-9 h-9 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 flex items-center justify-center transition" title="Выйти из системы">
+                    <button id="logout-btn" class="w-9 h-9 rounded-lg border border-slate-800 text-slate-400 hover:text-white hover:border-slate-600 flex items-center justify-center transition btn-spring" title="Выйти из системы">
                         <i class="fa-solid fa-right-from-bracket"></i>
                     </button>
                 </div>
@@ -133,14 +205,14 @@
         <!-- Основная область контента (Main Content) -->
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Сводный экран (Summary View) -->
-            <div id="summary-view" class="hidden space-y-6 fade-in">
+            <div id="summary-view" class="hidden space-y-6 fade-in-spring">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h2 class="text-3xl font-bold font-outfit text-white">Контроль проектов</h2>
                         <p class="text-slate-400 text-sm mt-1">Отслеживание планов и отклонений KPI по всем клиентам агентства</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button id="setup-test-btn" class="py-2 px-4 rounded-xl border border-dashed border-sky-500/30 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-medium text-sm transition flex items-center gap-2">
+                        <button id="setup-test-btn" class="py-2 px-4 rounded-lg border border-dashed border-sky-500/30 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-medium text-sm transition btn-spring flex items-center gap-2">
                             <i class="fa-solid fa-wrench"></i> Создать тест-проект
                         </button>
                     </div>
@@ -148,37 +220,37 @@
 
                 <!-- Блок общей сводки по агентству (Карточки) -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-panel p-6 rounded-2xl shadow-xl flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-folder-tree"></i>
-                        </div>
-                        <div>
-                            <div class="text-slate-400 text-xs uppercase font-semibold tracking-wider">Всего проектов</div>
-                            <div id="summary-total-projects" class="text-2xl font-bold text-white mt-1">0</div>
-                        </div>
+                <div class="bi-panel p-6 rounded-lg flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-folder-tree"></i>
                     </div>
-                    <div class="glass-panel p-6 rounded-2xl shadow-xl flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-ruble-sign"></i>
-                        </div>
-                        <div>
-                            <div class="text-slate-400 text-xs uppercase font-semibold tracking-wider">Общий расход (мес)</div>
-                            <div id="summary-total-spent" class="text-2xl font-bold text-white mt-1">0 ₽</div>
-                        </div>
+                    <div>
+                        <div class="text-slate-400 text-xs uppercase font-semibold tracking-wider">Всего проектов</div>
+                        <div id="summary-total-projects" class="text-2xl font-bold text-white mt-1">0</div>
                     </div>
-                    <div class="glass-panel p-6 rounded-2xl shadow-xl flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-bullseye"></i>
-                        </div>
-                        <div>
-                            <div class="text-slate-400 text-xs uppercase font-semibold tracking-wider">Всего лидов (мес)</div>
-                            <div id="summary-total-leads" class="text-2xl font-bold text-white mt-1">0</div>
-                        </div>
+                </div>
+                <div class="bi-panel p-6 rounded-lg flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-ruble-sign"></i>
                     </div>
+                    <div>
+                        <div class="text-slate-400 text-xs uppercase font-semibold tracking-wider">Общий расход (мес)</div>
+                        <div id="summary-total-spent" class="text-2xl font-bold text-white mt-1">0 ₽</div>
+                    </div>
+                </div>
+                <div class="bi-panel p-6 rounded-lg flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div>
+                        <div class="text-slate-400 text-xs uppercase font-semibold tracking-wider">Всего лидов (мес)</div>
+                        <div id="summary-total-leads" class="text-2xl font-bold text-white mt-1">0</div>
+                    </div>
+                </div>
                 </div>
 
                 <!-- Главная таблица (Светофор) -->
-                <div class="glass-panel rounded-2xl shadow-xl overflow-hidden border border-slate-800">
+                <div class="bi-panel rounded-lg overflow-hidden border border-slate-800">
                     <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/40">
                         <h3 class="font-bold text-lg text-white">Список проектов и выполнение KPI</h3>
                         <span id="current-month-badge" class="px-3 py-1 text-xs font-semibold rounded-full bg-slate-800 text-slate-300">Июнь 2026</span>
@@ -207,11 +279,11 @@
             </div>
 
             <!-- Детальный экран проекта (Project Detail View) -->
-            <div id="project-detail-view" class="hidden space-y-6 fade-in">
+            <div id="project-detail-view" class="hidden space-y-6 fade-in-spring">
                 <!-- Кнопка Назад и заголовок -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
-                        <a href="#/" class="w-10 h-10 rounded-xl border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white flex items-center justify-center transition">
+                        <a href="#/" class="w-10 h-10 rounded-lg border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition btn-spring">
                             <i class="fa-solid fa-arrow-left"></i>
                         </a>
                         <div>
@@ -226,10 +298,10 @@
                     </div>
                     
                     <div class="flex items-center gap-3">
-                        <button id="project-sync-btn" class="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-medium text-sm transition flex items-center gap-2 border border-slate-700">
+                        <button id="project-sync-btn" class="py-2.5 px-4 rounded-lg bg-slate-850 hover:bg-slate-800 text-slate-200 hover:text-white font-medium text-sm transition btn-spring flex items-center gap-2 border border-slate-800">
                             <i class="fa-solid fa-rotate"></i> Синхронизировать
                         </button>
-                        <button id="yandex-auth-btn" class="py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#ffcc00] to-[#ffaa00] text-black font-semibold text-sm transition hover:opacity-90 flex items-center gap-2 shadow-lg shadow-[#ffcc00]/10">
+                        <button id="yandex-auth-btn" class="py-2.5 px-4 rounded-lg bg-gradient-to-r from-[#ffcc00] to-[#ffaa00] text-black font-semibold text-sm transition hover:opacity-90 btn-spring flex items-center gap-2">
                             <i class="fa-brands fa-yandex"></i> Подключить Яндекс
                         </button>
                     </div>
@@ -237,22 +309,22 @@
 
                 <!-- Карточки итогов за выбранный период -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div class="glass-panel p-5 rounded-2xl shadow-md">
+                    <div class="bi-panel p-5 rounded-lg">
                         <div class="text-slate-400 text-xs uppercase font-medium">Расход (Факт / План)</div>
                         <div id="detail-spent" class="text-2xl font-bold text-white mt-1">0 ₽</div>
                         <div id="detail-spent-progress" class="text-xs text-slate-400 mt-1">План: 0 ₽</div>
                     </div>
-                    <div class="glass-panel p-5 rounded-2xl shadow-md">
+                    <div class="bi-panel p-5 rounded-lg">
                         <div class="text-slate-400 text-xs uppercase font-medium">Лиды (Факт / План)</div>
                         <div id="detail-leads" class="text-2xl font-bold text-white mt-1">0</div>
                         <div id="detail-leads-progress" class="text-xs text-slate-400 mt-1">План: 0</div>
                     </div>
-                    <div class="glass-panel p-5 rounded-2xl shadow-md">
+                    <div class="bi-panel p-5 rounded-lg">
                         <div class="text-slate-400 text-xs uppercase font-medium">Стоимость лида (CPL)</div>
                         <div id="detail-cpl" class="text-2xl font-bold text-white mt-1">0 ₽</div>
                         <div id="detail-cpl-progress" class="text-xs text-slate-400 mt-1">План: 0 ₽</div>
                     </div>
-                    <div class="glass-panel p-5 rounded-2xl shadow-md">
+                    <div class="bi-panel p-5 rounded-lg">
                         <div class="text-slate-400 text-xs uppercase font-medium">Эффективность (CTR / CPC)</div>
                         <div id="detail-efficiency" class="text-2xl font-bold text-white mt-1">0% / 0 ₽</div>
                         <div id="detail-clicks" class="text-xs text-slate-400 mt-1">Клики: 0</div>
@@ -262,13 +334,13 @@
                 <!-- Раздел графиков и лога изменений -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Блок графиков (Занимает 2 колонки) -->
-                    <div class="lg:col-span-2 glass-panel p-6 rounded-2xl shadow-xl flex flex-col">
+                    <div class="lg:col-span-2 bi-panel p-6 rounded-lg flex flex-col">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="font-bold text-lg text-white">Динамика показателей</h3>
                             <div class="flex gap-2">
-                                <button class="chart-tab-btn py-1 px-3 rounded-lg text-xs font-semibold bg-sky-500 text-white transition" data-chart="spent">Расход</button>
-                                <button class="chart-tab-btn py-1 px-3 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition" data-chart="leads">Лиды</button>
-                                <button class="chart-tab-btn py-1 px-3 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition" data-chart="cpl">CPL</button>
+                                <button class="chart-tab-btn py-1 px-3 rounded-lg text-xs font-semibold bg-sky-600 text-white transition tab-spring" data-chart="spent">Расход</button>
+                                <button class="chart-tab-btn py-1 px-3 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition tab-spring" data-chart="leads">Лиды</button>
+                                <button class="chart-tab-btn py-1 px-3 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition tab-spring" data-chart="cpl">CPL</button>
                             </div>
                         </div>
                         <div class="relative flex-1 h-[300px]">
@@ -277,7 +349,7 @@
                     </div>
 
                     <!-- Лог изменений проекта (Из Google Sheets) -->
-                    <div class="glass-panel p-6 rounded-2xl shadow-xl flex flex-col max-h-[400px] lg:max-h-none overflow-hidden border border-slate-800">
+                    <div class="bi-panel p-6 rounded-lg flex flex-col max-h-[400px] lg:max-h-none overflow-hidden border border-slate-800">
                         <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2">
                             <i class="fa-solid fa-list-check text-sky-400"></i> Журнал изменений
                         </h3>
@@ -291,7 +363,7 @@
         </main>
 
         <!-- Подвал (Footer) -->
-        <footer class="glass-panel border-t border-slate-800 py-6 mt-8">
+        <footer class="bi-panel border-t border-slate-800 py-6 mt-8 rounded-none border-b-0 border-x-0">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-xs">
                 <div>&copy; 2026 Target Media. Все права защищены.</div>
                 <div class="flex gap-4">
