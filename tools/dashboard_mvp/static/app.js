@@ -55,10 +55,26 @@ async function request(url, options = {}) {
 // --- УПРАВЛЕНИЕ АВТОРИЗАЦИЕЙ ---
 
 function showScreen(screenId) {
-    document.getElementById("login-screen").classList.add("hidden");
-    document.getElementById("app-container").classList.add("hidden");
+    const loginScreen = document.getElementById("login-screen");
+    const appContainer = document.getElementById("app-container");
     
-    document.getElementById(screenId).classList.remove("hidden");
+    const screens = [loginScreen, appContainer];
+    screens.forEach(s => {
+        if (s.id === screenId) {
+            s.classList.remove("hidden");
+            // Даем один кадр для применения анимации перехода
+            requestAnimationFrame(() => {
+                s.classList.remove("screen-hidden");
+            });
+        } else {
+            s.classList.add("screen-hidden");
+            setTimeout(() => {
+                if (s.classList.contains("screen-hidden")) {
+                    s.classList.add("hidden");
+                }
+            }, 350);
+        }
+    });
 }
 
 function checkAuth() {
@@ -86,14 +102,32 @@ function logout() {
 
 // --- РОУТИНГ (ROUTING) ---
 
+function showView(viewId) {
+    const summaryView = document.getElementById("summary-view");
+    const detailView = document.getElementById("project-detail-view");
+    
+    const views = [summaryView, detailView];
+    views.forEach(v => {
+        if (v.id === viewId) {
+            v.classList.remove("hidden");
+            requestAnimationFrame(() => {
+                v.classList.remove("screen-hidden");
+            });
+        } else {
+            v.classList.add("screen-hidden");
+            setTimeout(() => {
+                if (v.classList.contains("screen-hidden")) {
+                    v.classList.add("hidden");
+                }
+            }, 350);
+        }
+    });
+}
+
 async function handleRoute() {
     if (!checkAuth()) return;
     
     const hash = window.location.hash || "#/";
-    
-    // Скрываем все виды контента внутри приложения
-    document.getElementById("summary-view").classList.add("hidden");
-    document.getElementById("project-detail-view").classList.add("hidden");
     
     if (hash === "#/" || hash === "#") {
         const startInput = document.getElementById("filter-start-date");
@@ -101,7 +135,7 @@ async function handleRoute() {
         if (startInput) startInput.value = "";
         if (endInput) endInput.value = "";
 
-        document.getElementById("summary-view").classList.remove("hidden");
+        showView("summary-view");
         await loadSummary();
     } else if (hash.startsWith("#/project/")) {
         const parts = hash.split("/");
@@ -112,7 +146,7 @@ async function handleRoute() {
             if (startInput) startInput.value = "";
             if (endInput) endInput.value = "";
 
-            document.getElementById("project-detail-view").classList.remove("hidden");
+            showView("project-detail-view");
             await loadProjectDetail(projectId);
         }
     }
@@ -122,7 +156,18 @@ async function handleRoute() {
 
 async function loadSummary() {
     const tableBody = document.getElementById("projects-table-body");
-    tableBody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Загрузка проектов...</td></tr>`;
+    tableBody.innerHTML = Array.from({ length: 3 }).map(() => `
+        <tr class="animate-pulse">
+            <td class="py-4 px-6"><div class="h-6 w-32 skeleton"></div><div class="h-4 w-20 skeleton mt-2"></div></td>
+            <td class="py-4 px-6"><div class="h-5 w-24 skeleton"></div></td>
+            <td class="py-4 px-6"><div class="h-8 w-24 skeleton mx-auto"></div></td>
+            <td class="py-4 px-6"><div class="h-8 w-24 skeleton mx-auto"></div></td>
+            <td class="py-4 px-6"><div class="h-8 w-24 skeleton mx-auto"></div></td>
+            <td class="py-4 px-6"><div class="h-8 w-24 skeleton mx-auto"></div></td>
+            <td class="py-4 px-6"><div class="h-8 w-24 skeleton mx-auto"></div></td>
+            <td class="py-4 px-6"><div class="h-7 w-20 skeleton mx-auto"></div></td>
+        </tr>
+    `).join("");
     
     try {
         const data = await request(`${API_BASE}/api/dashboard/summary`);
@@ -275,6 +320,14 @@ async function loadProjectDetail(projectId) {
         if (params.length > 0) {
             url += `?${params.join("&")}`;
         }
+
+        // Показываем пружинные скелетоны на время загрузки
+        document.getElementById("detail-spent").innerHTML = `<div class="h-7 w-24 skeleton mx-auto md:mx-0"></div>`;
+        document.getElementById("detail-leads").innerHTML = `<div class="h-7 w-12 skeleton mx-auto md:mx-0"></div>`;
+        document.getElementById("detail-qual-leads").innerHTML = `<div class="h-7 w-12 skeleton mx-auto md:mx-0"></div>`;
+        document.getElementById("detail-cpl").innerHTML = `<div class="h-7 w-20 skeleton mx-auto md:mx-0"></div>`;
+        document.getElementById("detail-cpl-qual").innerHTML = `<div class="h-7 w-20 skeleton mx-auto md:mx-0"></div>`;
+        document.getElementById("detail-pacing").innerHTML = `<div class="h-7 w-16 skeleton mx-auto md:mx-0"></div>`;
 
         const data = await request(url);
         state.currentProject = data;
@@ -440,9 +493,13 @@ function renderChart() {
                 backgroundColor: backgroundColor,
                 borderWidth: 2,
                 fill: true,
-                tension: 0.35,
-                pointRadius: 3,
-                pointBackgroundColor: borderColor
+                tension: 0.38,
+                pointRadius: 2,
+                pointHoverRadius: 6,
+                pointBackgroundColor: borderColor,
+                pointHoverBackgroundColor: "#ffffff",
+                pointHoverBorderColor: borderColor,
+                pointHoverBorderWidth: 3
             }]
         },
         options: {
@@ -451,27 +508,40 @@ function renderChart() {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    backgroundColor: "rgba(15, 23, 42, 0.9)",
+                    titleFont: { family: "Outfit", size: 12, weight: "bold" },
+                    bodyFont: { family: "Inter", size: 12 },
+                    padding: 10,
+                    borderColor: "rgba(255, 255, 255, 0.08)",
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    displayColors: false
                 }
             },
             scales: {
                 x: {
                     grid: {
-                        color: "rgba(255, 255, 255, 0.05)"
+                        display: false
                     },
                     ticks: {
-                        color: "#94a3b8",
+                        color: "#8a94a6",
                         font: {
+                            family: "Inter",
                             size: 10
                         }
                     }
                 },
                 y: {
                     grid: {
-                        color: "rgba(255, 255, 255, 0.05)"
+                        color: "rgba(255, 255, 255, 0.04)",
+                        drawBorder: false
                     },
                     ticks: {
-                        color: "#94a3b8",
+                        color: "#8a94a6",
                         font: {
+                            family: "Inter",
                             size: 10
                         }
                     }

@@ -26,12 +26,13 @@
         }
     </script>
     <style>
-        /* Дизайн-токены Yandex DataLens BI */
+        /* Дизайн-токены Yandex DataLens BI & Emil Kowalski Physics */
         :root {
             --color-bg: #0b0f17;
-            --color-surface: #141923;
-            --color-surface-hover: #1c2331;
-            --color-border: rgba(255, 255, 255, 0.07);
+            --color-surface: rgba(20, 25, 35, 0.7);
+            --color-surface-hover: rgba(28, 35, 49, 0.85);
+            --color-border: rgba(255, 255, 255, 0.05);
+            --color-border-hover: rgba(255, 255, 255, 0.12);
             --color-border-focus: #3890ff;
             
             --color-primary: #3890ff;
@@ -46,7 +47,7 @@
             --color-text-muted: #8a94a6;
             
             /* Пресеты пружин Эмиля Ковальски */
-            --spring-snappy: cubic-bezier(0.2, 1, 0.2, 1);
+            --spring-snappy: cubic-bezier(0.19, 1, 0.22, 1);
             --spring-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
             --spring-smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
         }
@@ -55,92 +56,113 @@
             background-color: var(--color-bg);
             color: var(--color-text-main);
             font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+            overflow-x: hidden;
         }
 
-        /* Компоненты BI-панели */
+        /* Премиум стеклянные панели (Glassmorphism) */
         .bi-panel {
             background-color: var(--color-surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--color-border);
-            border-radius: 8px; /* Умеренное закругление DataLens */
-            transition: border-color 0.2s var(--spring-smooth), background-color 0.2s var(--spring-smooth);
+            border-radius: 8px;
+            transition: border-color 0.3s var(--spring-smooth), background-color 0.3s var(--spring-smooth), box-shadow 0.3s var(--spring-smooth);
         }
 
         .bi-panel:hover {
-            border-color: rgba(255, 255, 255, 0.12);
+            border-color: var(--color-border-hover);
         }
 
-        /* Пружинные кнопки по Ковальски */
+        /* Светофорная подсветка с эффектом внутреннего свечения */
+        .kpi-glow-success { box-shadow: inset 0 0 12px rgba(36, 161, 72, 0.03), 0 0 15px rgba(36, 161, 72, 0.02); }
+        .kpi-glow-warning { box-shadow: inset 0 0 12px rgba(245, 176, 65, 0.03), 0 0 15px rgba(245, 176, 65, 0.02); }
+        .kpi-glow-danger { box-shadow: inset 0 0 12px rgba(218, 54, 55, 0.03), 0 0 15px rgba(218, 54, 55, 0.02); }
+
+        /* Пружинные элементы управления */
         .btn-spring {
-            transition: transform 0.15s var(--spring-snappy), opacity 0.15s var(--spring-smooth), background-color 0.15s var(--spring-smooth);
+            transition: transform 0.2s var(--spring-pop), background-color 0.2s var(--spring-smooth), border-color 0.2s var(--spring-smooth);
             will-change: transform;
         }
 
         .btn-spring:active {
-            transform: scale(0.96);
+            transform: scale(0.95);
         }
 
         /* Интерактивные строки таблицы */
         .table-row-interactive {
-            transition: background-color 0.15s var(--spring-smooth), transform 0.15s var(--spring-snappy);
+            transition: background-color 0.2s var(--spring-smooth), transform 0.2s var(--spring-snappy);
             will-change: transform;
         }
 
         .table-row-interactive:hover {
             background-color: var(--color-surface-hover);
+            transform: translateY(-1px);
         }
 
-        /* Вкладки с пружинной анимацией */
+        /* Вкладки с пружинной физикой */
         .tab-spring {
-            transition: transform 0.15s var(--spring-snappy), background-color 0.15s var(--spring-smooth), color 0.15s var(--spring-smooth);
+            transition: transform 0.2s var(--spring-pop), background-color 0.2s var(--spring-smooth), color 0.2s var(--spring-smooth);
             will-change: transform;
         }
         
         .tab-spring:active {
-            transform: scale(0.95);
+            transform: scale(0.93);
         }
 
-        /* Плавные переходы страниц */
-        .fade-in-spring {
-            animation: fadeInSpring 0.45s var(--spring-smooth) forwards;
+        /* Плавные переходы экранов */
+        .screen-transition {
+            transition: opacity 0.35s var(--spring-smooth), transform 0.35s var(--spring-pop);
             will-change: opacity, transform;
         }
+        
+        .screen-hidden {
+            opacity: 0;
+            transform: translateY(8px) scale(0.99);
+            pointer-events: none;
+        }
 
-        @keyframes fadeInSpring {
-            from {
-                opacity: 0;
-                transform: translateY(6px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Пульсирующие скелетоны */
+        .skeleton {
+            background: linear-gradient(90deg, #151b26 25%, #222a3a 50%, #151b26 75%);
+            background-size: 200% 100%;
+            animation: loading-skeleton 1.6s infinite ease-in-out;
+            border-radius: 6px;
+        }
+        @keyframes loading-skeleton {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         /* Стильный скроллбар */
         ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
             background: var(--color-bg);
         }
         ::-webkit-scrollbar-thumb {
-            background: #2b354a;
-            border-radius: 3px;
+            background: #1f283a;
+            border-radius: 4px;
+            transition: background 0.2s;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #3e4d6c;
+            background: #313f5c;
         }
     </style>
 </head>
-<body class="font-sans antialiased min-h-screen flex flex-col">
+<body class="font-sans antialiased min-h-screen flex flex-col relative">
+
+    <!-- Задний анимированный фон с неоновым свечением (Neon Backdrops) -->
+    <div class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#3890ff]/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#4f46e5]/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
     <!-- Экран логина (Login Screen) -->
-    <div id="login-screen" class="hidden fixed inset-0 flex items-center justify-center bg-[#0b0f19] z-50">
-        <div class="bi-panel w-full max-w-md p-8 rounded-lg shadow-xl fade-in-spring mx-4">
+    <div id="login-screen" class="hidden fixed inset-0 flex items-center justify-center bg-[#0b0f17]/95 backdrop-blur-xl z-50 screen-transition screen-hidden">
+        <div class="bi-panel w-full max-w-md p-8 rounded-xl shadow-2xl mx-4 relative border border-white/5">
             <div class="text-center mb-8">
                 <!-- Логотип Target Media (имитация) -->
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white text-2xl font-bold mb-4 shadow-lg shadow-sky-500/20">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white text-2xl font-bold mb-4 shadow-xl shadow-sky-500/20">
                     TM
                 </div>
                 <h1 class="text-3xl font-bold font-outfit tracking-tight bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">Рука на пульсе</h1>
@@ -159,7 +181,7 @@
                         <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                             <i class="fa-regular fa-envelope"></i>
                         </span>
-                        <input type="email" id="login-email" required class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:outline-none transition text-white placeholder-slate-500" placeholder="name@targetmedia.ru">
+                        <input type="email" id="login-email" required class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-none transition-all duration-200 text-white placeholder-slate-500" placeholder="name@targetmedia.ru">
                     </div>
                 </div>
                 <div>
@@ -168,7 +190,7 @@
                         <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                             <i class="fa-solid fa-lock"></i>
                         </span>
-                        <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 focus:outline-none transition text-white placeholder-slate-500" placeholder="••••••••">
+                        <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-none transition-all duration-200 text-white placeholder-slate-500" placeholder="••••••••">
                     </div>
                 </div>
                 <button type="submit" class="w-full py-3 px-4 rounded-lg bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white font-semibold transition btn-spring flex items-center justify-center gap-2">
@@ -179,9 +201,9 @@
     </div>
 
     <!-- Основной рабочий экран дашборда -->
-    <div id="app-container" class="hidden flex-1 flex flex-col">
+    <div id="app-container" class="hidden flex-1 flex flex-col screen-transition screen-hidden relative z-10">
         <!-- Шапка (Header) -->
-        <header class="bi-panel sticky top-0 z-40 border-b border-slate-800 rounded-none border-t-0 border-x-0">
+        <header class="bi-panel sticky top-0 z-40 border-b border-slate-800 rounded-none border-t-0 border-x-0 bg-[#0b0f17]/70 backdrop-blur-md">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <a href="#/" class="flex items-center gap-3">
                     <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white font-bold text-lg shadow-md shadow-sky-500/10">
@@ -205,7 +227,7 @@
         <!-- Основная область контента (Main Content) -->
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Сводный экран (Summary View) -->
-            <div id="summary-view" class="hidden space-y-6 fade-in-spring">
+            <div id="summary-view" class="hidden space-y-6 screen-transition screen-hidden">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h2 class="text-3xl font-bold font-outfit text-white">Контроль проектов</h2>
@@ -281,7 +303,7 @@
             </div>
 
             <!-- Детальный экран проекта (Project Detail View) -->
-            <div id="project-detail-view" class="hidden space-y-6 fade-in-spring">
+            <div id="project-detail-view" class="hidden space-y-6 screen-transition screen-hidden">
                 <!-- Кнопка Назад и заголовок -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
