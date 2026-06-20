@@ -263,7 +263,9 @@
                                     <th class="py-4 px-6">Менеджер</th>
                                     <th class="py-4 px-6 text-center">Бюджет (Факт / План)</th>
                                     <th class="py-4 px-6 text-center">Лиды (Факт / План)</th>
+                                    <th class="py-4 px-6 text-center">Квал-лиды (Факт / План)</th>
                                     <th class="py-4 px-6 text-center">CPL (Факт / План)</th>
+                                    <th class="py-4 px-6 text-center">Pacing (Расход)</th>
                                     <th class="py-4 px-6 text-center">Действия</th>
                                 </tr>
                             </thead>
@@ -297,7 +299,16 @@
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-3">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <!-- Фильтр дат -->
+                        <div class="flex items-center gap-2 bg-slate-900/40 p-1.5 px-3 rounded-lg border border-slate-800">
+                            <span class="text-xs text-slate-400 font-medium">Период:</span>
+                            <input type="date" id="filter-start-date" class="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300 focus:outline-none focus:border-sky-500 transition">
+                            <span class="text-xs text-slate-500">—</span>
+                            <input type="date" id="filter-end-date" class="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300 focus:outline-none focus:border-sky-500 transition">
+                            <button id="apply-filter-btn" class="ml-2 py-1 px-2.5 rounded bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs transition btn-spring">Применить</button>
+                        </div>
+                        
                         <button id="project-sync-btn" class="py-2.5 px-4 rounded-lg bg-slate-850 hover:bg-slate-800 text-slate-200 hover:text-white font-medium text-sm transition btn-spring flex items-center gap-2 border border-slate-800">
                             <i class="fa-solid fa-rotate"></i> Синхронизировать
                         </button>
@@ -308,26 +319,48 @@
                 </div>
 
                 <!-- Карточки итогов за выбранный период -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div class="bi-panel p-5 rounded-lg">
-                        <div class="text-slate-400 text-xs uppercase font-medium">Расход (Факт / План)</div>
-                        <div id="detail-spent" class="text-2xl font-bold text-white mt-1">0 ₽</div>
-                        <div id="detail-spent-progress" class="text-xs text-slate-400 mt-1">План: 0 ₽</div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                    <div class="bi-panel p-5 rounded-lg flex flex-col justify-between">
+                        <div>
+                            <div class="text-slate-400 text-xs uppercase font-medium">Расход (Факт / План)</div>
+                            <div id="detail-spent" class="text-xl font-bold text-white mt-1">0 ₽</div>
+                        </div>
+                        <div id="detail-spent-progress" class="text-xs text-slate-400 mt-2 pt-2 border-t border-slate-800">План: 0 ₽</div>
                     </div>
-                    <div class="bi-panel p-5 rounded-lg">
-                        <div class="text-slate-400 text-xs uppercase font-medium">Лиды (Факт / План)</div>
-                        <div id="detail-leads" class="text-2xl font-bold text-white mt-1">0</div>
-                        <div id="detail-leads-progress" class="text-xs text-slate-400 mt-1">План: 0</div>
+                    <div class="bi-panel p-5 rounded-lg flex flex-col justify-between">
+                        <div>
+                            <div class="text-slate-400 text-xs uppercase font-medium">Лиды (Факт / План)</div>
+                            <div id="detail-leads" class="text-xl font-bold text-white mt-1">0</div>
+                        </div>
+                        <div id="detail-leads-progress" class="text-xs text-slate-400 mt-2 pt-2 border-t border-slate-800">План: 0</div>
                     </div>
-                    <div class="bi-panel p-5 rounded-lg">
-                        <div class="text-slate-400 text-xs uppercase font-medium">Стоимость лида (CPL)</div>
-                        <div id="detail-cpl" class="text-2xl font-bold text-white mt-1">0 ₽</div>
-                        <div id="detail-cpl-progress" class="text-xs text-slate-400 mt-1">План: 0 ₽</div>
+                    <div class="bi-panel p-5 rounded-lg flex flex-col justify-between">
+                        <div>
+                            <div class="text-slate-400 text-xs uppercase font-medium">Квал-лиды (Факт / План)</div>
+                            <div id="detail-qual-leads" class="text-xl font-bold text-white mt-1">0</div>
+                        </div>
+                        <div id="detail-qual-leads-progress" class="text-xs text-slate-400 mt-2 pt-2 border-t border-slate-800">План: 0</div>
                     </div>
-                    <div class="bi-panel p-5 rounded-lg">
-                        <div class="text-slate-400 text-xs uppercase font-medium">Эффективность (CTR / CPC)</div>
-                        <div id="detail-efficiency" class="text-2xl font-bold text-white mt-1">0% / 0 ₽</div>
-                        <div id="detail-clicks" class="text-xs text-slate-400 mt-1">Клики: 0</div>
+                    <div class="bi-panel p-5 rounded-lg flex flex-col justify-between">
+                        <div>
+                            <div class="text-slate-400 text-xs uppercase font-medium">Стоимость лида (CPL)</div>
+                            <div id="detail-cpl" class="text-xl font-bold text-white mt-1">0 ₽</div>
+                        </div>
+                        <div id="detail-cpl-progress" class="text-xs text-slate-400 mt-2 pt-2 border-t border-slate-800">План: 0 ₽</div>
+                    </div>
+                    <div class="bi-panel p-5 rounded-lg flex flex-col justify-between">
+                        <div>
+                            <div class="text-slate-400 text-xs uppercase font-medium">CPL квал-лида</div>
+                            <div id="detail-cpl-qual" class="text-xl font-bold text-white mt-1">0 ₽</div>
+                        </div>
+                        <div id="detail-cpl-qual-progress" class="text-xs text-slate-400 mt-2 pt-2 border-t border-slate-800">План: 0 ₽</div>
+                    </div>
+                    <div class="bi-panel p-5 rounded-lg flex flex-col justify-between">
+                        <div>
+                            <div class="text-slate-400 text-xs uppercase font-medium">Pacing (Расход)</div>
+                            <div id="detail-pacing" class="text-xl font-bold text-white mt-1">0%</div>
+                        </div>
+                        <div id="detail-pacing-progress" class="text-xs text-slate-400 mt-2 pt-2 border-t border-slate-800">Норма: 100%</div>
                     </div>
                 </div>
 
@@ -337,10 +370,12 @@
                     <div class="lg:col-span-2 bi-panel p-6 rounded-lg flex flex-col">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="font-bold text-lg text-white">Динамика показателей</h3>
-                            <div class="flex gap-2">
+                            <div class="flex flex-wrap gap-2">
                                 <button class="chart-tab-btn py-1 px-3 rounded-lg text-xs font-semibold bg-sky-600 text-white transition tab-spring" data-chart="spent">Расход</button>
                                 <button class="chart-tab-btn py-1 px-3 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition tab-spring" data-chart="leads">Лиды</button>
+                                <button class="chart-tab-btn py-1 px-3 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition tab-spring" data-chart="qual_leads">Квал-лиды</button>
                                 <button class="chart-tab-btn py-1 px-3 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition tab-spring" data-chart="cpl">CPL</button>
+                                <button class="chart-tab-btn py-1 px-3 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition tab-spring" data-chart="cpl_qualified">CPL квал</button>
                             </div>
                         </div>
                         <div class="relative flex-1 h-[300px]">
