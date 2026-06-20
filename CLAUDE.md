@@ -25,14 +25,8 @@
 Перед выполнением любой задачи **обязательно** ознакомьтесь с соответствующим файлом навыка в папке `skills/`:
 - **Скрапинг и парсинг HTML (Selectolax / curl_cffi)**: См. [skills/stealth-scraping/SKILL.md](file:///Users/rus/ai-tools/skills/stealth-scraping/SKILL.md)
 - **Генерация PDF-документов (Typst)**: См. [skills/typst-pdf/SKILL.md](file:///Users/rus/ai-tools/skills/typst-pdf/SKILL.md)
-- **Тестирование и валидация промптов**: См. [skills/prompt-testing/SKILL.md](file:///Users/rus/ai-tools/skills/prompt-testing/SKILL.md)
 - **Хранение данных и RLS (Supabase / pgvector / Alembic)**: См. [skills/database-persistence/SKILL.md](file:///Users/rus/ai-tools/skills/database-persistence/SKILL.md)
-- **Управление серверами (SSH / Cloudflare DNS по API)**: См. [skills/vps-automation/SKILL.md](file:///Users/rus/ai-tools/skills/vps-automation/SKILL.md)
-- **Оркестрация агентов, стейт и кэш (SPARC / Checkpoints / Prompt Caching)**: См. [skills/agent-orchestration/SKILL.md](file:///Users/rus/ai-tools/skills/agent-orchestration/SKILL.md)
-- **Стандарты фронтенда и верстки (Mobile-First / Accessibility WCAG / Web Vitals)**: См. [skills/frontend-standards/SKILL.md](file:///Users/rus/ai-tools/skills/frontend-standards/SKILL.md)
-- **Адаптивная память агентов (Scoping / Consolidation Decision Engine)**: См. [skills/agent-memory/SKILL.md](file:///Users/rus/ai-tools/skills/agent-memory/SKILL.md)
-- **Разработка промптов и контекст (XML Delimiters / CoT / ReAct / Caching)**: См. [skills/prompt-engineering/SKILL.md](file:///Users/rus/ai-tools/skills/prompt-engineering/SKILL.md)
-- **Программное видеопроизводство (Remotion)**: См. [.agents/skills/remotion-best-practices/SKILL.md](file:///Users/rus/ai-tools/.agents/skills/remotion-best-practices/SKILL.md)
+
 
 
 ## 💻 Команды сборки и разработки (Makefile CLI)
@@ -43,6 +37,10 @@
 - **Юнит-тестирование**: `make test`
 - **Очистка кэша**: `make clean`
 - **Конвертация документов в MD**: `uv run python tools/convert_docs.py <путь_к_файлу> [-o <выходной_файл>]`
+- **Импорт документов в Wiki**: `uv run python tools/llm_wiki.py injest`
+- **Запрос из Wiki**: `uv run python tools/llm_wiki.py query <заметка> [--depth <глубина>]`
+- **Логирование в Obsidian Daily Note**: `uv run python tools/obsidian_cli.py --token <токен> append-daily "<текст>"`
+
 
 
 ## 📐 Глобальные правила разработки
