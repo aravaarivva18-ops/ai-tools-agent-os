@@ -4,6 +4,11 @@ import plotly.graph_objects as go
 import requests
 import streamlit as st
 
+try:
+    from tools.prompt_validator import check_constitution_health
+except ImportError:
+    check_constitution_health = None
+
 # ---------------------------------------------------------
 # Настройка страницы
 # ---------------------------------------------------------
@@ -299,6 +304,19 @@ def render_sidebar():
             "<p style='font-size:11px; color:#666666;'>Каталог: Таргет Медиа / Пилот-МВП</p>",
             unsafe_allow_html=True,
         )
+
+        if check_constitution_health:
+            health = check_constitution_health()
+            if health.get("status") != "missing":
+                h_status = health.get("health", "unknown").upper()
+                h_color = "#4CAF50" if h_status == "GOOD" else "#FF9800"
+                st.markdown(
+                    f"<p style='font-size:10px; color:#888888; margin-top:20px;'>"
+                    f"Constitution: <span style='color:{h_color}; font-weight:bold;'>{h_status}</span> "
+                    f"(Sec: {health.get('sections')}, Overlap: {health.get('overlap_score'):.2f})"
+                    f"</p>",
+                    unsafe_allow_html=True,
+                )
 
     return menu_selection
 

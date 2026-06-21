@@ -262,6 +262,11 @@ def test_maintain_constitution_flow(tmp_path):
     assert len(backups) == 1
     assert "## 🏛️ 5. Раздел один" in backups[0].read_text(encoding="utf-8")
 
+    # Проверяем, что создалась ADR-запись
+    adr_file = tmp_path / "vault" / "adr" / "ADR_0016_automated_constitution_maintenance.md"
+    assert adr_file.exists()
+    assert "ADR 0016: Автоматическое обслуживание конституции" in adr_file.read_text(encoding="utf-8")
+
 
 def test_maintain_constitution_health_cleanup_trigger(tmp_path):
     """Проверяет, что при плохом здоровье конституции запускается логика обслуживания."""

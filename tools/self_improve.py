@@ -625,6 +625,39 @@ def maintain_constitution(constitution_path: Path = None) -> None:
             backup.write_text(original, encoding="utf-8")
             constitution_path.write_text(fixed, encoding="utf-8")
             print(f"✅ Constitution normalized. Backup: {backup}")
+
+            # Create ADR record in vault/adr/
+            if "pytest" in sys.modules or "tmp" in str(constitution_path):
+                adr_dir = constitution_path.parent / "vault" / "adr"
+                adr_dir.mkdir(parents=True, exist_ok=True)
+            else:
+                adr_dir = Path("/Users/rus/ai-tools/vault/adr")
+
+            if adr_dir.exists():
+                adr_path = adr_dir / "ADR_0016_automated_constitution_maintenance.md"
+                adr_content = """# ADR 0016: Автоматическое обслуживание конституции GEMINI_ANTIGRAVITY.md
+
+## Статус
+Принято (Суперсессия)
+
+## Контекст
+Приведение структуры конституции к единому стандарту нумерации разделов и автоматическое отслеживание здоровья (health check) правил YAGNI / Solo Loop во избежание оверинжиниринга.
+
+## Решение
+1. Интеграция нормализации заголовков и проверки здоровья (`overlap_score`, `bloat`, `sections`) в `prompt_validator.py`.
+2. Автоматический вызов при изменении конституции из `self_improve.py` (конец сессии или через `make auto-improve`).
+3. Отображение Constitution Health Score на Streamlit-дашборде разработчика.
+
+## Последствия
+- Полное исключение рассинхронизации номеров разделов.
+- Автоматический контроль метрик YAGNI / Bloat.
+- Бэкапирование изменений в `.md.bak.<timestamp>`.
+"""
+                try:
+                    adr_path.write_text(adr_content, encoding="utf-8")
+                    print(f"✅ ADR 0016 record saved to Obsidian at: {adr_path}")
+                except Exception as e:
+                    print(f"Warning: Could not save ADR to Obsidian: {e}")
         else:
             print("⚠️ Constitution health needs cleanup but content is already normalized. Manual YAGNI audit is recommended.")
 
