@@ -84,7 +84,8 @@ class AgentSkillsManager:
 - **Time Auditing**: Automatic logging of start/end timestamps and execution cost"""
             design_principles = """- 10-80-10 Rule: Ensure agent implements the core 80% work based on 10% explicit specs, outputting results for human final 10% review.
 - DRIP Matrix & SOP: Design autonomous tasks to execute well-defined, low-energy processes via sequential, repeatable scripts.
-- Buyback Loop: Log "Time Saved" metrics at the end of each run to measure delegation efficiency."""
+- Buyback Loop & Time Saved: Log "Time Saved: <number_of_minutes> min" in the final log or HANDOFF.md to trace business buyback rate.
+- Pre-delegation Checklist: Define input datasets, expected output schema, and human approval gates before executing the script."""
         elif is_seo:
             tech_stack = """- **Core Technology**: Programmatic SEO (Python / sqlite3 / jinja2)
 - **AI Crawler Strategy**: Robots.txt and AI crawlers customization (allow/disallow rules for agents)"""

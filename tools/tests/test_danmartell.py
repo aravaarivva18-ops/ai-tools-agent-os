@@ -29,14 +29,15 @@ def test_create_scale_skill_includes_productivity_principles():
         name="team-delegation-flow",
         description="A system that automates tasks delegation and audits time saved to optimize buyback rate.",
     )
-    
+
     assert skill_path.exists()
     content = skill_path.read_text(encoding="utf-8")
-    
+
     # Verify productivity & scaling best practices are generated
     assert "10-80-10 rule" in content.lower(), "10-80-10 Rule should be recommended in scale/productivity skill templates"
     assert "drip matrix" in content.lower() or "sop" in content.lower(), "SOP / DRIP matrix should be recommended in scale templates"
     assert "buyback" in content.lower() or "time saved" in content.lower(), "Buyback loop / Time saved metrics should be in scale templates"
+    assert "pre-delegation checklist" in content.lower(), "Pre-delegation checklist should be recommended in scale templates"
 
 
 def test_create_non_scale_skill_clean():
@@ -46,9 +47,9 @@ def test_create_non_scale_skill_clean():
         name="redis-cache-connector",
         description="A lightweight redis cache integration script.",
     )
-    
+
     assert skill_path.exists()
     content = skill_path.read_text(encoding="utf-8")
-    
+
     assert "10-80-10 rule" not in content.lower(), "Productivity bloat should not exist in redis connector"
     assert "buyback" not in content.lower(), "Productivity bloat should not exist in redis connector"
