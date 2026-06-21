@@ -205,6 +205,40 @@ def get_constitution_health_score(path: Path = None) -> int:
     return max(score, 0)
 
 
+def enforce_anti_clutter(file_path: str) -> bool:
+    """Проверка перед созданием/изменением файлов (Anti-Clutter Guardrails)."""
+    path_obj = Path(file_path).resolve()
+    path_str = str(path_obj)
+
+    # 1. Разрешаем временные директории pytest для тестов
+    if "pytest" in path_str or "tmp_path" in path_str or "pytest-of-" in path_str:
+        return True
+
+    # 2. Разрешено писать в конституцию, гайд студента и их бакапы в /Users/rus/
+    allowed_external_prefixes = [
+        "/Users/rus/GEMINI_ANTIGRAVITY.md",
+        "/Users/rus/STUDENT_GUIDE.md"
+    ]
+    if any(path_str.startswith(prefix) for prefix in allowed_external_prefixes):
+        return True
+
+    # 3. Разрешено писать в handoff_notes.md в корне воркспейса
+    if path_str == "/Users/rus/ai-tools/handoff_notes.md":
+        return True
+
+    # 4. Разрешенные директории согласно правилам
+    allowed_dirs = {
+        "/Users/rus/ai-tools/tools",
+        "/Users/rus/ai-tools/vault",
+        "/Users/rus/ai-tools/dashboard-hand-on-pulse"
+    }
+    if any(path_str.startswith(d) for d in allowed_dirs):
+        return True
+
+    raise ValueError(f"Anti-Clutter: запрещено изменять файл вне разрешённых путей: {file_path}")
+
+
+
 def main():
     if not validate_constitution_system():
         sys.exit(1)

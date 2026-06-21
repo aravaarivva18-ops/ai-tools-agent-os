@@ -161,8 +161,22 @@ if __name__ == "__main__":
         print(f"Error applying patch: {err_msg}")
         sys.exit(1)
 
-    # Делаем резервную копию перед записью
     backup_path = target_path + ".bak"
+
+    # Проверяем на anti-clutter перед записью
+    try:
+        try:
+            from tools.prompt_validator import enforce_anti_clutter
+        except ImportError:
+            from prompt_validator import enforce_anti_clutter
+        if enforce_anti_clutter:
+            enforce_anti_clutter(target_path)
+            enforce_anti_clutter(backup_path)
+    except Exception as e:
+        print(f"Anti-Clutter error: {e}")
+        sys.exit(1)
+
+    # Делаем резервную копию перед записью
     with open(backup_path, "w", encoding="utf-8") as f:
         f.write(target_content)
 

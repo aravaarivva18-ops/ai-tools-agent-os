@@ -11,6 +11,15 @@ import re
 import sys
 from pathlib import Path
 
+try:
+    from tools.prompt_validator import enforce_anti_clutter
+except ImportError:
+    try:
+        from prompt_validator import enforce_anti_clutter
+    except ImportError:
+        enforce_anti_clutter = None
+
+
 
 class LLMWiki:
     def __init__(self, root_dir: str | Path | None = None):
@@ -35,6 +44,8 @@ class LLMWiki:
 
         index_file = self.wiki_dir / "index.md"
         if not index_file.is_file():
+            if enforce_anti_clutter:
+                enforce_anti_clutter(index_file)
             index_file.write_text(
                 "# LLM Knowledge Wiki Index\n\n"
                 "Welcome to the knowledge core. Below are the key entry points:\n\n"
@@ -44,6 +55,8 @@ class LLMWiki:
 
         log_file = self.wiki_dir / "Log.md"
         if not log_file.is_file():
+            if enforce_anti_clutter:
+                enforce_anti_clutter(log_file)
             log_file.write_text(
                 "# Wiki Log\n\n"
                 "System history and updates tracker:\n\n"
@@ -85,6 +98,8 @@ class LLMWiki:
             target_wiki_path = self.wiki_dir / target_name
 
             # Write to wiki directory
+            if enforce_anti_clutter:
+                enforce_anti_clutter(target_wiki_path)
             target_wiki_path.write_text(content, encoding="utf-8")
             newly_processed.append(raw_file.stem)
 
@@ -96,6 +111,8 @@ class LLMWiki:
         for link in links_found:
             stub_path = self.wiki_dir / f"{link}.md"
             if not stub_path.is_file():
+                if enforce_anti_clutter:
+                    enforce_anti_clutter(stub_path)
                 stub_path.write_text(
                     f"# {link}\n\nThis is an automatically generated stub note.\n",
                     encoding="utf-8",
@@ -110,6 +127,8 @@ class LLMWiki:
             link_str = f"- [[{name}]]"
             if link_str not in index_content:
                 index_lines.append(link_str)
+        if enforce_anti_clutter:
+            enforce_anti_clutter(index_file)
         index_file.write_text("\n".join(index_lines) + "\n", encoding="utf-8")
 
         # Update Log.md
@@ -121,6 +140,8 @@ class LLMWiki:
             log_entry = f"- **{timestamp}**: Ingested raw file [[{name}]]."
             if log_entry not in log_content:
                 log_lines.append(log_entry)
+        if enforce_anti_clutter:
+            enforce_anti_clutter(log_file)
         log_file.write_text("\n".join(log_lines) + "\n", encoding="utf-8")
 
     def query(self, start_node: str, max_depth: int = 2) -> str:

@@ -23,3 +23,10 @@ pgdata/
 
 # Temporary outputs / spikes
 ai-ads/
+
+# Anti-clutter rules
+scratch/
+*.bak.*
+Desktop/*.py
+~/*.md
+**/__pycache__/

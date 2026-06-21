@@ -1,15 +1,18 @@
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from tools.prompt_validator import (
     check_constitution_health,
     check_overlap,
     check_sequential_sections,
+    enforce_anti_clutter,
     ensure_core_imperatives_block,
     estimate_overlap,
+    get_constitution_health_score,
     normalize_gemini_constitution_headings,
     validate_constitution_system,
-    get_constitution_health_score,
 )
 
 
@@ -156,6 +159,29 @@ def test_get_constitution_health_score(tmp_path):
     )
     # 100 - 15 (bloat) = 85
     assert get_constitution_health_score(temp_file) == 85
+
+
+
+
+def test_enforce_anti_clutter():
+    # 1. Допустимый путь внутри разрешенных директорий монорепозитория
+    assert enforce_anti_clutter("/Users/rus/ai-tools/tools/script.py") is True
+    assert enforce_anti_clutter("/Users/rus/ai-tools/vault/some_data.json") is True
+    assert enforce_anti_clutter("/Users/rus/ai-tools/dashboard-hand-on-pulse/app.py") is True
+
+    # 2. Допустимый внешний путь и handoff_notes
+    assert enforce_anti_clutter("/Users/rus/GEMINI_ANTIGRAVITY.md") is True
+    assert enforce_anti_clutter("/Users/rus/GEMINI_ANTIGRAVITY.md.bak.123") is True
+    assert enforce_anti_clutter("/Users/rus/ai-tools/handoff_notes.md") is True
+
+    # 3. Недопустимый путь
+    with pytest.raises(ValueError, match="Anti-Clutter"):
+        enforce_anti_clutter("/Users/rus/ai-tools/geo-seo/tests/test_x.py")
+    with pytest.raises(ValueError, match="Anti-Clutter"):
+        enforce_anti_clutter("/Users/rus/Desktop/clutter.py")
+    with pytest.raises(ValueError, match="Anti-Clutter"):
+        enforce_anti_clutter("/tmp/temp.txt")  # nosec B108
+
 
 
 

@@ -15,6 +15,7 @@ except ImportError:
 try:
     from tools.prompt_validator import (
         check_constitution_health,
+        enforce_anti_clutter,
         ensure_core_imperatives_block,
         normalize_gemini_constitution_headings,
     )
@@ -22,6 +23,7 @@ except ImportError:
     try:
         from prompt_validator import (
             check_constitution_health,
+            enforce_anti_clutter,
             ensure_core_imperatives_block,
             normalize_gemini_constitution_headings,
         )
@@ -29,6 +31,7 @@ except ImportError:
         check_constitution_health = None
         normalize_gemini_constitution_headings = None
         ensure_core_imperatives_block = None
+        enforce_anti_clutter = None
 
 
 def generate_research_queries(category: str, issue_content: str) -> list:
@@ -521,6 +524,8 @@ def generate_improvement_report(
     )
 
     try:
+        if enforce_anti_clutter:
+            enforce_anti_clutter(output_path)
         output_path.write_text("\n".join(report_lines), encoding="utf-8")
         print(f"✅ Improvement report saved to: {output_path}")
     except Exception as e:
@@ -544,6 +549,8 @@ def apply_improvement_record(handoff_notes_path: Path, metrics: dict) -> None:
         f"- **Действие**: Обновлены правила взаимодействия, оптимизированы JIT-инструкции.\n"
     )
     try:
+        if enforce_anti_clutter:
+            enforce_anti_clutter(handoff_notes_path)
         with open(handoff_notes_path, "a", encoding="utf-8") as f:
             f.write(delta_record)
         print(f"✅ Global handoff notes updated at: {handoff_notes_path}")
@@ -595,6 +602,7 @@ def main() -> None:
         print("Warning: dashboard_logger.log_change not found. Skipping DB log.")
 
     maintain_constitution()
+    cleanup_clutter()
 
     print("🚀 Self-Improvement Loop iteration completed successfully.")
 
@@ -622,6 +630,9 @@ def maintain_constitution(constitution_path: Path = None) -> None:
     if fixed != original or health.get("health") == "needs_cleanup":
         if fixed != original:
             backup = constitution_path.with_suffix(".md.bak." + datetime.now().strftime("%Y%m%d_%H%M%S"))
+            if enforce_anti_clutter:
+                enforce_anti_clutter(backup)
+                enforce_anti_clutter(constitution_path)
             backup.write_text(original, encoding="utf-8")
             constitution_path.write_text(fixed, encoding="utf-8")
             print(f"✅ Constitution normalized. Backup: {backup}")
@@ -635,6 +646,8 @@ def maintain_constitution(constitution_path: Path = None) -> None:
 
             if adr_dir.exists():
                 adr_path = adr_dir / "ADR_0016_automated_constitution_maintenance.md"
+                if enforce_anti_clutter:
+                    enforce_anti_clutter(adr_path)
                 adr_content = """# ADR 0016: Автоматическое обслуживание конституции GEMINI_ANTIGRAVITY.md
 
 ## Статус
@@ -681,6 +694,36 @@ def maintain_constitution(constitution_path: Path = None) -> None:
                 )
             except Exception as e:
                 print(f"Warning: Could not log constitution change to dashboard.db: {e}")
+
+
+def cleanup_clutter(constitution_dir: Path = None) -> None:
+    """Удаляет временные файлы бэкапов конституции и другие .bak файлы старше 7 дней."""
+    if constitution_dir is None:
+        constitution_dir = Path("/Users/rus")
+
+    # 1. Удаляем бэкапы конституции в /Users/rus
+    if constitution_dir.exists():
+        for f in constitution_dir.glob("GEMINI_ANTIGRAVITY.md.bak.*"):
+            try:
+                mtime = f.stat().st_mtime
+                if (datetime.now() - datetime.fromtimestamp(mtime)).days > 7:
+                    f.unlink()
+                    print(f"🧹 Removed old constitution backup: {f}")
+            except Exception as e:
+                print(f"Warning: Could not remove old backup {f}: {e}")
+
+    # 2. Удаляем временные .bak.* в репозитории /Users/rus/ai-tools
+    workspace_dir = Path("/Users/rus/ai-tools")
+    if workspace_dir.exists() and constitution_dir != workspace_dir:
+        for f in workspace_dir.rglob("*.bak.*"):
+            try:
+                mtime = f.stat().st_mtime
+                if (datetime.now() - datetime.fromtimestamp(mtime)).days > 7:
+                    f.unlink()
+                    print(f"🧹 Removed old repository backup: {f}")
+            except Exception as e:
+                print(f"Warning: Could not remove old backup {f}: {e}")
+
 
 
 if __name__ == "__main__":

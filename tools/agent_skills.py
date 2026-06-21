@@ -28,7 +28,16 @@ except ImportError:
         validate_llm_output,
     )
 
+try:
+    from tools.prompt_validator import enforce_anti_clutter
+except ImportError:
+    try:
+        from prompt_validator import enforce_anti_clutter
+    except ImportError:
+        enforce_anti_clutter = None
+
 __all__ = ["AgentSkillsManager", "LLMValidationError"]
+
 
 
 class AgentSkillsManager:
@@ -186,6 +195,8 @@ description: {description.strip()}
 - [ ] Code is formatted with Ruff.
 - [ ] Tests run successfully offline.
 """
+        if enforce_anti_clutter:
+            enforce_anti_clutter(skill_md_path)
         skill_md_path.write_text(template_content, encoding="utf-8")
 
         # Create scripts, examples and tests placeholders

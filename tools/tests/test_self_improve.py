@@ -1,8 +1,11 @@
 import json
+import os
+import time
 from pathlib import Path
 
 from tools.self_improve import (
     apply_improvement_record,
+    cleanup_clutter,
     generate_improvement_report,
     maintain_constitution,
 )
@@ -289,5 +292,29 @@ def test_maintain_constitution_health_cleanup_trigger(tmp_path):
     # Должен создаться бэкап, так как health == needs_cleanup, даже при правильной нумерации
     backups = list(tmp_path.glob("GEMINI_ANTIGRAVITY.md.bak.*"))
     assert len(backups) == 1
+
+
+
+def test_cleanup_clutter(tmp_path):
+    """Проверяет корректное удаление бэкапов старше 7 дней."""
+    # 1. Создаем свежий бэкап
+    fresh_backup = tmp_path / "GEMINI_ANTIGRAVITY.md.bak.20260622_120000"
+    fresh_backup.write_text("fresh", encoding="utf-8")
+
+    # 2. Создаем старый бэкап (10 дней назад)
+    old_backup = tmp_path / "GEMINI_ANTIGRAVITY.md.bak.20260612_120000"
+    old_backup.write_text("old", encoding="utf-8")
+
+    # Устанавливаем время модификации для старого бэкапа
+    ten_days_ago = time.time() - (10 * 24 * 3600)
+    os.utime(old_backup, (ten_days_ago, ten_days_ago))
+
+    # Запускаем очистку
+    cleanup_clutter(tmp_path)
+
+    # Старый должен быть удален, свежий должен остаться
+    assert fresh_backup.exists()
+    assert not old_backup.exists()
+
 
 
