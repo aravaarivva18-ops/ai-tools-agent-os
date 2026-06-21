@@ -16,6 +16,10 @@ normalize-constitution:
 	uv run python tools/self_improve.py
 	uv run python tools/update_gem_bot_prompts.py
 
+auto-improve:
+	uv run python tools/self_improve.py
+	uv run python tools/update_gem_bot_prompts.py
+
 check: check-rules
 	uv run ruff check .
 	uv run ruff format --check .

@@ -4,9 +4,11 @@ from pathlib import Path
 from tools.prompt_validator import (
     check_overlap,
     check_sequential_sections,
-    validate_constitution_system,
-    normalize_gemini_constitution_headings,
     ensure_core_imperatives_block,
+    normalize_gemini_constitution_headings,
+    validate_constitution_system,
+    check_constitution_health,
+    estimate_overlap,
 )
 
 
@@ -109,4 +111,31 @@ def test_ensure_core_block_already_exists():
     src = "# GEMINI_ANTIGRAVITY\n## 🏛️ Core Rules Summary (Ядро)\n## 1. Первый раздел\n"
     out = ensure_core_imperatives_block(src)
     assert "## 🏛️ Ядро (Core Imperatives)" not in out
+
+
+def test_constitution_health_positive(tmp_path):
+    temp_file = tmp_path / "GEMINI_ANTIGRAVITY.md"
+    temp_file.write_text(
+        "# GEMINI_ANTIGRAVITY\n\n## 🏛️ Core Rules Summary\n\n## 1. Section One\nSolo Loop\n",
+        encoding="utf-8",
+    )
+    health = check_constitution_health(temp_file)
+    assert health["sections"] == 2
+    assert health["health"] == "good"
+    assert health["bloat"] is False
+
+
+def test_constitution_health_bloat(tmp_path):
+    temp_file = tmp_path / "GEMINI_ANTIGRAVITY.md"
+    large_text = "# GEMINI_ANTIGRAVITY\n\n## 1. Section One\n" + ("A" * 60000)
+    temp_file.write_text(large_text, encoding="utf-8")
+    health = check_constitution_health(temp_file)
+    assert health["bloat"] is True
+    assert health["health"] == "needs_cleanup"
+
+
+def test_estimate_overlap():
+    assert estimate_overlap("Solo Loop and Stealth Stop") == 2.0 / 20.0
+    assert estimate_overlap("No keywords") == 0.0
+
 

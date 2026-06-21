@@ -163,6 +163,33 @@ def ensure_core_imperatives_block(text: str) -> str:
     return "".join(lines)
 
 
+def check_constitution_health(path: Path = None) -> dict:
+    """Возвращает метрики здоровья конституции."""
+    if path is None:
+        path = CONSTITUTION_PATH
+    if not path.exists():
+        return {"status": "missing"}
+
+    text = path.read_text(encoding="utf-8")
+    sections = len(re.findall(r"^##", text, re.MULTILINE))
+    overlap_score = estimate_overlap(text)
+    bloat = len(text) > 55000
+
+    return {
+        "sections": sections,
+        "overlap_score": overlap_score,
+        "bloat": bloat,
+        "health": "good" if sections < 45 and not bloat and overlap_score < 0.12 else "needs_cleanup",
+    }
+
+
+def estimate_overlap(text: str) -> float:
+    """Простая оценка дублирования (по ключевым фразам)."""
+    keywords = ["Solo Loop", "Stealth Stop", "YAGNI", "TDD", "file://", "WAL"]
+    count = sum(text.count(k) for k in keywords)
+    return min(count / 20.0, 1.0)  # нормализованный score
+
+
 def main():
     if not validate_constitution_system():
         sys.exit(1)

@@ -14,16 +14,19 @@ except ImportError:
 
 try:
     from tools.prompt_validator import (
+        check_constitution_health,
         normalize_gemini_constitution_headings,
         ensure_core_imperatives_block,
     )
 except ImportError:
     try:
         from prompt_validator import (
+            check_constitution_health,
             normalize_gemini_constitution_headings,
             ensure_core_imperatives_block,
         )
     except ImportError:
+        check_constitution_health = None
         normalize_gemini_constitution_headings = None
         ensure_core_imperatives_block = None
 
@@ -598,8 +601,8 @@ def main() -> None:
 
 def maintain_constitution(constitution_path: Path = None) -> None:
     """Нормализует заголовки и ядро в конституции, если требуется."""
-    if not normalize_gemini_constitution_headings or not ensure_core_imperatives_block:
-        print("Warning: normalization functions are not available. Skipping maintenance.")
+    if not normalize_gemini_constitution_headings or not ensure_core_imperatives_block or not check_constitution_health:
+        print("Warning: normalization or health check functions are not available. Skipping maintenance.")
         return
 
     if constitution_path is None:
@@ -609,15 +612,21 @@ def maintain_constitution(constitution_path: Path = None) -> None:
         print(f"Warning: Constitution file not found at {constitution_path}. Skipping maintenance.")
         return
 
+    health = check_constitution_health(constitution_path)
+    print(f"📋 Constitution health check status: {health}")
+
     original = constitution_path.read_text(encoding="utf-8")
     fixed = normalize_gemini_constitution_headings(original)
     fixed = ensure_core_imperatives_block(fixed)
 
-    if fixed != original:
-        backup = constitution_path.with_suffix(".md.bak." + datetime.now().strftime("%Y%m%d_%H%M%S"))
-        backup.write_text(original, encoding="utf-8")
-        constitution_path.write_text(fixed, encoding="utf-8")
-        print(f"✅ Constitution normalized. Backup: {backup}")
+    if fixed != original or health.get("health") == "needs_cleanup":
+        if fixed != original:
+            backup = constitution_path.with_suffix(".md.bak." + datetime.now().strftime("%Y%m%d_%H%M%S"))
+            backup.write_text(original, encoding="utf-8")
+            constitution_path.write_text(fixed, encoding="utf-8")
+            print(f"✅ Constitution normalized. Backup: {backup}")
+        else:
+            print("⚠️ Constitution health needs cleanup but content is already normalized. Manual YAGNI audit is recommended.")
 
         # Log change in dashboard.db
         log_change = None
@@ -633,9 +642,9 @@ def maintain_constitution(constitution_path: Path = None) -> None:
             try:
                 log_change(
                     project_name="Парковка Уфа",
-                    description="Automated normalization of GEMINI_ANTIGRAVITY.md structure (v10)",
-                    reason="Ensure sequential headings and core imperatives block alignment",
-                    expected_effect="Sequential rules consistency",
+                    description=f"Automated health-driven maintenance of GEMINI_ANTIGRAVITY.md. Health: {health}",
+                    reason="Enforce constitution health and rules structure alignment",
+                    expected_effect="Sequential rules consistency and size health",
                 )
             except Exception as e:
                 print(f"Warning: Could not log constitution change to dashboard.db: {e}")

@@ -262,3 +262,27 @@ def test_maintain_constitution_flow(tmp_path):
     assert len(backups) == 1
     assert "## 🏛️ 5. Раздел один" in backups[0].read_text(encoding="utf-8")
 
+
+def test_maintain_constitution_health_cleanup_trigger(tmp_path):
+    """Проверяет, что при плохом здоровье конституции запускается логика обслуживания."""
+    constitution_file = tmp_path / "GEMINI_ANTIGRAVITY.md"
+    # Создаем файл с правильной нумерацией, но огромным размером (bloat = True), чтобы вызвать needs_cleanup
+    content = (
+        "# GEMINI_ANTIGRAVITY\n"
+        "\n"
+        "## 🏛️ 1. Раздел один\n"
+        "Текст один\n"
+        "\n"
+        "## 🧠 2. Раздел два\n"
+        "Текст два\n"
+        + ("A" * 60000)
+    )
+    constitution_file.write_text(content, encoding="utf-8")
+
+    maintain_constitution(constitution_file)
+
+    # Должен создаться бэкап, так как health == needs_cleanup, даже при правильной нумерации
+    backups = list(tmp_path.glob("GEMINI_ANTIGRAVITY.md.bak.*"))
+    assert len(backups) == 1
+
+
