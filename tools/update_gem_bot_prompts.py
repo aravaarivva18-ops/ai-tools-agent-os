@@ -19,6 +19,7 @@ def main() -> None:
         "gem_bot_audit_specialist.md": "Gem Bot Audit Specialist",
         "gem_bot_prompt_architect.md": "Gem Bot Prompt Architect",
         "gem_bot_prompt_generator.md": "Gem Bot Prompt Generator",
+        "gem_bot_developer.md": "Gem Bot Developer Agent",
     }
 
     conn = sqlite3.connect(DB_PATH)
