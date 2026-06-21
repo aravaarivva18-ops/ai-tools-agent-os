@@ -1,0 +1,35 @@
+title: Telephony  
+href: index.md  
+items:  
+  - name: Overview of Methods  
+    href: index.md  
+  - name: Register External Line  
+    href: telephony-external-line-add.md  
+  - name: Update External Line  
+    href: telephony-external-line-update.md  
+  - name: Get List of External Lines  
+    href: telephony-external-line-get.md  
+  - name: Delete External Line  
+    href: telephony-external-line-delete.md  
+  - name: Find Client in CRM by Phone Number  
+    href: telephony-external-call-search-crm-entities.md  
+  - name: Register Call Start  
+    href: telephony-external-call-register.md  
+  - name: Open Call Detail for User  
+    href: telephony-external-call-show.md  
+  - name: Hide Call Detail for User  
+    href: telephony-external-call-hide.md  
+  - name: Finish Call  
+    href: telephony-external-call-finish.md  
+  - name: Attach Call Recording  
+    href: telephony-external-call-attach-record.md  
+  - name: Add Transcription of Recording to Call  
+    href: telephony-call-attach-transcription.md  
+  - name: Events  
+    include:  
+      path: events/b24-toc.yaml  
+      mode: link  
+  - name: SIP and Built-in Telephony  
+    include:  
+      path: voximplant/b24-toc.yaml  
+      mode: link  

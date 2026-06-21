@@ -1,0 +1,65 @@
+# Call the interface to remove a registered event handler BX24.callUnbind
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+```js
+BX24.callUnbind(
+    String event,
+    String handler[
+        Integer auth_type[
+            Function callback
+        ]
+    ]
+);
+```
+
+The interface for the method [event.unbind](../../../api-reference/events/event-unbind.md), which removes a registered [event](../../../api-reference/common/events/index.md) handler.
+
+{% note info %}
+
+Works only when authorized as a user with administrative rights on the account.
+
+{% endnote %}
+
+## Parameters
+
+{% include [Note on required parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **event**
+[`string`](../../../api-reference/data-types.md) | Event name ||
+|| **handler**
+[`string`](../../../api-reference/data-types.md) | Link to the event handler ||
+|| **auth_type**
+[`integer`](../../../api-reference/data-types.md) | Identifier of the user under which the event handler is authorized. 
+
+{% note info %}
+
+If you need to remove event handlers set with an empty *auth_type* (authorized on behalf of the user who triggered the event), but keep the other handlers, specify *auth_type=0* or an empty value for the parameter. If you need to remove event handlers for all users, specify the value *null*.
+
+{% endnote %}
+
+ ||
+|| **callback**
+[`function`](../../../api-reference/data-types.md) | Function to handle the result of the method call ||
+|#
+
+## Example
+
+```js
+BX24.callUnbind('OnAppUninstall', 'http://www.my-domain.com/handler/');
+```
+
+{% include [Note on examples](../../../_includes/examples.md) %}
+
+## Continue exploring
+
+- [{#T}](./bx24-call-bind.md)
+- [{#T}](./bx24-call-method.md)
+- [{#T}](./bx24-call-batch.md)

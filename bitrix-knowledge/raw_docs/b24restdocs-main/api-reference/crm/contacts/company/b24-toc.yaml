@@ -1,0 +1,17 @@
+title: Linking Contacts with Companies
+href: index.md
+items:
+  - name: Overview of Methods
+    href: index.md
+  - name: Add a Company to the Specified Contact
+    href: crm-contact-company-add.md
+  - name: Remove a Company from the Specified Contact
+    href: crm-contact-company-delete.md
+  - name: Get Fields for Linking Contact-Company
+    href: crm-contact-company-fields.md
+  - name: Get Set of Companies Linked to the Specified Contact
+    href: crm-contact-company-items-get.md
+  - name: Set of Companies Linked to the Specified Contact
+    href: crm-contact-company-items-set.md
+  - name: Clear the Set of Companies Linked to the Specified Contact
+    href: crm-contact-company-items-delete.md

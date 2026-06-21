@@ -16,14 +16,19 @@ if DATABASE_URL.startswith("postgres://"):
 # Безопасность и JWT
 JWT_SECRET = os.getenv("JWT_SECRET", "super-secret-key-change-it-in-production")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440")) # 24 часа
+ACCESS_TOKEN_EXPIRE_MINUTES = int(
+    os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440")
+)  # 24 часа
 
 # Настройки Яндекс OAuth
 YANDEX_CLIENT_ID = os.getenv("YANDEX_CLIENT_ID", "")
 YANDEX_CLIENT_SECRET = os.getenv("YANDEX_CLIENT_SECRET", "")
-YANDEX_REDIRECT_URI = os.getenv("YANDEX_REDIRECT_URI", "http://localhost:3000/auth/yandex/callback")
+YANDEX_REDIRECT_URI = os.getenv(
+    "YANDEX_REDIRECT_URI", "http://localhost:3000/auth/yandex/callback"
+)
 
 # Настройки Google Sheets API
 GOOGLE_SPREADSHEET_ID = os.getenv("GOOGLE_SPREADSHEET_ID", "")
-GOOGLE_CREDENTIALS_PATH = os.getenv("GOOGLE_CREDENTIALS_PATH", "google_credentials.json")
-
+GOOGLE_CREDENTIALS_PATH = os.getenv(
+    "GOOGLE_CREDENTIALS_PATH", "google_credentials.json"
+)

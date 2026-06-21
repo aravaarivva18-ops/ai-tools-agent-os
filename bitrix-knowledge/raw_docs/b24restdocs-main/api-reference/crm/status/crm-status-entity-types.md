@@ -1,0 +1,394 @@
+# Get CRM Status Entity Types
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`crm`](../../scopes/permissions.md)
+>
+> Who can execute the method: any user
+
+The method `crm.status.entity.types` returns a list of all supported types of directories, `ENTITY_ID` objects.
+
+## Method Parameters
+
+No parameters.
+
+## Code Examples
+
+{% include [Examples Note](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+         -H "Content-Type: application/json" \
+         -H "Accept: application/json" \
+         -d '{}' \
+         https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/crm.status.entity.types
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/crm.status.entity.types
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of each entity type returned in result[]
+    type CrmStatusEntityType = {
+      ID: string
+      NAME: string
+      ENTITY_TYPE_ID?: number
+      SEMANTIC_INFO?: {
+        START_FIELD: string
+        FINAL_SUCCESS_FIELD: string
+        FINAL_UNSUCCESS_FIELD: string
+        FINAL_SORT: number
+      } | unknown[]
+      PREFIX?: string
+      FIELD_ATTRIBUTE_SCOPE?: string
+      IS_ENABLED?: boolean
+      CATEGORY_ID?: number | string
+      PARENT_ID?: string
+      CATEGORY_NAME?: string
+      CATEGORY_SORT?: number
+      IS_DEFAULT_CATEGORY?: boolean
+    }
+
+    try {
+      const response = await $b24.actions.v2.call.make<CrmStatusEntityType[]>({
+        method: 'crm.status.entity.types',
+        params: {},
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Entity types:', result.length, result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function getStatusEntityTypes() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'crm.status.entity.types',
+            params: {},
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Entity types:', result.length, result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', getStatusEntityTypes)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'crm.status.entity.types',
+                []
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        if ($result->error()) {
+            error_log($result->error());
+            echo 'Error: ' . $result->error();
+        } else {
+            echo 'Success: ' . print_r($result->data(), true);
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error calling crm.status.entity.types: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        "crm.status.entity.types",
+        {},
+        function(result) {
+            if(result.error())
+                console.error(result.error());
+            else
+                console.dir(result.data());
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'crm.status.entity.types',
+        []
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP status: **200**
+
+```json
+{
+  "result": [
+    {
+      "ID": "STATUS",
+      "NAME": "Lead Stages",
+      "SEMANTIC_INFO": {
+        "START_FIELD": "NEW",
+        "FINAL_SUCCESS_FIELD": "CONVERTED",
+        "FINAL_UNSUCCESS_FIELD": "JUNK",
+        "FINAL_SORT": 0
+      },
+      "ENTITY_TYPE_ID": 1
+    },
+    {
+      "ID": "SOURCE",
+      "NAME": "Sources"
+    },
+    {
+      "ID": "CONTACT_TYPE",
+      "NAME": "Contact Type"
+    },
+    {
+      "ID": "COMPANY_TYPE",
+      "NAME": "Company Type"
+    },
+    {
+      "ID": "EMPLOYEES",
+      "NAME": "Number of Employees"
+    },
+    {
+      "ID": "INDUSTRY",
+      "NAME": "Industry"
+    },
+    {
+      "ID": "DEAL_TYPE",
+      "NAME": "Deal Type"
+    },
+    {
+      "ID": "SMART_INVOICE_STAGE_5",
+      "NAME": "Invoice Stages",
+      "SEMANTIC_INFO": [],
+      "PREFIX": "DT31_5",
+      "FIELD_ATTRIBUTE_SCOPE": "category_5",
+      "ENTITY_TYPE_ID": 31,
+      "IS_ENABLED": true,
+      "CATEGORY_ID": 5
+    },
+    {
+      "ID": "DEAL_STAGE_1",
+      "NAME": "Newest Deal Stages",
+      "PARENT_ID": "DEAL_STAGE",
+      "SEMANTIC_INFO": {
+        "START_FIELD": "C1:NEW",
+        "FINAL_SUCCESS_FIELD": "C1:WON",
+        "FINAL_UNSUCCESS_FIELD": "C1:LOSE",
+        "FINAL_SORT": 0
+      },
+      "PREFIX": "C1",
+      "FIELD_ATTRIBUTE_SCOPE": "category_1",
+      "ENTITY_TYPE_ID": 2,
+      "CATEGORY_ID": "1"
+    },
+    {
+      "ID": "DEAL_STAGE",
+      "NAME": "General Deal Stages",
+      "SEMANTIC_INFO": {
+        "START_FIELD": "NEW",
+        "FINAL_SUCCESS_FIELD": "WON",
+        "FINAL_UNSUCCESS_FIELD": "LOSE",
+        "FINAL_SORT": 0
+      },
+      "FIELD_ATTRIBUTE_SCOPE": "",
+      "ENTITY_TYPE_ID": 2,
+      "CATEGORY_ID": 0
+    },
+    {
+      "ID": "QUOTE_STATUS",
+      "NAME": "Estimate Stages",
+      "SEMANTIC_INFO": {
+        "START_FIELD": "DRAFT",
+        "FINAL_SUCCESS_FIELD": "APPROVED",
+        "FINAL_UNSUCCESS_FIELD": "DECLINED",
+        "FINAL_SORT": 0
+      },
+      "ENTITY_TYPE_ID": 7
+    },
+    {
+      "ID": "HONORIFIC",
+      "NAME": "Honorifics"
+    },
+    {
+      "ID": "CALL_LIST",
+      "NAME": "Call Statuses"
+    },
+    {
+      "ID": "SMART_DOCUMENT_STAGE_13",
+      "NAME": "Document Stages",
+      "SEMANTIC_INFO": [],
+      "PREFIX": "DT36_13",
+      "FIELD_ATTRIBUTE_SCOPE": "category_13",
+      "ENTITY_TYPE_ID": 36,
+      "IS_ENABLED": true,
+      "CATEGORY_ID": 13
+    },
+    {
+      "ID": "DYNAMIC_177_STAGE_7",
+      "NAME": "Equipment Purchase (General)",
+      "SEMANTIC_INFO": [],
+      "PREFIX": "DT177_7",
+      "FIELD_ATTRIBUTE_SCOPE": "category_7",
+      "ENTITY_TYPE_ID": 177,
+      "IS_ENABLED": true,
+      "CATEGORY_ID": 7,
+      "CATEGORY_NAME": "General",
+      "CATEGORY_SORT": 500,
+      "IS_DEFAULT_CATEGORY": true
+    },
+    {
+      "ID": "DYNAMIC_177_STAGE_9",
+      "NAME": "Equipment Purchase (Second Funnel)",
+      "SEMANTIC_INFO": [],
+      "PREFIX": "DT177_9",
+      "FIELD_ATTRIBUTE_SCOPE": "category_9",
+      "ENTITY_TYPE_ID": 177,
+      "IS_ENABLED": true,
+      "CATEGORY_ID": 9,
+      "CATEGORY_NAME": "Second Funnel",
+      "CATEGORY_SORT": 500,
+      "IS_DEFAULT_CATEGORY": false
+    }
+  ],
+  "time": {
+    "start": 1752142616.128453,
+    "finish": 1752142616.215683,
+    "duration": 0.08722996711730957,
+    "processing": 0.018637895584106445,
+    "date_start": "2025-07-10T13:16:56+02:00",
+    "date_finish": "2025-07-10T13:16:56+02:00",
+    "operating_reset_at": 1752143216,
+    "operating": 0
+  }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`array`](../../data-types.md) | Array of objects describing the types of directories [(detailed field description)](#result) ||
+|| **time**
+[`time`](../../data-types.md#time) | Information about the request execution time ||
+|#
+
+#### Fields of the result object {#result}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **ID**
+[`string`](../../data-types.md) | Object identifier, use the value in the `ENTITY_ID` field of the [crm.status.*](./index.md) methods ||
+|| **NAME**
+[`string`](../../data-types.md) | Name ||
+|| **ENTITY_TYPE_ID**
+[`integer`](../../data-types.md) | [CRM object type](../data-types.md#object_type#) to which the status belongs ||
+|| **SEMANTIC_INFO**
+[`object`](../../data-types.md) | Information about the semantics of status stages ||
+|| **PREFIX**
+[`string`](../../data-types.md) | Prefix for the stage code in the funnel ||
+|| **FIELD_ATTRIBUTE_SCOPE**
+[`string`](../../data-types.md) | Field application area, funnel ||
+|| **IS_ENABLED**
+[`boolean`](../../data-types.md) | Activity ||
+|| **CATEGORY_ID**
+[`integer`](../../data-types.md) | Funnel identifier ||
+|| **PARENT_ID**
+[`string`](../../data-types.md) | ID of the parent element ||
+|| **CATEGORY_NAME**
+[`string`](../../data-types.md) | Funnel name ||
+|| **CATEGORY_SORT**
+[`integer`](../../data-types.md) | Funnel sorting ||
+|| **IS_DEFAULT_CATEGORY**
+[`boolean`](../../data-types.md) | Default funnel ||
+|#
+
+## Error Handling
+
+The method does not return errors.
+
+{% include [system errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./crm-status-fields.md)
+- [{#T}](./crm-status-list.md)
+- [{#T}](./crm-status-add.md)
+- [{#T}](./crm-status-update.md)
+- [{#T}](./crm-status-delete.md)

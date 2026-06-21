@@ -26,7 +26,7 @@ class TestPromptsRepository(unittest.TestCase):
         with self.repo._get_connection() as conn:
             conn.execute(
                 "INSERT INTO prompts (act, prompt, for_devs, contributor) VALUES (?, ?, ?, ?)",
-                ("Mock Terminal", "Act as a mock terminal.", 1, "test-user")
+                ("Mock Terminal", "Act as a mock terminal.", 1, "test-user"),
             )
             conn.commit()
 

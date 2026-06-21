@@ -1,0 +1,255 @@
+# Delete Requisite and Related Objects crm.requisite.delete
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`crm`](../../../scopes/permissions.md)
+>
+> Who can execute the method: any user
+
+This method deletes a requisite and all associated objects (links to other entities, addresses, bank details).
+
+## Method Parameters
+
+{% include [Note on required parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id***
+[`integer`](../../../data-types.md) | Identifier of the requisite.
+
+The identifier can be obtained using the [crm.requisite.list](./crm-requisite-list.md) method ||
+|#
+
+## Code Examples
+
+{% include [Note on examples](../../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id":27}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/crm.requisite.delete
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id":27,"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/crm.requisite.delete
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    try {
+      const response = await $b24.actions.v2.call.make<boolean>({
+        method: 'crm.requisite.delete',
+        params: {
+          id: 27,
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Requisite deleted:', result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function deleteRequisite() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'crm.requisite.delete',
+            params: {
+              id: 27,
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Requisite deleted:', result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', deleteRequisite)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'crm.requisite.delete',
+                [
+                    'id' => 27
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        if ($result->error()) {
+            error_log($result->error());
+        } else {
+            echo 'Success: ' . print_r($result->data(), true);
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error deleting requisite: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        "crm.requisite.delete",
+        {
+            id: 27
+        },
+        function(result)
+        {
+            if(result.error())
+                console.error(result.error());
+            else
+                console.info(result.data());
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'crm.requisite.delete',
+        [
+            'id' => 27
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Successful Response
+
+HTTP status: **200**
+
+```json
+{
+    "result": true,
+    "time": {
+        "start": 1717166469.477791,
+        "finish": 1717166470.500321,
+        "duration": 1.0225298404693604,
+        "processing": 0.3063521385192871,
+        "date_start": "2024-05-31T16:41:09+02:00",
+        "date_finish": "2024-05-31T16:41:10+02:00",
+        "operating": 0.30628108978271484
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`boolean`](../../../data-types.md) | Returns the value:
+
+- `true` — requisite deleted
+- `false` — requisite not deleted
+
+||
+|| **time**
+[`time`](../../../data-types.md) | Information about the request execution time ||
+|#
+
+## Error Response
+
+HTTP status: **400**
+
+```json
+{
+    "error": "",
+    "error_description": "The Requisite with ID '57' is not found"
+}
+```
+
+{% include notitle [error handling](../../../../_includes/error-info.md) %}
+
+### Possible Errors
+
+#|  
+|| **Code** | **Error Text** | **Description** ||
+|| Empty string | The Requisite with ID '57' is not found | The requisite with the specified identifier was not found ||
+|| Empty string | ID is not defined or invalid. | The requisite identifier is not specified or has an invalid value ||
+|| Empty string | Access denied. | Insufficient access permissions to delete the requisite ||
+|#
+
+{% include [system errors](../../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./index.md)
+- [{#T}](./crm-requisite-add.md)
+- [{#T}](./crm-requisite-update.md)
+- [{#T}](./crm-requisite-get.md)
+- [{#T}](./crm-requisite-list.md)
+- [{#T}](./crm-requisite-fields.md)

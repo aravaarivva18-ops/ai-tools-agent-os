@@ -1,17 +1,17 @@
-version: '3.8'
-
 services:
   # Local database for agent memory and RAG vectors
   db:
     image: pgvector/pgvector:pg16
     container_name: ai_tools_db
     restart: always
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: rus
-      POSTGRES_PASSWORD: secure_password
-      POSTGRES_DB: ai_tools_memory
+      POSTGRES_USER: ${POSTGRES_USER:-rus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-ai_tools_memory}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     security_opt:
@@ -29,9 +29,11 @@ services:
     restart: always
     depends_on:
       - db
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=postgresql://rus:secure_password@db:5432/ai_tools_memory
-      - OBSIDIAN_VAULT_PATH=/app/vault
+      - DATABASE_URL=${DATABASE_URL:-postgresql://rus:changeme@db:5432/ai_tools_memory}
+      - OBSIDIAN_VAULT_PATH=${OBSIDIAN_VAULT_PATH:-/app/vault}
     volumes:
       # Mount workspace code for live reloading during development
       - .:/app

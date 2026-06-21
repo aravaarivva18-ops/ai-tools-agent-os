@@ -51,6 +51,10 @@
 * **Статус**: Интегрировано.
 * **Описание**: Проведена синхронизация всей системной документации с последними изменениями. Обновлены файлы [GEMINI_ANTIGRAVITY.md](file:///Users/rus/GEMINI_ANTIGRAVITY.md), [STUDENT_GUIDE.md](file:///Users/rus/STUDENT_GUIDE.md), [CLAUDE.md](file:///Users/rus/ai-tools/CLAUDE.md), [AGENTS.md](file:///Users/rus/ai-tools/AGENTS.md) и база знаний гем-бота [gemini_bot_knowledge_base.md](file:///Users/rus/ai-tools/attachments/gemini_bot_knowledge_base.md). В них зафиксированы: Solo Loop v10, JIT-категоризация навыков (UI, SEO, Scale, MCP), автозамер времени выкупа (Buyback Loop), а также стандарты Karpathy Vibe Coding и levelsio YAGNI. Написаны TDD автотесты для контроля знаний в `test_knowledge_update.py`.
 
+### Решение 11. Оценка и интеграция n8n сервера (Отклонено / Rejected)
+* **Статус**: Отклонен (Rejected).
+* **Обоснование (YAGNI)**: n8n требует запуска ресурсоемкого Node.js Docker-контейнера (2-4 ГБ ОЗУ), что избыточно для локального ИИ-агента на macOS. Оркестрация отлично решается локальным линейным Python-скриптом [advanced_workflow.py](file:///Users/rus/ai-tools/tools/advanced_workflow.py).
+
 ---
 
 ## ✅ 4. Definition of Done (DoD)

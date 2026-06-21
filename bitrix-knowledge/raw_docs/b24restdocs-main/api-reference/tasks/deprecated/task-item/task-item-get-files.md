@@ -1,0 +1,26 @@
+# Get Links to Files Attached to a Task task.item.getfiles
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`task`](../../../scopes/permissions.md)
+>
+> Who can execute the method: any user
+
+This method returns an array containing links to files attached to a task.
+
+{% note warning "DEPRECATED" %}
+
+Development of this method has been halted. Please use [tasks.task.get](../../tasks-task-get.md).
+
+{% endnote %}
+
+## Method Parameters
+
+#| 
+|| **Name** | **Description** ||
+|| **TASKID** | Task identifier || 
+|#

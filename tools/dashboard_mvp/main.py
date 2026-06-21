@@ -45,6 +45,7 @@ Base.metadata.create_all(bind=engine)
 
 # --- РАЗДЕЛ АВТОРИЗАЦИИ СОТРУДНИКОВ ---
 
+
 @app.post("/api/auth/login")
 def login(payload: dict, db: Session = Depends(get_db)):
     """Авторизация сотрудника по email и паролю. Возвращает JWT токен."""
@@ -63,21 +64,21 @@ def login(payload: dict, db: Session = Depends(get_db)):
         "sub": user.email,
         "role": user.role,
         "user_id": user.id,
-        "client_id": user.client_id
+        "client_id": user.client_id,
     }
-    access_token = create_access_token(token_data, expires_delta=timedelta(minutes=1440))
+    access_token = create_access_token(
+        token_data, expires_delta=timedelta(minutes=1440)
+    )
 
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user": {
-            "email": user.email,
-            "role": user.role,
-            "client_id": user.client_id
-        }
+        "user": {"email": user.email, "role": user.role, "client_id": user.client_id},
     }
 
+
 # --- РАЗДЕЛ ЯНДЕКС OAUTH АВТОРИЗАЦИИ ---
+
 
 @app.get("/api/auth/yandex/login")
 def yandex_login(project_id: int):
@@ -85,16 +86,19 @@ def yandex_login(project_id: int):
     auth_url = get_yandex_auth_url(project_id)
     return {"auth_url": auth_url}
 
+
 @app.get("/auth/yandex/callback")
 async def yandex_callback(
     code: str = Query(None),
-    state: str = Query(None), # Здесь передается project_id
+    state: str = Query(None),  # Здесь передается project_id
     error: str = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Обработчик ответа (callback) от Яндекса после авторизации пользователя."""
     if error:
-        raise HTTPException(status_code=400, detail=f"Ошибка авторизации Яндекс: {error}")
+        raise HTTPException(
+            status_code=400, detail=f"Ошибка авторизации Яндекс: {error}"
+        )
 
     if not code or not state:
         raise HTTPException(status_code=400, detail="Отсутствует code или state")
@@ -106,15 +110,18 @@ async def yandex_callback(
 
     project = db.query(Project).filter(Project.id == project_id).first()
     if not project:
-        raise HTTPException(status_code=404, detail=f"Проект с ID {project_id} не найден")
+        raise HTTPException(
+            status_code=404, detail=f"Проект с ID {project_id} не найден"
+        )
 
     try:
         tokens = await exchange_code_for_tokens(code)
 
-        integration = db.query(Integration).filter(
-            Integration.project_id == project_id,
-            Integration.type == "yandex"
-        ).first()
+        integration = (
+            db.query(Integration)
+            .filter(Integration.project_id == project_id, Integration.type == "yandex")
+            .first()
+        )
 
         if integration:
             integration.access_token = tokens["access_token"]
@@ -126,20 +133,26 @@ async def yandex_callback(
                 type="yandex",
                 access_token=tokens["access_token"],
                 refresh_token=tokens["refresh_token"],
-                expires_at=tokens["expires_at"]
+                expires_at=tokens["expires_at"],
             )
             db.add(integration)
 
         db.commit()
 
         # Перенаправляем пользователя обратно на фронтенд
-        return RedirectResponse(url=f"http://localhost:3000/#/project/{project_id}?auth=success")
+        return RedirectResponse(
+            url=f"http://localhost:3000/#/project/{project_id}?auth=success"
+        )
 
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Не удалось сохранить токены: {e!s}")
+        raise HTTPException(
+            status_code=500, detail=f"Не удалось сохранить токены: {e!s}"
+        )
+
 
 # --- РАЗДЕЛ ДАШБОРДА И АНАЛИТИКИ ---
+
 
 @app.get("/api/dashboard/summary")
 def get_dashboard_summary(db: Session = Depends(get_db)):
@@ -161,23 +174,31 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
 
     for project in projects:
         # 1. Получаем план на текущий месяц
-        plan = db.query(MarketingPlan).filter(
-            MarketingPlan.project_id == project.id,
-            MarketingPlan.month == current_month_str
-        ).first()
+        plan = (
+            db.query(MarketingPlan)
+            .filter(
+                MarketingPlan.project_id == project.id,
+                MarketingPlan.month == current_month_str,
+            )
+            .first()
+        )
 
         # 2. Получаем сумму факта по marketing_fact за этот месяц
-        stats = db.query(
-            MarketingFact.impressions,
-            MarketingFact.clicks,
-            MarketingFact.spend,
-            MarketingFact.leads_primary,
-            MarketingFact.leads_qualified
-        ).filter(
-            MarketingFact.project_id == project.id,
-            MarketingFact.date >= start_of_month,
-            MarketingFact.date <= end_of_month
-        ).all()
+        stats = (
+            db.query(
+                MarketingFact.impressions,
+                MarketingFact.clicks,
+                MarketingFact.spend,
+                MarketingFact.leads_primary,
+                MarketingFact.leads_qualified,
+            )
+            .filter(
+                MarketingFact.project_id == project.id,
+                MarketingFact.date >= start_of_month,
+                MarketingFact.date <= end_of_month,
+            )
+            .all()
+        )
 
         fact_impressions = sum(s.impressions for s in stats)
         fact_clicks = sum(s.clicks for s in stats)
@@ -186,8 +207,12 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
         fact_qualified_leads = sum(s.leads_qualified for s in stats)
 
         fact_cpl = (fact_spent / fact_leads) if fact_leads > 0 else 0.0
-        fact_cpl_qualified = (fact_spent / fact_qualified_leads) if fact_qualified_leads > 0 else 0.0
-        fact_ctr = (fact_clicks / fact_impressions * 100) if fact_impressions > 0 else 0.0
+        fact_cpl_qualified = (
+            (fact_spent / fact_qualified_leads) if fact_qualified_leads > 0 else 0.0
+        )
+        fact_ctr = (
+            (fact_clicks / fact_impressions * 100) if fact_impressions > 0 else 0.0
+        )
         fact_cpc = (fact_spent / fact_clicks) if fact_clicks > 0 else 0.0
 
         # 3. Вычисляем отклонения для светофора
@@ -210,65 +235,84 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
                 cpl_dev = round(((fact_cpl - plan.cpl_plan) / plan.cpl_plan) * 100, 1)
             # Выполнение плана по квал-лидам
             if plan.qualified_leads_plan > 0:
-                qual_leads_dev = round((fact_qualified_leads / plan.qualified_leads_plan) * 100, 1)
+                qual_leads_dev = round(
+                    (fact_qualified_leads / plan.qualified_leads_plan) * 100, 1
+                )
             # Отклонение по стоимости квал-лида
             if plan.cpl_qualified_plan > 0:
-                cpl_qual_dev = round(((fact_cpl_qualified - plan.cpl_qualified_plan) / plan.cpl_qualified_plan) * 100, 1)
+                cpl_qual_dev = round(
+                    (
+                        (fact_cpl_qualified - plan.cpl_qualified_plan)
+                        / plan.cpl_qualified_plan
+                    )
+                    * 100,
+                    1,
+                )
 
             # Расчет Pacing
             elapsed_days = today.day
             total_days = end_of_month.day
-            daily_spent_plan = plan.budget_plan / total_days if plan.budget_plan > 0 else 0.0
+            daily_spent_plan = (
+                plan.budget_plan / total_days if plan.budget_plan > 0 else 0.0
+            )
             daily_spent_fact = fact_spent / elapsed_days if elapsed_days > 0 else 0.0
-            pacing_pct = round((daily_spent_fact / daily_spent_plan) * 100, 1) if daily_spent_plan > 0 else 0.0
+            pacing_pct = (
+                round((daily_spent_fact / daily_spent_plan) * 100, 1)
+                if daily_spent_plan > 0
+                else 0.0
+            )
 
         # Название ответственного менеджера
-        manager_name = project.manager.email.split('@')[0] if project.manager else "Не назначен"
+        manager_name = (
+            project.manager.email.split("@")[0] if project.manager else "Не назначен"
+        )
 
-        summary_data.append({
-            "id": project.id,
-            "client_name": project.client.name,
-            "project_name": project.name,
-            "manager_name": manager_name,
-            "plan": {
-                "budget": plan.budget_plan if plan else 0.0,
-                "leads": plan.leads_plan if plan else 0,
-                "cpl": plan.cpl_plan if plan else 0.0,
-                "qualified_leads": plan.qualified_leads_plan if plan else 0,
-                "cpl_qualified": plan.cpl_qualified_plan if plan else 0.0
-            } if plan else None,
-            "fact": {
-                "impressions": fact_impressions,
-                "clicks": fact_clicks,
-                "spent": round(fact_spent, 2),
-                "leads": fact_leads,
-                "qualified_leads": fact_qualified_leads,
-                "cpl": round(fact_cpl, 2),
-                "cpl_qualified": round(fact_cpl_qualified, 2),
-                "ctr": round(fact_ctr, 2),
-                "cpc": round(fact_cpc, 2)
-            },
-            "deviations": {
-                "budget_progress_pct": budget_dev, # % расхода от плана
-                "leads_progress_pct": leads_dev,   # % выполнения плана по лидам
-                "cpl_deviation_pct": cpl_dev,       # % превышения стоимости лида от плана
-                "qual_leads_progress_pct": qual_leads_dev,
-                "cpl_qual_deviation_pct": cpl_qual_dev,
-                "budget_pacing_pct": pacing_pct
+        summary_data.append(
+            {
+                "id": project.id,
+                "client_name": project.client.name,
+                "project_name": project.name,
+                "manager_name": manager_name,
+                "plan": {
+                    "budget": plan.budget_plan if plan else 0.0,
+                    "leads": plan.leads_plan if plan else 0,
+                    "cpl": plan.cpl_plan if plan else 0.0,
+                    "qualified_leads": plan.qualified_leads_plan if plan else 0,
+                    "cpl_qualified": plan.cpl_qualified_plan if plan else 0.0,
+                }
+                if plan
+                else None,
+                "fact": {
+                    "impressions": fact_impressions,
+                    "clicks": fact_clicks,
+                    "spent": round(fact_spent, 2),
+                    "leads": fact_leads,
+                    "qualified_leads": fact_qualified_leads,
+                    "cpl": round(fact_cpl, 2),
+                    "cpl_qualified": round(fact_cpl_qualified, 2),
+                    "ctr": round(fact_ctr, 2),
+                    "cpc": round(fact_cpc, 2),
+                },
+                "deviations": {
+                    "budget_progress_pct": budget_dev,  # % расхода от плана
+                    "leads_progress_pct": leads_dev,  # % выполнения плана по лидам
+                    "cpl_deviation_pct": cpl_dev,  # % превышения стоимости лида от плана
+                    "qual_leads_progress_pct": qual_leads_dev,
+                    "cpl_qual_deviation_pct": cpl_qual_dev,
+                    "budget_pacing_pct": pacing_pct,
+                },
             }
-        })
+        )
 
-    return {
-        "month": current_month_str,
-        "projects": summary_data
-    }
+    return {"month": current_month_str, "projects": summary_data}
+
 
 @app.get("/api/dashboard/project/{project_id}")
 def get_project_detail(
     project_id: int,
     start_date: str = Query(None),
     end_date: str = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Возвращает детальные данные проекта за выбранный период (графики, лог изменений)."""
     project = db.query(Project).filter(Project.id == project_id).first()
@@ -289,17 +333,25 @@ def get_project_detail(
 
     # 1. Получаем планы за этот период
     month_str = start_date_val.strftime("%Y-%m")
-    plan = db.query(MarketingPlan).filter(
-        MarketingPlan.project_id == project_id,
-        MarketingPlan.month == month_str
-    ).first()
+    plan = (
+        db.query(MarketingPlan)
+        .filter(
+            MarketingPlan.project_id == project_id, MarketingPlan.month == month_str
+        )
+        .first()
+    )
 
     # 2. Получаем ежедневную статистику
-    stats_query = db.query(MarketingFact).filter(
-        MarketingFact.project_id == project_id,
-        MarketingFact.date >= start_date_val,
-        MarketingFact.date <= end_date_val
-    ).order_by(MarketingFact.date.asc()).all()
+    stats_query = (
+        db.query(MarketingFact)
+        .filter(
+            MarketingFact.project_id == project_id,
+            MarketingFact.date >= start_date_val,
+            MarketingFact.date <= end_date_val,
+        )
+        .order_by(MarketingFact.date.asc())
+        .all()
+    )
 
     # Группируем по дате для совместимости
     daily_map = {}
@@ -312,7 +364,7 @@ def get_project_detail(
                 "clicks": 0,
                 "spent": 0.0,
                 "leads": 0,
-                "qualified_leads": 0
+                "qualified_leads": 0,
             }
         daily_map[dt_str]["impressions"] += s.impressions
         daily_map[dt_str]["clicks"] += s.clicks
@@ -345,22 +397,28 @@ def get_project_detail(
         cpl = (sp / ld) if ld > 0 else 0.0
         cpl_q = (sp / qld) if qld > 0 else 0.0
 
-        stats_list.append({
-            "date": dt_str,
-            "impressions": imp,
-            "clicks": clk,
-            "spent": round(sp, 2),
-            "leads": ld,
-            "qualified_leads": qld,
-            "ctr": round(ctr, 2),
-            "cpc": round(cpc, 2),
-            "cpl": round(cpl, 2),
-            "cpl_qualified": round(cpl_q, 2)
-        })
+        stats_list.append(
+            {
+                "date": dt_str,
+                "impressions": imp,
+                "clicks": clk,
+                "spent": round(sp, 2),
+                "leads": ld,
+                "qualified_leads": qld,
+                "ctr": round(ctr, 2),
+                "cpc": round(cpc, 2),
+                "cpl": round(cpl, 2),
+                "cpl_qualified": round(cpl_q, 2),
+            }
+        )
 
     total_cpl = (total_spent / total_leads) if total_leads > 0 else 0.0
-    total_cpl_qualified = (total_spent / total_qualified_leads) if total_qualified_leads > 0 else 0.0
-    total_ctr = (total_clicks / total_impressions * 100) if total_impressions > 0 else 0.0
+    total_cpl_qualified = (
+        (total_spent / total_qualified_leads) if total_qualified_leads > 0 else 0.0
+    )
+    total_ctr = (
+        (total_clicks / total_impressions * 100) if total_impressions > 0 else 0.0
+    )
     total_cpc = (total_spent / total_clicks) if total_clicks > 0 else 0.0
 
     # Расчет Pacing для выбранного периода
@@ -375,28 +433,39 @@ def get_project_detail(
             elapsed_period_days = (today - start_date_val).days + 1
 
         daily_spent_plan = plan.budget_plan / total_period_days
-        daily_spent_fact = total_spent / elapsed_period_days if elapsed_period_days > 0 else 0.0
+        daily_spent_fact = (
+            total_spent / elapsed_period_days if elapsed_period_days > 0 else 0.0
+        )
         pacing_pct = round((daily_spent_fact / daily_spent_plan) * 100, 1)
 
     # 3. Получаем логи изменений
-    logs_query = db.query(Changelog).filter(
-        Changelog.project_id == project_id,
-        Changelog.date >= start_date_val,
-        Changelog.date <= end_date_val
-    ).order_by(Changelog.date.desc()).all()
+    logs_query = (
+        db.query(Changelog)
+        .filter(
+            Changelog.project_id == project_id,
+            Changelog.date >= start_date_val,
+            Changelog.date <= end_date_val,
+        )
+        .order_by(Changelog.date.desc())
+        .all()
+    )
 
-    logs_list = [{
-        "date": log.date.strftime("%Y-%m-%d"),
-        "description": log.description,
-        "comment": log.reason, # Маппим reason в comment для совместимости с фронтендом
-        "expected_effect": log.expected_effect
-    } for log in logs_query]
+    logs_list = [
+        {
+            "date": log.date.strftime("%Y-%m-%d"),
+            "description": log.description,
+            "comment": log.reason,  # Маппим reason в comment для совместимости с фронтендом
+            "expected_effect": log.expected_effect,
+        }
+        for log in logs_query
+    ]
 
     # Идентификатор токена Яндекс (для отображения статуса подключения)
-    yandex_integration = db.query(Integration).filter(
-        Integration.project_id == project_id,
-        Integration.type == "yandex"
-    ).first()
+    yandex_integration = (
+        db.query(Integration)
+        .filter(Integration.project_id == project_id, Integration.type == "yandex")
+        .first()
+    )
     has_token = yandex_integration is not None
 
     return {
@@ -406,19 +475,21 @@ def get_project_detail(
             "client_name": project.client.name,
             "has_yandex_token": has_token,
             "vat_type": project.vat_type,
-            "vat_rate": project.vat_rate
+            "vat_rate": project.vat_rate,
         },
         "period": {
             "start_date": start_date_val.strftime("%Y-%m-%d"),
-            "end_date": end_date_val.strftime("%Y-%m-%d")
+            "end_date": end_date_val.strftime("%Y-%m-%d"),
         },
         "plan": {
             "budget": plan.budget_plan if plan else 0.0,
             "leads": plan.leads_plan if plan else 0,
             "cpl": plan.cpl_plan if plan else 0.0,
             "qualified_leads": plan.qualified_leads_plan if plan else 0,
-            "cpl_qualified": plan.cpl_qualified_plan if plan else 0.0
-        } if plan else None,
+            "cpl_qualified": plan.cpl_qualified_plan if plan else 0.0,
+        }
+        if plan
+        else None,
         "totals": {
             "impressions": total_impressions,
             "clicks": total_clicks,
@@ -429,11 +500,12 @@ def get_project_detail(
             "cpl_qualified": round(total_cpl_qualified, 2),
             "ctr": round(total_ctr, 2),
             "cpc": round(total_cpc, 2),
-            "budget_pacing_pct": pacing_pct
+            "budget_pacing_pct": pacing_pct,
         },
-        "daily_stats": stats_list, # Ожидается фронтендом
-        "change_logs": logs_list # Ожидается фронтендом
+        "daily_stats": stats_list,  # Ожидается фронтендом
+        "change_logs": logs_list,  # Ожидается фронтендом
     }
+
 
 @app.post("/api/dashboard/project/{project_id}/sync")
 async def trigger_sync(project_id: int, db: Session = Depends(get_db)):
@@ -451,6 +523,7 @@ async def trigger_sync(project_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Ошибка при синхронизации данных")
 
     return {"status": "success", "message": "Синхронизация успешно завершена"}
+
 
 @app.get("/api/cron/sync")
 async def cron_sync_all(db: Session = Depends(get_db)):
@@ -471,7 +544,9 @@ async def cron_sync_all(db: Session = Depends(get_db)):
 
     return {"status": "completed", "results": results}
 
+
 # --- УТИЛИТНЫЙ ЭНДПОИНТ ДЛЯ ТЕСТОВОЙ СТРУКТУРЫ ---
+
 
 @app.post("/api/test/setup")
 def setup_test_project(db: Session = Depends(get_db)):
@@ -504,7 +579,7 @@ def setup_test_project(db: Session = Depends(get_db)):
             name="Парковка Уфа",
             manager_id=manager_id,
             vat_type="with_vat",
-            vat_rate=0.20
+            vat_rate=0.20,
         )
         db.add(project)
         db.commit()
@@ -514,14 +589,16 @@ def setup_test_project(db: Session = Depends(get_db)):
         project.vat_rate = 0.20
         db.commit()
 
-    mapping = db.query(SourceMapping).filter(SourceMapping.project_id == project.id).first()
+    mapping = (
+        db.query(SourceMapping).filter(SourceMapping.project_id == project.id).first()
+    )
     if not mapping:
         mapping = SourceMapping(
             project_id=project.id,
             direct_login="e-17390364",
             metrika_counter_id="96109777",
             lead_goals_ids="320946135",
-            qual_goals_ids="320946351"
+            qual_goals_ids="320946351",
         )
         db.add(mapping)
         db.commit()
@@ -534,16 +611,20 @@ def setup_test_project(db: Session = Depends(get_db)):
     excel_path = "/Users/rus/Downloads/dashboard_input_pack_mvp_filled_parking_ufa.xlsx"
     if os.path.exists(excel_path):
         from dashboard_mvp.sync import sync_excel_data
+
         sync_excel_data(db, excel_path)
     else:
-        print(f"[SETUP TEST] Файл Excel по пути {excel_path} не найден. Планы не импортированы.")
+        print(
+            f"[SETUP TEST] Файл Excel по пути {excel_path} не найден. Планы не импортированы."
+        )
 
     return {
         "status": "success",
         "client_id": client.id,
         "project_id": project.id,
-        "message": "Тестовая структура создана (Парковка Уфа) и планы KPI импортированы из Excel"
+        "message": "Тестовая структура создана (Парковка Уфа) и планы KPI импортированы из Excel",
     }
+
 
 # Раздача статических файлов (фронтенда)
 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")

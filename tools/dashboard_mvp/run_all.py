@@ -13,9 +13,19 @@ parent_dir = current_dir.parent
 if str(parent_dir) not in sys.path:
     sys.path.insert(0, str(parent_dir))
 
+
 def check_dependencies():
     """Проверяет наличие необходимых библиотек Python."""
-    required = ["fastapi", "uvicorn", "sqlalchemy", "streamlit", "pandas", "numpy", "plotly", "requests"]
+    required = [
+        "fastapi",
+        "uvicorn",
+        "sqlalchemy",
+        "streamlit",
+        "pandas",
+        "numpy",
+        "plotly",
+        "requests",
+    ]
     missing = []
     for module in required:
         try:
@@ -30,6 +40,7 @@ def check_dependencies():
         print("\nПожалуйста, установите их следующей командой:")
         print(f"  {sys.executable} -m pip install " + " ".join(missing))
         sys.exit(1)
+
 
 def setup_database_and_mock_data():
     """Инициализирует базу данных и загружает тестовые данные из Excel."""
@@ -54,6 +65,7 @@ def setup_database_and_mock_data():
         print(f"Ошибка при настройке базы данных: {e}")
         print("Продолжаем запуск с использованием резервных данных...")
 
+
 def main():
     check_dependencies()
     setup_database_and_mock_data()
@@ -66,20 +78,43 @@ def main():
     try:
         print("\nЗапуск FastAPI Бэкенда на http://localhost:8000...")
         backend_proc = subprocess.Popen(
-            [sys.executable, "-m", "uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000", "--log-level", "warning"],
+            [
+                sys.executable,
+                "-m",
+                "uvicorn",
+                "main:app",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                "8000",
+                "--log-level",
+                "warning",
+            ],
             cwd=str(current_dir),
-            env=env
+            env=env,
         )
         processes.append(backend_proc)
 
         # Небольшая пауза, чтобы FastAPI успел инициализироваться
         time.sleep(1.5)
 
-        print("Запуск Streamlit Дашборда (Yandex DataLens стиль) на http://localhost:8501...")
+        print(
+            "Запуск Streamlit Дашборда (Yandex DataLens стиль) на http://localhost:8501..."
+        )
         streamlit_proc = subprocess.Popen(
-            [sys.executable, "-m", "streamlit", "run", "streamlit_app.py", "--server.port", "8501", "--server.headless", "true"],
+            [
+                sys.executable,
+                "-m",
+                "streamlit",
+                "run",
+                "streamlit_app.py",
+                "--server.port",
+                "8501",
+                "--server.headless",
+                "true",
+            ],
             cwd=str(current_dir),
-            env=env
+            env=env,
         )
         processes.append(streamlit_proc)
 
@@ -98,7 +133,9 @@ def main():
             # Проверяем, не упал ли какой-то из процессов
             for p in processes:
                 if p.poll() is not None:
-                    print(f"\nОдин из процессов неожиданно завершился с кодом {p.returncode}")
+                    print(
+                        f"\nОдин из процессов неожиданно завершился с кодом {p.returncode}"
+                    )
                     return
             time.sleep(1)
 
@@ -116,6 +153,7 @@ def main():
                 except Exception:
                     pass
         print("Все процессы остановлены.")
+
 
 if __name__ == "__main__":
     main()

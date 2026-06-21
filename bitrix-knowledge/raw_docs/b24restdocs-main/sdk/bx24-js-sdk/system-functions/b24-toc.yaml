@@ -1,0 +1,15 @@
+title: Initialization and Authorization  
+href: index.md  
+items:  
+  - name: Overview of Features  
+    href: index.md  
+  - name: Initialize the Library  
+    href: bx24-init.md  
+  - name: Handle User's First Application Launch Event  
+    href: bx24-install.md  
+  - name: Notify Completion of Installer Work  
+    href: bx24-install-finish.md  
+  - name: Obtain Data for OAuth 2.0  
+    href: bx24-get-auth.md  
+  - name: Force Update Authorization Key  
+    href: bx24-refresh-auth.md  

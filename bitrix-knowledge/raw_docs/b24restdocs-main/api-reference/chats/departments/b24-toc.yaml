@@ -1,0 +1,13 @@
+title: Working with Departments
+href: index.md
+items:
+  - name: Overview of Methods
+    href: index.md
+  - name: Get Information About a Department
+    href: im-department-get.md
+  - name: Get List of Department Managers
+    href: im-department-managers-get.md
+  - name: Get List of Department Employees
+    href: im-department-employees-get.md
+  - name: Get List of Current User's Colleagues
+    href: im-department-colleagues-list.md

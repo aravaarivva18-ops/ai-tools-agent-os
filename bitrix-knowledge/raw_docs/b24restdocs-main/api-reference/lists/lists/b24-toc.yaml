@@ -1,0 +1,15 @@
+title: General Methods
+href: index.md
+items:
+  - name: Overview of Methods
+    href: index.md
+  - name: Create List
+    href: lists-add.md
+  - name: Update List
+    href: lists-update.md
+  - name: Get List Data or Array of Lists
+    href: lists-get.md
+  - name: Delete List
+    href: lists-delete.md
+  - name: Get Information Block Type ID
+    href: lists-get-iblock-type-id.md

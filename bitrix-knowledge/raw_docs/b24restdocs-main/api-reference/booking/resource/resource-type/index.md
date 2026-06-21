@@ -1,0 +1,39 @@
+# Resource Types: Overview of Methods
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+Resource types are needed to categorize booking objects. For example, the Meeting Rooms type includes rooms for meetings, while the Chery type refers to cars of a specific brand.
+
+With resource types, you can:
+- group similar objects,
+- configure notification templates for clients,
+- filter bookings.
+
+> Quick navigation: [all methods](#all-methods)
+
+## Connection of Resource Types with Other Objects
+
+**Resource.** Use the `id` of the resource type in the `typeId` parameter of the [booking.v1.resource.*](../index.md) methods.
+
+## Features of Working with Resource Types
+
+You can create resource types through the Bitrix24 interface or using the [booking.v1.resourceType.add](./booking-v1-resourcetype-add.md) method. To modify or delete, use only the [booking.v1.resourceType.update](./booking-v1-resourcetype-update.md) and [booking.v1.resourceType.delete](./booking-v1-resourcetype-delete.md) methods.
+
+## Overview of Methods {#all-methods}
+
+> Scope: [`booking`](../../../scopes/permissions.md)
+>
+> Who can perform the method: any user
+
+#|
+|| **Method** | **Description** ||
+|| [booking.v1.resourceType.add](./booking-v1-resourcetype-add.md) | Adds a new resource type ||
+|| [booking.v1.resourceType.update](./booking-v1-resourcetype-update.md) | Updates a resource type ||
+|| [booking.v1.resourceType.get](./booking-v1-resourcetype-get.md) | Retrieves a resource type ||
+|| [booking.v1.resourceType.list](./booking-v1-resourcetype-list.md) | Retrieves a list of resource types ||
+|| [booking.v1.resourceType.delete](./booking-v1-resourcetype-delete.md) | Deletes a resource type ||
+|#

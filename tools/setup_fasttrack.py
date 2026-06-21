@@ -29,12 +29,7 @@ def check_tool_exec(python_bin: str, script_path: Path, args: list[str]) -> bool
 
     cmd = [python_bin, str(script_path), *args]
     try:
-        res = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
         if res.returncode == 0:
             print(f"[ OK ] Tool executed successfully: {script_path.name}")
             return True
@@ -61,7 +56,10 @@ def main():
     key_files = [
         (workspace_root / "CLAUDE.md", "CLAUDE.md project guide"),
         (workspace_root / "AGENTS.md", "AGENTS.md project rules"),
-        (Path("/Users/rus/GEMINI_ANTIGRAVITY.md"), "GEMINI_ANTIGRAVITY.md constitution"),
+        (
+            Path("/Users/rus/GEMINI_ANTIGRAVITY.md"),
+            "GEMINI_ANTIGRAVITY.md constitution",
+        ),
         (Path("/Users/rus/STUDENT_GUIDE.md"), "STUDENT_GUIDE.md student guide"),
     ]
 

@@ -20,8 +20,11 @@ from sqlalchemy.orm import sessionmaker
 TEST_DB_FILE = "./test_temp.db"
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{TEST_DB_FILE}"
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 # Переопределяем зависимость get_db в приложении
 def override_get_db():
@@ -31,7 +34,9 @@ def override_get_db():
     finally:
         db.close()
 
+
 app.dependency_overrides[get_db] = override_get_db
+
 
 @pytest.fixture(autouse=True)
 def run_around_tests():
@@ -50,7 +55,7 @@ def run_around_tests():
     admin = User(
         email="test_admin@targetmedia.ru",
         password_hash=get_password_hash("test_password123"),
-        role="admin"
+        role="admin",
     )
     db.add(admin)
 
@@ -70,19 +75,19 @@ def run_around_tests():
         except PermissionError:
             pass
 
+
 # Пересоздаем клиент для тестов
 client = TestClient(app)
+
 
 def test_read_root():
     response = client.get("/")
     assert response.status_code == 200
     assert "<!DOCTYPE html>" in response.text
 
+
 def test_login_success():
-    payload = {
-        "email": "test_admin@targetmedia.ru",
-        "password": "test_password123"
-    }
+    payload = {"email": "test_admin@targetmedia.ru", "password": "test_password123"}
     response = client.post("/api/auth/login", json=payload)
     assert response.status_code == 200
     data = response.json()
@@ -90,14 +95,13 @@ def test_login_success():
     assert data["token_type"] == "bearer"
     assert data["user"]["email"] == "test_admin@targetmedia.ru"
 
+
 def test_login_invalid_password():
-    payload = {
-        "email": "test_admin@targetmedia.ru",
-        "password": "wrong_password"
-    }
+    payload = {"email": "test_admin@targetmedia.ru", "password": "wrong_password"}
     response = client.post("/api/auth/login", json=payload)
     assert response.status_code == 401
     assert response.json()["detail"] == "Неверный email или пароль"
+
 
 def test_setup_test_project():
     response = client.post("/api/test/setup")
@@ -106,11 +110,13 @@ def test_setup_test_project():
     assert data["status"] == "success"
     assert "project_id" in data
 
+
 def test_yandex_login_url():
     response = client.get("/api/auth/yandex/login?project_id=1")
     assert response.status_code == 200
     data = response.json()
     assert "auth_url" in data
+
 
 def test_get_dashboard_summary():
     # Сначала создадим тестовые данные
@@ -130,6 +136,7 @@ def test_get_dashboard_summary():
     assert "fact" in proj
     assert "deviations" in proj
 
+
 def test_get_project_detail():
     # Создаем данные
     client.post("/api/test/setup")
@@ -147,7 +154,7 @@ def test_get_project_detail():
         leads_primary=5,
         ctr=5.0,
         cpc=20.0,
-        cpl=200.0
+        cpl=200.0,
     )
     db.add(stat)
 
@@ -158,7 +165,7 @@ def test_get_project_detail():
         project_id=1,
         budget_plan=40000,
         leads_plan=100,
-        cpl_plan=400
+        cpl_plan=400,
     )
     db.add(plan)
 
@@ -175,17 +182,14 @@ def test_get_project_detail():
     assert len(data["daily_stats"]) == 1
     assert data["daily_stats"][0]["clicks"] == 50
 
+
 def test_trigger_sync_success():
     # Создаем структуру
     client.post("/api/test/setup")
 
     # Добавляем mock integration токен
     db = TestingSessionLocal()
-    integration = Integration(
-        project_id=1,
-        type="yandex",
-        access_token="mock_token"
-    )
+    integration = Integration(project_id=1, type="yandex", access_token="mock_token")
     db.add(integration)
     db.commit()
     db.close()
@@ -193,7 +197,11 @@ def test_trigger_sync_success():
     # Запускаем ручную синхронизацию
     response = client.post("/api/dashboard/project/1/sync")
     assert response.status_code == 200
-    assert response.json() == {"status": "success", "message": "Синхронизация успешно завершена"}
+    assert response.json() == {
+        "status": "success",
+        "message": "Синхронизация успешно завершена",
+    }
+
 
 def test_cron_sync_all():
     # Создаем структуру

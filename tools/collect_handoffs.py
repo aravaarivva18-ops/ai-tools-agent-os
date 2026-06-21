@@ -10,8 +10,18 @@ from pathlib import Path
 def extract_friction_blocks(file_path: Path) -> list[dict]:
     """Parses a markdown file and extracts sections under headers containing friction keywords."""
     friction_keywords = [
-        "проблем", "ошибк", "oom", "unresolved", "issues", "errors",
-        "stop", "риск", "danger", "warning", "bottleneck", "трени"
+        "проблем",
+        "ошибк",
+        "oom",
+        "unresolved",
+        "issues",
+        "errors",
+        "stop",
+        "риск",
+        "danger",
+        "warning",
+        "bottleneck",
+        "трени",
     ]
 
     try:
@@ -35,10 +45,12 @@ def extract_friction_blocks(file_path: Path) -> list[dict]:
         if match:
             # We hit a new heading. Save previous block if it was a friction block.
             if current_heading and current_block_lines:
-                blocks.append({
-                    "heading": current_heading,
-                    "content": "\n".join(current_block_lines).strip()
-                })
+                blocks.append(
+                    {
+                        "heading": current_heading,
+                        "content": "\n".join(current_block_lines).strip(),
+                    }
+                )
                 current_block_lines = []
 
             level = len(match.group(1))
@@ -61,10 +73,12 @@ def extract_friction_blocks(file_path: Path) -> list[dict]:
 
     # Capture the last block if it exists
     if current_heading and current_block_lines:
-        blocks.append({
-            "heading": current_heading,
-            "content": "\n".join(current_block_lines).strip()
-        })
+        blocks.append(
+            {
+                "heading": current_heading,
+                "content": "\n".join(current_block_lines).strip(),
+            }
+        )
 
     return blocks
 
@@ -79,11 +93,16 @@ def parse_stealth_stop_and_metrics(file_path: Path) -> dict:
     content_lower = content.lower()
 
     # Detect stealth stop
-    stealth_stop = any(kw in content_lower for kw in ["stealth stop", "stealth-stop", "лимит 3", "зацикливание"])
+    stealth_stop = any(
+        kw in content_lower
+        for kw in ["stealth stop", "stealth-stop", "лимит 3", "зацикливание"]
+    )
 
     # Extract LOC delta
     loc_delta = 0
-    loc_match = re.search(r'(?:loc changed|loc delta|изменено строк)[:\s]*([+-]?\d+)', content_lower)
+    loc_match = re.search(
+        r"(?:loc changed|loc delta|изменено строк)[:\s]*([+-]?\d+)", content_lower
+    )
     if loc_match:
         try:
             loc_delta = int(loc_match.group(1))
@@ -92,17 +111,38 @@ def parse_stealth_stop_and_metrics(file_path: Path) -> dict:
 
     # Extract time saved
     time_saved = 0
-    time_match = re.search(r'(?:time saved|сэкономлено времени|сэкономлено)[:\s]*(\d+)', content_lower)
+    time_match = re.search(
+        r"(?:time saved|сэкономлено времени|сэкономлено)[:\s]*(\d+)", content_lower
+    )
     if time_match:
         try:
             time_saved = int(time_match.group(1))
         except ValueError:
             pass
 
+    # Extract tests passed/failed
+    tests_passed = 0
+    passed_match = re.search(r"(\d+)\s+passed", content_lower)
+    if passed_match:
+        try:
+            tests_passed = int(passed_match.group(1))
+        except ValueError:
+            pass
+
+    tests_failed = 0
+    failed_match = re.search(r"(\d+)\s+(?:failed|error|errors)", content_lower)
+    if failed_match:
+        try:
+            tests_failed = int(failed_match.group(1))
+        except ValueError:
+            pass
+
     return {
         "stealth_stop": stealth_stop,
         "loc_delta": loc_delta,
-        "time_saved_min": time_saved
+        "time_saved_min": time_saved,
+        "tests_passed": tests_passed,
+        "tests_failed": tests_failed,
     }
 
 
@@ -115,7 +155,9 @@ def collect() -> None:
     print(f"Collecting handoffs into folder: {target_dir}...\n")
 
     # Find all HANDOFF.md in session directories
-    raw_handoff_paths = glob.glob(os.path.join(brain_dir, "**/HANDOFF.md"), recursive=True)
+    raw_handoff_paths = glob.glob(
+        os.path.join(brain_dir, "**/HANDOFF.md"), recursive=True
+    )
 
     # Sort by modification time descending and limit to last 5 sessions
     sorted_raw_paths = sorted(raw_handoff_paths, key=os.path.getmtime, reverse=True)
@@ -144,13 +186,15 @@ def collect() -> None:
         blocks = extract_friction_blocks(path)
         meta = parse_stealth_stop_and_metrics(path)
 
-        friction_logs.append({
-            "session_id": session_id,
-            "date": dt.strftime("%Y-%m-%d"),
-            "source_file": new_name,
-            "friction_points": blocks,
-            "metrics": meta
-        })
+        friction_logs.append(
+            {
+                "session_id": session_id,
+                "date": dt.strftime("%Y-%m-%d"),
+                "source_file": new_name,
+                "friction_points": blocks,
+                "metrics": meta,
+            }
+        )
 
     # Also parse and copy global handoff_notes.md
     global_notes_str = "/Users/rus/ai-tools/handoff_notes.md"
@@ -168,13 +212,15 @@ def collect() -> None:
         blocks = extract_friction_blocks(global_notes_path)
         meta = parse_stealth_stop_and_metrics(global_notes_path)
 
-        friction_logs.append({
-            "session_id": "global",
-            "date": dt.strftime("%Y-%m-%d"),
-            "source_file": new_name,
-            "friction_points": blocks,
-            "metrics": meta
-        })
+        friction_logs.append(
+            {
+                "session_id": "global",
+                "date": dt.strftime("%Y-%m-%d"),
+                "source_file": new_name,
+                "friction_points": blocks,
+                "metrics": meta,
+            }
+        )
 
     # Save friction logs to JSON file
     try:

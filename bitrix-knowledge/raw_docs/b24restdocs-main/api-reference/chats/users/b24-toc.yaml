@@ -1,0 +1,17 @@
+title: Working with Users
+href: index.md
+items:
+  - name: Overview of Methods
+    href: index.md
+  - name: Retrieve User Data
+    href: im-user-get.md
+  - name: Retrieve User List Data
+    href: im-user-list-get.md
+  - name: Set User Status
+    href: im-user-status-set.md
+  - name: Get User Status
+    href: im-user-status-get.md
+  - name: Enable Automatic "Away" Status
+    href: im-user-status-idle-start.md
+  - name: Disable Automatic "Away" Status
+    href: im-user-status-idle-end.md

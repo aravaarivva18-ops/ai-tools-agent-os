@@ -1,0 +1,393 @@
+# Update Estimate crm.quote.update
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`crm`](../../scopes/permissions.md)
+>
+> Who can execute the method: a user with "edit" access permission for estimates
+
+{% note warning "DEPRECATED" %}
+
+The development of this method has been halted. Please use [crm.item.update](../universal/crm-item-update.md).
+
+{% endnote %}
+
+The method `crm.quote.update` updates an existing estimate.
+
+## Method Parameters
+
+{% include [Note on parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id***
+[`integer`](../data-types.md) | Identifier of the estimate.
+
+The identifier can be obtained using the methods [crm.quote.list](./crm-quote-list.md) and [crm.quote.add](./crm-quote-add.md) ||
+|| **fields**
+[`object`](../data-types.md) | Object format:
+
+```json
+{
+    "field_1": "value_1",
+    "field_2": "value_2",
+    "...": "..."
+}
+```
+
+where:
+- `field_n` — field name
+- `value_n` — new field value
+
+Only include the fields that need to be changed in `fields`.
+
+Unknown fields in `fields` will be ignored.
+
+The list of main fields for updating is provided [below](#parameter-fields).
+
+A complete list of fields and types can be obtained using the method [crm.quote.fields](./crm-quote-fields.md) ||
+|| **params**
+[`object`](../data-types.md) | Object of additional parameters [(detailed description)](#parameter-params) ||
+|#
+
+### Fields Parameter {#parameter-fields}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **TITLE**
+[`string`](../data-types.md) | Subject of the estimate.
+
+Length limit — up to `255` characters.
+
+If a value longer than `255` is provided, the system will truncate it to `255` characters ||
+|| **STATUS_ID**
+[`crm_status`](../data-types.md) | Stage of the estimate.
+
+The list of available stages can be obtained using the method [crm.status.list](../status/crm-status-list.md) with the filter `ENTITY_ID = QUOTE_STATUS` ||
+|| **CURRENCY_ID**
+[`crm_currency`](../data-types.md) | Currency of the estimate amount ||
+|| **OPPORTUNITY**
+[`double`](../data-types.md) | Amount of the estimate ||
+|| **ASSIGNED_BY_ID**
+[`user`](../data-types.md) | Identifier of the responsible person ||
+|| **COMPANY_ID**
+[`crm_company`](../data-types.md) | Identifier of the client company ||
+|| **CONTACT_IDS**
+[`crm_contact[]`](../data-types.md) | Array of identifiers for client contacts.
+
+This field is completely replaced ||
+|| **MYCOMPANY_ID**
+[`crm_company`](../data-types.md) | Identifier of "your company" for vendor details ||
+|| **OPENED**
+[`char`](../data-types.md) | Is the estimate available to everyone? Possible values:
+- `Y` — yes
+- `N` — no ||
+|| **PERSON_TYPE_ID**
+[`integer`](../data-types.md) | Identifier of the client type ||
+|| **BEGINDATE**
+[`date`](../data-types.md) | Date of issuance ||
+|| **CLOSEDATE**
+[`date`](../data-types.md) | Expiration date of the estimate ||
+|| **CLIENT_TITLE**
+[`string`](../data-types.md) | Client name, up to `255` characters ||
+|| **CLIENT_ADDR**
+[`string`](../data-types.md) | Client address, up to `255` characters ||
+|| **CLIENT_EMAIL**
+[`string`](../data-types.md) | Client email, up to `255` characters ||
+|| **CLIENT_PHONE**
+[`string`](../data-types.md) | Client phone, up to `255` characters ||
+|| **COMMENTS**
+[`string`](../data-types.md) | Comment ||
+|| **PARENT_ID_...**
+[`crm_entity`](../data-types.md) | Fields for connections with smart processes.
+
+For example, `PARENT_ID_136` — connection with the smart process `entityTypeId = 136` ||
+|#
+
+{% note info "Method Feature" %}
+
+Some incorrect values in the fields may not lead to a `400` error: values are normalized, truncated, or replaced with default values.
+
+{% endnote %}
+
+### Params Parameter {#parameter-params}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **REGISTER_HISTORY_EVENT**
+[`boolean`](../data-types.md) | Should a record be created in the change history? Possible values:
+- `Y` — yes
+- `N` — no
+
+Default — `Y` ||
+|#
+
+## Code Examples
+
+{% include [Note on examples](../../../_includes/examples.md) %}
+
+Example of updating an estimate:
+- estimate identifier — `43`
+- new stage — `SENT`
+- updated comment — `Conditions and deadlines clarified`
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id":43,"fields":{"STATUS_ID":"SENT","COMMENTS":"Conditions and deadlines clarified"},"params":{"REGISTER_HISTORY_EVENT":"Y"}}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/crm.quote.update
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id":43,"fields":{"STATUS_ID":"SENT","COMMENTS":"Conditions and deadlines clarified"},"params":{"REGISTER_HISTORY_EVENT":"Y"},"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/crm.quote.update
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    try {
+      const response = await $b24.actions.v2.call.make<boolean>({
+        method: 'crm.quote.update',
+        params: {
+          id: 43,
+          fields: {
+            STATUS_ID: 'SENT',
+            COMMENTS: 'Clarified terms and deadlines',
+          },
+          params: {
+            REGISTER_HISTORY_EVENT: 'Y',
+          },
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Quote updated:', result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function updateQuote() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'crm.quote.update',
+            params: {
+              id: 43,
+              fields: {
+                STATUS_ID: 'SENT',
+                COMMENTS: 'Clarified terms and deadlines',
+              },
+              params: {
+                REGISTER_HISTORY_EVENT: 'Y',
+              },
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Quote updated:', result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', updateQuote)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'crm.quote.update',
+                [
+                    'id' => 43,
+                    'fields' => [
+                        'STATUS_ID' => 'SENT',
+                        'COMMENTS' => 'Conditions and deadlines clarified',
+                    ],
+                    'params' => [
+                        'REGISTER_HISTORY_EVENT' => 'Y',
+                    ],
+                ]
+            );
+
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+
+        echo 'Updated: ' . ($result ? 'true' : 'false');
+
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error updating estimate: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'crm.quote.update',
+        {
+            id: 43,
+            fields: {
+                STATUS_ID: 'SENT',
+                COMMENTS: 'Conditions and deadlines clarified',
+            },
+            params: {
+                REGISTER_HISTORY_EVENT: 'Y',
+            },
+        },
+        (result) => {
+            result.error()
+                ? console.error(result.error())
+                : console.info(result.data())
+            ;
+        },
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'crm.quote.update',
+        [
+            'id' => 43,
+            'fields' => [
+                'STATUS_ID' => 'SENT',
+                'COMMENTS' => 'Conditions and deadlines clarified',
+            ],
+            'params' => [
+                'REGISTER_HISTORY_EVENT' => 'Y',
+            ],
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP status: **200**
+
+```json
+{
+    "result": true,
+    "time": {
+        "start": 1773410167,
+        "finish": 1773410167.690598,
+        "duration": 0.6905980110168457,
+        "processing": 0,
+        "date_start": "2026-03-13T16:56:07+01:00",
+        "date_finish": "2026-03-13T16:56:07+01:00",
+        "operating_reset_at": 1773410767,
+        "operating": 0.26904988288879395
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`boolean`](../data-types.md) | Root element of the response, returns `true` on success ||
+|| **time**
+[`time`](../data-types.md#time) | Information about the execution time of the request ||
+|#
+
+## Error Handling
+
+HTTP status: **400**
+
+```json
+{
+    "error": "",
+    "error_description": "Quote is not found"
+}
+```
+
+{% include notitle [error handling](../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** | **Value** ||
+|| `-` | `Parameter 'fields' must be array.` | `fields` is not an object ||
+|| `-` | `Parameter 'params' must be array.` | `params` is not an object ||
+|| `-` | `ID is not defined or invalid.` | An incorrect `id` was provided ||
+|| `-` | `Access denied.` | The user does not have permission to edit estimates ||
+|| `-` | `Quote is not found` | The estimate with the provided `id` was not found ||
+|#
+
+{% include [system errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./crm-quote-add.md)
+- [{#T}](./crm-quote-get.md)
+- [{#T}](./crm-quote-list.md)
+- [{#T}](./crm-quote-delete.md)
+- [{#T}](./crm-quote-fields.md)
+- [{#T}](./crm-quote-product-rows-set.md)
+- [{#T}](./crm-quote-product-rows-get.md)

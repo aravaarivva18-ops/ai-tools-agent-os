@@ -1,0 +1,265 @@
+# Invisible Widget on Every Page PAGE_BACKGROUND_WORKER
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`placement`](../../scopes/permissions.md)
+
+You can add an "invisible" widget that will be displayed on all pages of Bitrix24. This widget enables the implementation of scenarios with an external [WebRTC client](../ui-interaction/page-background-worker/webrtc-scenario.md) in telephony integrations, but it is not the only possible use case.
+
+For instance, using the [interactive interaction](../../../settings/interactivity/index.md) mechanism of backend and frontend applications, you can send a "signal" to the `PAGE_BACKGROUND_WORKER` widget, and upon receiving the "signal," open the application slider using the [openApplication](../bx24-widget-methods.md) method.
+
+The widget embedding code is specified in the `PLACEMENT` parameter of the [placement.bind](../placement-bind.md) method.
+
+{% note info "" %}
+
+The embedding will not be displayed in the interface until the application installation is complete. [Check the application installation](../../../settings/app-installation/installation-finish.md)
+
+{% endnote %}
+
+## Features of Widget Handler Registration
+
+Unlike other types of widgets, for `PAGE_BACKGROUND_WORKER`, the application can register only one handler.
+
+Since this widget loads on all pages, a handler that takes longer than 3-5 seconds to load may cause delays in rendering the Bitrix24 user interface. If this occurs more than 10 times within a day on the same Bitrix24, the handler will be automatically disabled.
+
+Bitrix24 will notify the application about the handler's deactivation. To do this, in the [placement.bind](../placement-bind.md) method, you need to specify the URL in the `OPTIONS[errorHandlerUrl]` parameter. Bitrix24 will call this URL in case the `PAGE_BACKGROUND_WORKER` widget handler is disabled.
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"PLACEMENT":"PAGE_BACKGROUND_WORKER","HANDLER":"http://myapp.com/handler/?type=1","OPTIONS":{"errorHandlerUrl":"http://myapp.com/error/"}}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/placement.bind
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"PLACEMENT":"PAGE_BACKGROUND_WORKER","HANDLER":"http://myapp.com/handler/?type=1","OPTIONS":{"errorHandlerUrl":"http://myapp.com/error/"},"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/placement.bind
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    try {
+      const response = await $b24.actions.v2.call.make<boolean>({
+        method: 'placement.bind',
+        params: {
+          PLACEMENT: 'PAGE_BACKGROUND_WORKER',
+          HANDLER: 'http://myapp.com/handler/?type=1',
+          OPTIONS: {
+            errorHandlerUrl: 'http://myapp.com/error/',
+          },
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Placement registered:', result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function bindBackgroundWorker() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'placement.bind',
+            params: {
+              PLACEMENT: 'PAGE_BACKGROUND_WORKER',
+              HANDLER: 'http://myapp.com/handler/?type=1',
+              OPTIONS: {
+                errorHandlerUrl: 'http://myapp.com/error/',
+              },
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Placement registered:', result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', bindBackgroundWorker)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'placement.bind',
+                [
+                    'PLACEMENT' => 'PAGE_BACKGROUND_WORKER',
+                    'HANDLER'   => 'http://myapp.com/handler/?type=1',
+                    'OPTIONS'   => [
+                        'errorHandlerUrl' => 'http://myapp.com/error/'
+                    ]
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        if ($result->error()) {
+            error_log($result->error());
+        } else {
+            echo 'Success: ' . print_r($result->data(), true);
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error binding placement: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        "placement.bind",
+        { 
+            PLACEMENT: "PAGE_BACKGROUND_WORKER",
+            HANDLER: "http://myapp.com/handler/?type=1",
+            OPTIONS: {
+                errorHandlerUrl: "http://myapp.com/error/"
+            }
+        },
+        function(result)
+        {
+            if(result.error())
+                console.error(result.error());
+            else
+                console.info(result.data());
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'placement.bind',
+        [
+            'PLACEMENT' => 'PAGE_BACKGROUND_WORKER',
+            'HANDLER' => 'http://myapp.com/handler/?type=1',
+            'OPTIONS' => [
+                'errorHandlerUrl' => 'http://myapp.com/error/'
+            ]
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## What the Handler Receives
+
+Data is transmitted as a POST request {.b24-info}
+
+```php
+
+Array
+(
+    [handler] => 1
+    [DOMAIN] => restapi.bitrix24.com
+    [PROTOCOL] => 1
+    [LANG] => de
+    [APP_SID] => 588b8a98e848778a4ffb38fbcf70f2b9
+    [AUTH_ID] => 4172bb6600705a0700005a4b00000001f0f107c42ca5bd5f61030c5d9c3e4d60d11b5a
+    [AUTH_EXPIRES] => 3600
+    [REFRESH_ID] => 31f1e26600705a0700005a4b00000001f0f107b1918506d8a2ed9ecf76e8fdac962471
+    [member_id] => da45a03b265edd8787f8a258d793cc5d
+    [status] => L
+    [PLACEMENT] => PAGE_BACKGROUND_WORKER
+    [PLACEMENT_OPTIONS] => {"ID":"PAGE_BACKGROUND_WORKER","URI":"\/company\/personal\/user\/1\/blog\/"}
+)
+
+```
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+{% include notitle [Description of Standard Data](../_includes/widget_data.md) %}
+
+### PLACEMENT_OPTIONS
+
+The value of `PLACEMENT_OPTIONS` is a JSON string containing an array of one or more keys.
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+#| 
+|| **Parameter** | **Description** ||
+|| **ID*** 
+[`string`](../../data-types.md) | Always equals `PAGE_BACKGROUND_WORKER` and is used for internal purposes
+
+|| 
+|| **URI*** 
+[`string`](../../data-types.md) | URL-encoded address of the current page where the widget was opened.
+
+|| 
+|#
+
+{% note tip "Typical use-cases and scenarios" %}
+
+- [{#T}](../ui-interaction/page-background-worker/webrtc-scenario.md)
+
+{% endnote %}
+
+## Continue Your Learning
+
+- [{#T}](../placement-bind.md)
+- [{#T}](../ui-interaction/index.md)
+- [{#T}](../../../settings/interactivity/index.md)
+- [{#T}](../bx24-widget-methods.md)

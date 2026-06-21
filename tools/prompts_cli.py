@@ -34,7 +34,9 @@ def main() -> None:
 
     # Get command
     get_parser = subparsers.add_parser("get", help="Get exact prompt text by role")
-    get_parser.add_argument("act", help="Exact name of the role (e.g. 'Linux Terminal')")
+    get_parser.add_argument(
+        "act", help="Exact name of the role (e.g. 'Linux Terminal')"
+    )
 
     args = parser.parse_args()
 

@@ -1,0 +1,239 @@
+# Add Configuration for Recurring Invoice crm.invoice.recurring.add
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`crm`](../../../scopes/permissions.md)
+>
+> Who can execute the method: any user
+
+{% note warning "DEPRECATED" %}
+
+The development of this method has been halted. Please use [Universal Methods for Invoices](../../universal/invoice.md).
+
+{% endnote %}
+
+This method adds a new configuration for a recurring invoice.
+
+## Method Parameters
+
+{% include [Note on Required Parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **fields**
+[`array`](../../../data-types.md) | Field values for creating the recurring invoice configuration. The required field is `INVOICE_ID` [ID of the invoice with the parameter `IS_RECURRING=Y`]. 
+
+To find out the required format for the fields, execute the method [crm.invoice.recurring.fields](./crm-invoice-recurring-fields.md) and check the format of the returned values for these fields ||
+|#
+
+## Code Examples
+
+{% include [Note on Examples](../../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```http
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"fields":{"INVOICE_ID":"10","IS_LIMIT":"N","START_DATE":"'$(date -Iseconds --utc --date='TZ="Europe/Berlin" +1 month')'","PARAMS":{"PERIOD":"day","IS_WORKING_ONLY":"N","INTERVAL":30,"DATE_PAY_BEFORE_OFFSET_TYPE":"month","DATE_PAY_BEFORE_OFFSET_VALUE":1}}}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/crm.invoice.recurring.add    
+    ```
+
+- cURL (OAuth)
+
+    ```http
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"fields":{"INVOICE_ID":"10","IS_LIMIT":"N","START_DATE":"'$(date -Iseconds --utc --date='TZ="Europe/Berlin" +1 month')'","PARAMS":{"PERIOD":"day","IS_WORKING_ONLY":"N","INTERVAL":30,"DATE_PAY_BEFORE_OFFSET_TYPE":"month","DATE_PAY_BEFORE_OFFSET_VALUE":1}},"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/crm.invoice.recurring.add
+    ```
+
+- JS
+
+    ```js
+    try
+    {
+    	const current = new Date();
+    	const nextMonth = new Date();
+    	nextMonth.setMonth(current.getMonth() + 1);
+    
+    	const date2str = function(d)
+    	{
+    		return d.getFullYear() + '-' + paddatepart(1 + d.getMonth()) + '-' + paddatepart(d.getDate()) + 'T' + paddatepart(d.getHours()) + ':' + paddatepart(d.getMinutes()) + ':' + paddatepart(d.getSeconds()) + '+02:00';
+    	};
+    
+    	const paddatepart = function(part)
+    	{
+    		return part >= 10 ? part.toString() : '0' + part.toString();
+    	};
+    
+    	const response = await $b24.callMethod(
+    		"crm.invoice.recurring.add",
+    		{
+    			fields:
+    			{
+    				"INVOICE_ID": "10",
+    				"IS_LIMIT": "N",
+    				"START_DATE": date2str(nextMonth),
+    				"PARAMS": {
+    					"PERIOD": "day",
+    					"IS_WORKING_ONLY": "N",
+    					"INTERVAL": 30,
+    					"DATE_PAY_BEFORE_OFFSET_TYPE": "month",
+    					"DATE_PAY_BEFORE_OFFSET_VALUE": 1,
+    				}
+    			}
+    		}
+    	);
+    
+    	const result = response.getData().result;
+    	if(result.error())
+    		console.error(result.error());
+    	else
+    		console.info("Recurring invoice settings added. Record ID - " + result);
+    }
+    catch(error)
+    {
+    	console.error('Error:', error);
+    }
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $current = new DateTime();
+        $nextMonth = new DateTime();
+        $nextMonth->setDate($current->format('Y'), $current->format('m') + 1, $current->format('d'));
+    
+        $date2str = function($d) {
+            return $d->format('Y-m-d\TH:i:sP');
+        };
+    
+        $paddatepart = function($part) {
+            return $part >= 10 ? $part : '0' . $part;
+        };
+    
+        $response = $b24Service
+            ->core
+            ->call(
+                'crm.invoice.recurring.add',
+                [
+                    'fields' => [
+                        'INVOICE_ID'                 => '10',
+                        'IS_LIMIT'                   => 'N',
+                        'START_DATE'                 => $date2str($nextMonth),
+                        'PARAMS' => [
+                            'PERIOD'                     => 'day',
+                            'IS_WORKING_ONLY'            => 'N',
+                            'INTERVAL'                   => 30,
+                            'DATE_PAY_BEFORE_OFFSET_TYPE' => 'month',
+                            'DATE_PAY_BEFORE_OFFSET_VALUE' => 1,
+                        ],
+                    ],
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        if ($result->error()) {
+            error_log($result->error());
+            echo 'Error: ' . $result->error();
+        } else {
+            echo 'Success: Recurring invoice settings added. Record ID - ' . $result->data();
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error adding recurring invoice settings: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    var current = new Date();
+    var nextMonth = new Date();
+    nextMonth.setMonth(current.getMonth() + 1);
+    var date2str = function(d)
+    {
+        return d.getFullYear() + '-' + paddatepart(1 + d.getMonth()) + '-' + paddatepart(d.getDate()) + 'T' + paddatepart(d.getHours()) + ':' + paddatepart(d.getMinutes()) + ':' + paddatepart(d.getSeconds()) + '+02:00';
+    };
+    var paddatepart = function(part)
+    {
+        return part >= 10 ? part.toString() : '0' + part.toString();
+    };
+    BX24.callMethod(
+        "crm.invoice.recurring.add",
+        {
+            fields:
+            {
+                "INVOICE_ID": "10",
+                "IS_LIMIT": "N",
+                "START_DATE": date2str(nextMonth),
+                "PARAMS": {
+                    "PERIOD": "day",
+                    "IS_WORKING_ONLY": "N",
+                    "INTERVAL": 30,
+                    "DATE_PAY_BEFORE_OFFSET_TYPE": "month",
+                    "DATE_PAY_BEFORE_OFFSET_VALUE": 1,
+                }
+            }
+        },
+        function(result)
+        {
+            if(result.error())
+                console.error(result.error());
+            else
+                console.info("Recurring invoice settings added. Record ID - " + result.data());
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $current = new DateTime();
+    $nextMonth = (new DateTime())->modify('+1 month');
+
+    function date2str($d) {
+        return $d->format('Y-m-d\TH:i:s+02:00');
+    }
+
+    $result = CRest::call(
+        'crm.invoice.recurring.add',
+        [
+            'fields' => [
+                'INVOICE_ID' => 10,
+                'IS_LIMIT' => 'N',
+                'START_DATE' => date2str($nextMonth),
+                'PARAMS' => [
+                    'PERIOD' => 'day',
+                    'IS_WORKING_ONLY' => 'N',
+                    'INTERVAL' => 30,
+                    'DATE_PAY_BEFORE_OFFSET_TYPE' => 'month',
+                    'DATE_PAY_BEFORE_OFFSET_VALUE' => 1,
+                ]
+            ]
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}

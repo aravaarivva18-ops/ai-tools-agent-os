@@ -1,0 +1,302 @@
+# Update Kanban Stage or "My Plan" task.stages.update
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`task`](../../scopes/permissions.md)
+>
+> Who can execute the method:
+> - any user for "My Plan" stages
+> - any user with access to the group for Kanban stages
+
+This method updates Kanban stages or "My Plan".
+
+The method can also be used to move a stage from one position to another. To do this, simply pass the required `AFTER_ID`.
+
+## Method Parameters
+
+{% include [Note on required parameters](../../../_includes/required.md) %}
+
+#| 
+|| **Name**
+`type` | **Description** ||
+|| **id*** 
+[`integer`](../../data-types.md) | Identifier of the stage ||
+|| **fields*** 
+[`array`](../../data-types.md) | Field values (detailed description provided [below](#parametr-fields)) for updating the Kanban stage or "My Plan" ||
+|| **isAdmin** 
+[`boolean`](../../data-types.md) | If set to `true`, permission checks will not occur, provided the requester is an administrator of the account ||
+|#
+
+### Parameter fields
+
+#| 
+|| **Name**
+`type` | **Description** ||
+|| **TITLE** [`string`](../../data-types.md) | Title of the stage ||
+|| **COLOR** [`string`](../../data-types.md) | Color of the stage in RGB format ||
+|| **AFTER_ID** [`integer`](../../data-types.md) | Identifier of the stage after which the new stage should be added.
+
+If not specified or equal to `0`, it will be added at the beginning ||
+|#
+
+When updating a group stage with insufficient permission levels, an access error will be displayed.
+
+## Code Examples
+
+{% include [Note on examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -d '{
+    "id": 5,
+    "fields": {
+        "TITLE": "New Stage",
+        "SORT": 200,
+        "COLOR": "FF5733"
+    }
+    }' \
+    https://your-domain.bitrix24.com/rest/_USER_ID_/_CODE_/task.stages.update
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Authorization: YOUR_ACCESS_TOKEN" \
+    -d '{
+    "id": 5,
+    "fields": {
+        "TITLE": "New Stage",
+        "SORT": 200,
+        "COLOR": "FF5733"
+    }
+    }' \
+    https://your-domain.bitrix24.com/rest/task.stages.update
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    try {
+      const response = await $b24.actions.v2.call.make<boolean>({
+        method: 'task.stages.update',
+        params: {
+          id: 5,
+          fields: {
+            TITLE: 'New Stage',
+            SORT: 200,
+            COLOR: 'FF5733',
+          },
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Stage updated:', result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function updateStage() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'task.stages.update',
+            params: {
+              id: 5,
+              fields: {
+                TITLE: 'New Stage',
+                SORT: 200,
+                COLOR: 'FF5733',
+              },
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Stage updated:', result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', updateStage)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $stageId = 5;
+        $fields = [
+            'TITLE' => "New Stage",
+            'SORT' => 200,
+            'COLOR' => "FF5733"
+        ];
+    
+        $response = $b24Service
+            ->core
+            ->call(
+                'task.stages.update',
+                [
+                    'id' => $stageId,
+                    'fields' => $fields
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        echo 'Success: ' . print_r($result, true);
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error updating task stage: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    const stageId = 5;
+    const fields = {
+        TITLE: "New Stage",
+        SORT: 200,
+        COLOR: "FF5733"
+    };
+    BX24.callMethod(
+        'task.stages.update',
+        {
+            id: stageId,
+            fields: fields
+        },
+        function(res)
+        {
+            console.log(res);
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php'); // include CRest PHP SDK
+
+    $stageId = 5;
+    $fields = [
+        "TITLE" => "New Stage",
+        "SORT" => 200,
+        "COLOR" => "FF5733"
+    ];
+
+    // execute request to REST API
+    $result = CRest::call(
+        'task.stages.update',
+        [
+            'id' => $stageId,
+            'fields' => $fields
+        ]
+    );
+
+    // Handle response from Bitrix24
+    if ($result['error']) {
+        echo 'Error: '.$result['error_description'];
+    } else {
+        print_r($result['result']);
+    }
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Status: 200
+
+```json
+{
+    "result": true
+}
+```
+
+### Returned Data
+
+#| 
+|| **Name**
+`type` | **Description** ||
+|| **result** 
+[`boolean`](../../data-types.md) | Returns `true` if the stage was successfully updated
+||
+|#
+
+## Error Handling
+
+HTTP status: **400**
+
+```json
+{
+    "error": "ACCESS_DENIED",
+    "error_description": "You cannot modify stages in this group"
+}
+```
+
+{% include notitle [error handling](../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#| 
+|| **Code** | **Description** ||
+|| `ACCESS_DENIED` | You cannot modify stages in this group ||
+|| `NOT_FOUND` | Stage not found ||
+|#
+
+{% include [system errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning 
+
+- [{#T}](./index.md)
+- [{#T}](./task-stages-add.md)
+- [{#T}](./task-stages-get.md)
+- [{#T}](./task-stages-can-move-task.md)
+- [{#T}](./task-stages-move-task.md)
+- [{#T}](./task-stages-delete.md)

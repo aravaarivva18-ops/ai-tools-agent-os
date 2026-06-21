@@ -1,0 +1,345 @@
+# IM_CONTEXT_MENU Message Context Menu Item
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`im`](../../scopes/permissions.md)
+
+The widget adds its item to the context menu of a message in the chat.
+
+The embedding code is specified in the `PLACEMENT` parameter of the [placement.bind](../placement-bind.md) method.
+
+{% note info "" %}
+
+The embedding will not be displayed in the interface until the application installation is complete. [Check the application installation](../../../settings/app-installation/installation-finish.md)
+
+{% endnote %}
+
+## Where the Widget is Embedded
+
+#|
+|| **Embedding Code** | **Location** ||
+|| `IM_CONTEXT_MENU` | Message context menu item ||
+|#
+
+### Where to Find It in the Interface
+
+Open any chat and hover over a message. In the message action bar, click the `...` button to open the context menu. Hover over *More* to reveal additional menu items. The application item with `PLACEMENT=IM_CONTEXT_MENU` appears at the end of the action list above the message.
+
+## What the Handler Receives
+
+Data is transmitted as a POST request {.b24-info}
+
+```php
+Array
+(
+    [DOMAIN] => xxx.bitrix24.com
+    [PROTOCOL] => 1
+    [LANG] => de
+    [APP_SID] => 99c80eff6378726287350416ee5fef0
+    [AUTH_ID] => 6061e72600631fcd00005a4b00000001f0f1076700000000f69dd5fc643d9ce2fdbc1
+    [AUTH_EXPIRES] => 3600
+    [REFRESH_ID] => 50e00aa340631fcd00005a4b00000001f0f1071111116580a5b83c2de639ef28c12
+    [member_id] => da45a03b265ed12127f8a258d793cc5d
+    [status] => F
+    [PLACEMENT] => IM_CONTEXT_MENU
+    [PLACEMENT_OPTIONS] => {"messageId":84889, "dialogId":"chat1489"}
+)
+```
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+{% include notitle [Description of Standard Data](../_includes/widget_data.md) %}
+
+### PLACEMENT_OPTIONS
+
+The value of `PLACEMENT_OPTIONS` is passed as a JSON string with the context of the call.
+
+For `IM_CONTEXT_MENU`, the following keys are passed in the context:
+
+- `dialogId` — the identifier of the current chat
+- `messageId` — the identifier of the selected message
+
+## OPTIONS When Registering via placement.bind
+
+For `IM_CONTEXT_MENU`, the `placement.bind` method supports `OPTIONS` parameters.
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+#|
+|| **Parameter**
+`type` | **Description** ||
+|| **extranet**
+[`string`](../../data-types.md) | Access in the extranet, default is `N`.
+
+Possible values:
+- `N` — the application is not available to extranet users
+- `Y` — the application is available to extranet users
+||
+|| **context**
+[`string`](../../data-types.md) | Display context, default is `ALL`. Multiple values can be passed using `;`.
+
+Possible values:
+- `ALL` — all chats
+- `USER` — personal chats of users, excluding chats with bots
+- `CHAT` — group chats, excluding `LINES` and `CRM`
+- `LINES` — open lines chats
+- `CRM` — chats created within CRM
+
+If `ALL` is passed along with other values, only `ALL` is used. An invalid value will cause a registration error.
+||
+|| **role**
+[`string`](../../data-types.md) | User role, default is `USER`.
+
+Possible values:
+- `USER` — the application is available to all users
+- `ADMIN` — the application is available only to portal administrators
+||
+|#
+
+## Code Examples
+
+{% include [Note on Examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+      -H "Content-Type: application/json" \
+      -H "Accept: application/json" \
+      -d '{
+        "PLACEMENT": "IM_CONTEXT_MENU",
+        "HANDLER": "https://your-domain.com/widgets/im-context-menu-handler.php",
+        "TITLE": "My menu item",
+        "LANG_ALL": {
+          "de": {
+            "TITLE": "Mein Menüpunkt"
+          },
+          "en": {
+            "TITLE": "My menu item"
+          }
+        },
+        "OPTIONS": {
+          "context": "ALL",
+          "role": "USER",
+          "extranet": "N"
+        },
+        "auth": "**put_access_token_here**"
+      }' \
+      https://**put_your_bitrix24_address**/rest/placement.bind
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    try {
+      const response = await $b24.actions.v2.call.make<boolean>({
+        method: 'placement.bind',
+        params: {
+          PLACEMENT: 'IM_CONTEXT_MENU',
+          HANDLER: 'https://your-domain.com/widgets/im-context-menu-handler.php',
+          TITLE: 'My menu item',
+          LANG_ALL: {
+            ru: {
+              TITLE: 'My menu item',
+            },
+            en: {
+              TITLE: 'My menu item',
+            },
+          },
+          OPTIONS: {
+            context: 'ALL',
+            role: 'USER',
+            extranet: 'N',
+          },
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Placement registered:', result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function bindImContextMenu() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'placement.bind',
+            params: {
+              PLACEMENT: 'IM_CONTEXT_MENU',
+              HANDLER: 'https://your-domain.com/widgets/im-context-menu-handler.php',
+              TITLE: 'My menu item',
+              LANG_ALL: {
+                ru: {
+                  TITLE: 'My menu item',
+                },
+                en: {
+                  TITLE: 'My menu item',
+                },
+              },
+              OPTIONS: {
+                context: 'ALL',
+                role: 'USER',
+                extranet: 'N',
+              },
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Placement registered:', result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', bindImContextMenu)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'placement.bind',
+                [
+                    'PLACEMENT' => 'IM_CONTEXT_MENU',
+                    'HANDLER' => 'https://your-domain.com/widgets/im-context-menu-handler.php',
+                    'TITLE' => 'My menu item',
+                    'LANG_ALL' => [
+                        'de' => [
+                            'TITLE' => 'Mein Menüpunkt',
+                        ],
+                        'en' => [
+                            'TITLE' => 'My menu item',
+                        ],
+                    ],
+                    'OPTIONS' => [
+                        'context' => 'ALL',
+                        'role' => 'USER',
+                        'extranet' => 'N',
+                    ],
+                ]
+            );
+
+        $result = $response->getResponseData()->getResult();
+        if ($result->error()) {
+            error_log($result->error());
+        } else {
+            echo 'Success: ' . print_r($result->data(), true);
+        }
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error binding placement: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'placement.bind',
+        {
+            PLACEMENT: 'IM_CONTEXT_MENU',
+            HANDLER: 'https://your-domain.com/widgets/im-context-menu-handler.php',
+            TITLE: 'My menu item',
+            LANG_ALL: {
+                de: { TITLE: 'Mein Menüpunkt' },
+                en: { TITLE: 'My menu item' }
+            },
+            OPTIONS: {
+                context: 'ALL',
+                role: 'USER',
+                extranet: 'N'
+            }
+        },
+        function(result) {
+            if (result.error()) {
+                console.error(result.error());
+            } else {
+                console.log(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'placement.bind',
+        [
+            'PLACEMENT' => 'IM_CONTEXT_MENU',
+            'HANDLER' => 'https://your-domain.com/widgets/im-context-menu-handler.php',
+            'TITLE' => 'My menu item',
+            'LANG_ALL' => [
+                'de' => [
+                    'TITLE' => 'Mein Menüpunkt',
+                ],
+                'en' => [
+                    'TITLE' => 'My menu item',
+                ],
+            ],
+            'OPTIONS' => [
+                'context' => 'ALL',
+                'role' => 'USER',
+                'extranet' => 'N',
+            ],
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Continue Learning
+
+- [{#T}](./index.md)
+- [{#T}](../placement-bind.md)
+- [{#T}](../ui-interaction/index.md)
+- [{#T}](../bx24-widget-methods.md)
+- [{#T}](../../../settings/interactivity/index.md)

@@ -1,0 +1,33 @@
+# Additional Content Blocks
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+Methods for working with additional content blocks in an activity:
+
+#|
+|| **Method** | **Description** ||
+|| [crm.activity.layout.blocks.set](./crm-activity-layout-blocks-set.md) | Sets a collection of additional content blocks in an activity ||
+|| [crm.activity.layout.blocks.get](./crm-activity-layout-blocks-get.md) | Retrieves the set of additional content blocks established by the application in the activity ||
+|| [crm.activity.layout.blocks.delete](./crm-activity-layout-blocks-delete.md) | Deletes the set of additional content blocks established by the application for the activity ||
+|#
+
+## Activity Linked to Multiple Entities
+
+Adding sets of additional content blocks to an activity linked to multiple entities will result in the sets of additional content blocks being rendered in each of the activities within the timeline.
+
+## Restoring Activities from Trash
+
+When restoring activities from the trash, the sets of additional content blocks added by applications will also be restored.
+
+## Deleting the Application
+
+When the application is deleted, all sets of additional content blocks added to activities by it will be permanently removed.
+
+## See Also
+
+- [Example Test Application](../../layout-blocks/content-blocks-test-app.md)
+- [Methods for Working with Sets of Additional Content Blocks in the Timeline](../../layout-blocks/index.md)

@@ -1,0 +1,674 @@
+# Set Parameters for the Individual Card crm.contact.details.configuration.set
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`crm`](../../../scopes/permissions.md)
+> 
+> Who can execute the method:
+>  - Any user has the right to access their own and shared settings
+>  - Only an administrator has the right to access others' settings
+
+{% note warning "DEPRECATED" %}
+
+The development of this method has been halted. Please use [crm.item.details.configuration.set](../../universal/item-details-configuration/crm-item-details-configuration-set.md).
+
+{% endnote %}
+
+This method sets the contact card settings: it writes personal settings for the specified user or shared settings for all users.
+
+## Method Parameters
+
+{% include [Note on Required Parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **scope**
+[`string`](../../../data-types.md) | The scope of the settings. 
+
+Possible values:
+- **P** — personal settings
+- **C** — shared settings
+
+Default — `P`
+||
+|| **userId**
+[`user`](../../../data-types.md) | User identifier. Required only when setting personal settings.
+
+If not specified, the `id` of the current user is used
+||
+|| **data***
+[`section[]`](#section) | The list of `section` describes the configuration of field sections in the item card.
+
+The structure is described [below](#section) ||
+|#
+
+### section
+
+Describes an individual section with fields within the contact card.
+
+{% include [Note on Required Parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **name***
+[`string`](../../../data-types.md) | Unique name of the section ||
+|| **title***
+[`string`](../../../data-types.md) | Title of the section.
+
+Displayed in the item card ||
+|| **type***
+[`string`](../../../data-types.md) | Type of the section.
+
+Currently, only the value `'section'` is available ||
+|| **elements**
+[`section_element[]`](#section_element) | The array `section_element` describes the configuration of fields in the section.
+
+The structure is described [below](#section_element) ||
+|#
+
+#### section_element
+
+Configuration of an individual field within the section.
+
+{% include [Note on Required Parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **name***
+[`string`](../../../data-types.md) | Field identifier.
+
+The list of available fields can be obtained using [`crm.contact.fields`](../crm-contact-fields.md) ||
+|| **optionFlags**
+[`integer`](../../../data-types.md) | Should the field always be displayed:
+- `1` — yes
+- `0` — no
+
+Default — `0` ||
+|| **options**
+[`object`](../../../data-types.md) | Additional [list of options](#options) for the field ||
+|#
+
+#### section_element.options {#options}
+
+#|
+|| **Name**
+`type` | **Fields where the option is available** | **Description** ||
+|| **defaultAddressType**
+[`integer`](../../../data-types.md) | `ADDRESS` | Identifier for the default address type. To find possible address types, use [`crm.enum.addresstype`](../../auxiliary/enum/crm-enum-address-type.md) ||
+|| **defaultCountry**
+[`string`](../../../data-types.md) | 
+`PHONE`
+`CLIENT`
+`COMPANY`
+`CONTACT`
+`MYCOMPANY_ID` | Country code for the default phone number format — a string of two Latin letters.
+
+For example, `"DE"` ||
+|| **isPayButtonVisible**
+[`boolean`](../../../data-types.md) | `OPPORTUNITY_WITH_CURRENCY` | Whether the payment acceptance button is displayed.
+
+Possible values:
+- `'true'` — displayed
+- `'false'` — hidden
+
+Default — `true` ||
+|| **isPaymentDocumentsVisible**
+[`boolean`](../../../data-types.md) | `OPPORTUNITY_WITH_CURRENCY` | Whether the "Payment and Delivery" block is displayed.
+
+Possible values:
+- `'true'` — displayed
+- `'false'` — hidden
+
+Default — `true`
+||
+|#
+
+
+## Code Examples
+
+{% include [Note on Examples](../../../../_includes/examples.md) %}
+
+For the user with `id = 1`, set the following configuration for the contact item card:
+
+- Section 1 — **Personal Data**
+    - **First Name**
+        - Always show
+    - **Last Name**
+        - Always show
+    - **Middle Name**
+    - **Date of Birth**
+    - **Phone**
+        - Always show
+        - Default country: **United Kingdom (+44)**
+    - **Address**
+        - Always show
+        - Default address type: **Registration Address** (see [`crm.enum.addresstype`](../../auxiliary/enum/crm-enum-address-type.md))
+- Section 2 — **Main Information**
+    - **Contact Type**
+    - **Source**
+    - **Position**
+- Section 3 — **Additional Information**
+    - **Photo**
+    - **Comment**
+    - **Custom Field #1**
+
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"userId":1,"data":[{"name":"section_1","title":"Personal Data","type":"section","elements":[{"name":"NAME","optionFlags":1},{"name":"LAST_NAME","optionFlags":1},{"name":"SECOND_NAME"},{"name":"BIRTHDATE"},{"name":"PHONE","optionFlags":1,"options":{"defaultCountry":"GB"}},{"name":"ADDRESS","optionFlags":1,"options":{"defaultAddressType":4}}]},{"name":"section_2","title":"Main Information","type":"section","elements":[{"name":"TYPE_ID"},{"name":"SOURCE_ID"},{"name":"POST"}]},{"name":"section_3","title":"Additional Information","type":"section","elements":[{"name":"PHOTO"},{"name":"COMMENTS"},{"name":"UF_CRM_1720697698689"}]}]}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/crm.contact.details.configuration.set
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"userId":1,"data":[{"name":"section_1","title":"Personal Data","type":"section","elements":[{"name":"NAME","optionFlags":1},{"name":"LAST_NAME","optionFlags":1},{"name":"SECOND_NAME"},{"name":"BIRTHDATE"},{"name":"PHONE","optionFlags":1,"options":{"defaultCountry":"GB"}},{"name":"ADDRESS","optionFlags":1,"options":{"defaultAddressType":4}}]},{"name":"section_2","title":"Main Information","type":"section","elements":[{"name":"TYPE_ID"},{"name":"SOURCE_ID"},{"name":"POST"}]},{"name":"section_3","title":"Additional Information","type":"section","elements":[{"name":"PHOTO"},{"name":"COMMENTS"},{"name":"UF_CRM_1720697698689"}]}],"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/crm.contact.details.configuration.set
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    try {
+      const response = await $b24.actions.v2.call.make<boolean>({
+        method: 'crm.contact.details.configuration.set',
+        params: {
+          userId: 1,
+          data: [
+            {
+              name: 'section_1',
+              title: 'Personal data',
+              type: 'section',
+              elements: [
+                {
+                  name: 'NAME',
+                  optionFlags: 1,
+                },
+                {
+                  name: 'LAST_NAME',
+                  optionFlags: 1,
+                },
+                {
+                  name: 'SECOND_NAME',
+                },
+                {
+                  name: 'BIRTHDATE',
+                },
+                {
+                  name: 'PHONE',
+                  optionFlags: 1,
+                  options: {
+                    defaultCountry: 'GB',
+                  },
+                },
+                {
+                  name: 'ADDRESS',
+                  optionFlags: 1,
+                  options: {
+                    defaultAddressType: 4,
+                  },
+                },
+              ],
+            },
+            {
+              name: 'section_2',
+              title: 'Main information',
+              type: 'section',
+              elements: [
+                { name: 'TYPE_ID' },
+                { name: 'SOURCE_ID' },
+                { name: 'POST' },
+              ],
+            },
+            {
+              name: 'section_3',
+              title: 'Additional information',
+              type: 'section',
+              elements: [
+                { name: 'PHOTO' },
+                { name: 'COMMENTS' },
+                { name: 'UF_CRM_1720697698689' },
+              ],
+            },
+          ],
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Configuration saved:', result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function setContactDetailsConfiguration() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'crm.contact.details.configuration.set',
+            params: {
+              userId: 1,
+              data: [
+                {
+                  name: 'section_1',
+                  title: 'Personal data',
+                  type: 'section',
+                  elements: [
+                    {
+                      name: 'NAME',
+                      optionFlags: 1,
+                    },
+                    {
+                      name: 'LAST_NAME',
+                      optionFlags: 1,
+                    },
+                    {
+                      name: 'SECOND_NAME',
+                    },
+                    {
+                      name: 'BIRTHDATE',
+                    },
+                    {
+                      name: 'PHONE',
+                      optionFlags: 1,
+                      options: {
+                        defaultCountry: 'GB',
+                      },
+                    },
+                    {
+                      name: 'ADDRESS',
+                      optionFlags: 1,
+                      options: {
+                        defaultAddressType: 4,
+                      },
+                    },
+                  ],
+                },
+                {
+                  name: 'section_2',
+                  title: 'Main information',
+                  type: 'section',
+                  elements: [
+                    { name: 'TYPE_ID' },
+                    { name: 'SOURCE_ID' },
+                    { name: 'POST' },
+                  ],
+                },
+                {
+                  name: 'section_3',
+                  title: 'Additional information',
+                  type: 'section',
+                  elements: [
+                    { name: 'PHOTO' },
+                    { name: 'COMMENTS' },
+                    { name: 'UF_CRM_1720697698689' },
+                  ],
+                },
+              ],
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Configuration saved:', result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', setContactDetailsConfiguration)
+    </script>
+    ```
+
+- PHP
+
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'crm.contact.details.configuration.set',
+                [
+                    'userId' => 1,
+                    'data'   => [
+                        [
+                            'name'     => "section_1",
+                            'title'    => "Personal Data",
+                            'type'     => "section",
+                            'elements' => [
+                                [
+                                    'name'        => "NAME",
+                                    'optionFlags' => 1,
+                                ],
+                                [
+                                    'name'        => "LAST_NAME",
+                                    'optionFlags' => 1,
+                                ],
+                                [
+                                    'name' => "SECOND_NAME",
+                                ],
+                                [
+                                    'name' => "BIRTHDATE",
+                                ],
+                                [
+                                    'name'    => "PHONE",
+                                    'optionFlags' => 1,
+                                    'options' => [
+                                        'defaultCountry' => "GB",
+                                    ],
+                                ],
+                                [
+                                    'name'    => "ADDRESS",
+                                    'optionFlags' => 1,
+                                    'options' => [
+                                        'defaultAddressType' => 4,
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'name'     => "section_2",
+                            'title'    => "Main Information",
+                            'type'     => "section",
+                            'elements' => [
+                                ['name' => "TYPE_ID"],
+                                ['name' => "SOURCE_ID"],
+                                ['name' => "POST"],
+                            ],
+                        ],
+                        [
+                            'name'     => "section_3",
+                            'title'    => "Additional Information",
+                            'type'     => "section",
+                            'elements' => [
+                                ['name' => "PHOTO"],
+                                ['name' => "COMMENTS"],
+                                ['name' => "UF_CRM_1720697698689"],
+                            ],
+                        ],
+                    ],
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        if ($response->getError()) {
+            echo 'Error: ' . $response->getError();
+        } else {
+            echo 'Success: ' . print_r($result, true);
+            // Your data processing logic here
+            processData($result);
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error setting contact details configuration: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'crm.contact.details.configuration.set',
+        {
+            userId: 1,
+            data: [
+                {
+                    name: "section_1",
+                    title: "Personal Data",
+                    type: "section",
+                    elements: [
+                        {
+                            name: "NAME",
+                            optionFlags: 1,
+                        },
+                        {
+                            name: "LAST_NAME",
+                            optionFlags: 1,
+                        },
+                        {
+                            name: "SECOND_NAME",
+                        },
+                        {
+                            name: "BIRTHDATE",
+                        },
+                        {
+                            name: "PHONE",
+                            optionFlags: 1,
+                            options: {
+                                defaultCountry: "GB",
+                            },
+                        },
+                        {
+                            name: "ADDRESS",
+                            optionFlags: 1,
+                            options: {
+                                defaultAddressType: 4,
+                            },
+                        },
+                    ],
+                },
+                {
+                    name: "section_2",
+                    title: "Main Information",
+                    type: "section",
+                    elements: [
+                        { name: "TYPE_ID" },
+                        { name: "SOURCE_ID" },
+                        { name: "POST" },
+                    ],
+                },
+                {
+                    name: "section_3",
+                    title: "Additional Information",
+                    type: "section",
+                    elements: [
+                        { name: "PHOTO" },
+                        { name: "COMMENTS" },
+                        { name: "UF_CRM_1720697698689" },
+                    ],
+                },
+            ],
+        },
+        (result) => {
+            result.error()
+                ? console.error(result.error())
+                : console.info(result.data())
+            ;
+        },
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'crm.contact.details.configuration.set',
+        [
+            'userId' => 1,
+            'data' => [
+                [
+                    'name' => 'section_1',
+                    'title' => 'Personal Data',
+                    'type' => 'section',
+                    'elements' => [
+                        [
+                            'name' => 'NAME',
+                            'optionFlags' => 1,
+                        ],
+                        [
+                            'name' => 'LAST_NAME',
+                            'optionFlags' => 1,
+                        ],
+                        [
+                            'name' => 'SECOND_NAME',
+                        ],
+                        [
+                            'name' => 'BIRTHDATE',
+                        ],
+                        [
+                            'name' => 'PHONE',
+                            'optionFlags' => 1,
+                            'options' => [
+                                'defaultCountry' => 'GB',
+                            ],
+                        ],
+                        [
+                            'name' => 'ADDRESS',
+                            'optionFlags' => 1,
+                            'options' => [
+                                'defaultAddressType' => 4,
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'name' => 'section_2',
+                    'title' => 'Main Information',
+                    'type' => 'section',
+                    'elements' => [
+                        ['name' => 'TYPE_ID'],
+                        ['name' => 'SOURCE_ID'],
+                        ['name' => 'POST'],
+                    ],
+                ],
+                [
+                    'name' => 'section_3',
+                    'title' => 'Additional Information',
+                    'type' => 'section',
+                    'elements' => [
+                        ['name' => 'PHOTO'],
+                        ['name' => 'COMMENTS'],
+                        ['name' => 'UF_CRM_1720697698689'],
+                    ],
+                ],
+            ],
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+    "result": true,
+    "time": {
+        "start": 1724677217.639681,
+        "finish": 1724677217.986853,
+        "duration": 0.3471717834472656,
+        "processing": 0.01840806007385254,
+        "date_start": "2024-08-26T15:00:17+02:00",
+        "date_finish": "2024-08-26T15:00:17+02:00",
+        "operating": 0
+    }
+}
+```
+
+### Returned Values
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`boolean`](../../../data-types.md) | The root element of the response.
+
+Returns `true` on success ||
+|| **time**
+[`time`](../../../data-types.md#time) | Information about the request execution time ||
+|#
+
+## Error Handling
+
+HTTP Status: **400**
+
+```json
+{
+    "error": "",
+    "error_description": "Element at index 0 in section at index 1 does not have name."
+}
+```
+
+{% include notitle [Error Handling](../../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** | **Value** ||
+|| Empty Value | Access denied. | The user does not have administrative rights ||
+|| Empty Value | Parameter 'data' must be array. | A non-array was passed in `data` ||
+|| Empty Value | The data must be indexed array. | A non-indexed array was passed in `data` ||
+|| Empty Value | There are no data to write. | An empty array was passed in `data` ||
+|| Empty Value | Section at index `i` has type `data[i].type`. The expected type is 'section'. | A value other than `'section'` is found in `data[i].type` ||
+|| Empty Value | Section at index `i` does not have name. | An empty value was passed in `data[i].name` ||
+|| Empty Value | Section at index `i` does not have title. | An empty value was passed in `data[i].title` ||
+|| Empty Value | Element at index `j` in section at index `i` does not have name. | An empty value was passed in `data[i].elements[j].name` ||
+|#
+
+{% include [System Errors](./../../../../_includes/system-errors.md) %}
+
+## Continue Learning 
+
+- [{#T}](./index.md)
+- [{#T}](./crm-contact-details-configuration-get.md)
+- [{#T}](./crm-contact-details-configuration-force-common-scope-for-all.md)
+- [{#T}](./crm-contact-details-configuration-reset.md)

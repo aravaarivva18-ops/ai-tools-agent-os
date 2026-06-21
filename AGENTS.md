@@ -40,6 +40,8 @@ Every meaningful change requires a DOX pass before the task is done. Update the 
 Основные стандарты:
 - **Solo Loop v10**: Субагенты запрещены. Статус сессии считывается из `implementation_plan.md` через `PlanningWithFiles`. Выводы сжимаются через `SoloLoopV10`.
 - **Валидация и Схемы**: Строгая валидация по BaseModel и экспорт Agno-style схем через `tools/tool_validator.py`.
+- **Тест-маркеры в доках**: При редактировании инструкций и баз знаний сохранять ключевые слова и доменные имена (например, `context7.com`), используемые в TDD-тестах для верификации документов.
+- **Запрет импорта из scratch/**: Черновики и прототипы пишутся строго внутри директорий `scratch/`. Запрещено импортировать модули из `scratch/` в продакшн-код.
 - **Навыки**: Управление JIT-навыками через [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py) с поддержкой тем: `is_ui` (Framer Motion, GSAP, Tailwind, Three.js), `is_seo` (Programmatic SEO, EEAT, GEO), `is_scale` (Dan Martell 10-80-10, SOP, Pre-delegation, Buyback Loop) и `is_mcp` (Anthropic MCP SDK, SQLite YAGNI).
 - **Окружение**: Python 3.12+ (`uv run`), форматирование Ruff (`ruff.toml`).
 - **Плагины**: Обязательно использование `agent-skills` (слэш-команды), `fablize` (DoD и доказательства) и `ponytail` (YAGNI/контроль абстракций).

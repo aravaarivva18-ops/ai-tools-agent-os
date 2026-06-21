@@ -1,0 +1,33 @@
+title: Contacts
+href: index.md
+items:
+  - name: Overview of methods
+    href: index.md
+  - name: Create new contact
+    href: crm-contact-add.md
+  - name: Update contact
+    href: crm-contact-update.md
+  - name: Get contact by Id
+    href: crm-contact-get.md
+  - name: Get list of contacts
+    href: crm-contact-list.md
+  - name: Delete contact
+    href: crm-contact-delete.md
+  - name: Get contact fields
+    href: crm-contact-fields.md
+  - name: Contact's relationship with companies
+    include:
+      path: company/b24-toc.yaml
+      mode: link
+  - name: Custom fields
+    include:
+      path: userfield/b24-toc.yaml
+      mode: link
+  - name: Events
+    include:
+      path: events/b24-toc.yaml
+      mode: link
+  - name: Managing contact cards
+    include:
+      path: custom-form/b24-toc.yaml
+      mode: link

@@ -1,0 +1,33 @@
+title: Typical use-cases and scenarios
+href: index.md
+items:
+  - name: Ready-to-use scenarios for REST API
+    href: index.md
+  - name: CRM
+    include:
+      path: crm/b24-toc.yaml
+      mode: link
+  - name: Online Sales
+    include:
+      path: sale/b24-toc.yaml
+      mode: link
+  - name: Workflows
+    include:
+      path: bizproc/b24-toc.yaml
+      mode: link
+  - name: Chatbots
+    include:
+      path: chat-bots/b24-toc.yaml
+      mode: link
+  - name: Telephony
+    include:
+      path: telephony/b24-toc.yaml
+      mode: link
+  - name: Tasks
+    include:
+      path: tasks/b24-toc.yaml
+      mode: link
+  - name: Open Channels
+    include:
+      path: openlines/b24-toc.yaml
+      mode: link

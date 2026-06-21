@@ -1,0 +1,11 @@
+title: List of events when working with companies
+href: index.md
+items:
+  - name: Overview of events 
+    href: index.md
+  - name: When creating a company
+    href: on-crm-company-add.md
+  - name: When deleting a company
+    href: on-crm-company-delete.md
+  - name: When updating a company
+    href: on-crm-company-update.md

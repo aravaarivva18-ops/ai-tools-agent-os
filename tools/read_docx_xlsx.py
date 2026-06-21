@@ -14,11 +14,11 @@ def read_docx(file_path):
     # Читаем параграфы и таблицы по порядку их следования
     # Для этого перебираем элементы body
     for element in doc.element.body:
-        if element.tag.endswith('p'):
+        if element.tag.endswith("p"):
             para = docx.text.paragraph.Paragraph(element, doc)
             if para.text.strip():
                 # Попробуем определить заголовок
-                if para.style.name.startswith('Heading'):
+                if para.style.name.startswith("Heading"):
                     try:
                         level = int(para.style.name.split()[-1])
                         content.append("#" * level + " " + para.text)
@@ -26,7 +26,7 @@ def read_docx(file_path):
                         content.append("## " + para.text)
                 else:
                     content.append(para.text)
-        elif element.tag.endswith('tbl'):
+        elif element.tag.endswith("tbl"):
             table = docx.table.Table(element, doc)
             content.append("\n[Таблица]")
             # Сделаем вывод в markdown-подобном виде
@@ -34,12 +34,13 @@ def read_docx(file_path):
                 # Избегаем дублирования ячеек при объединении (merge)
                 cells = []
                 for cell in row.cells:
-                    text = cell.text.strip().replace('\n', ' ')
+                    text = cell.text.strip().replace("\n", " ")
                     cells.append(text)
                 content.append("| " + " | ".join(cells) + " |")
             content.append("")
 
     return "\n".join(content)
+
 
 def read_xlsx(file_path):
     try:
@@ -75,12 +76,13 @@ def read_xlsx(file_path):
                     if cell.is_integer():
                         formatted_cells.append(str(int(cell)))
                     else:
-                        formatted_cells.append(f"{cell:.4f}".rstrip('0').rstrip('.'))
+                        formatted_cells.append(f"{cell:.4f}".rstrip("0").rstrip("."))
                 else:
                     formatted_cells.append(str(cell))
-            content.append(f"Строка {idx+1}: " + " | ".join(formatted_cells))
+            content.append(f"Строка {idx + 1}: " + " | ".join(formatted_cells))
 
     return "\n".join(content)
+
 
 def main():
     if len(sys.argv) < 3:
@@ -90,13 +92,14 @@ def main():
     file_type = sys.argv[1].lower()
     file_path = sys.argv[2]
 
-    if file_type == 'docx':
+    if file_type == "docx":
         print(read_docx(file_path))
-    elif file_type == 'xlsx':
+    elif file_type == "xlsx":
         print(read_xlsx(file_path))
     else:
         print("Неизвестный тип. Используйте 'docx' или 'xlsx'.")
         sys.exit(1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

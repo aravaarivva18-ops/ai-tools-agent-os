@@ -71,6 +71,79 @@ def run_security_scan(
         return 1, "", str(e)
 
 
+import re
+from pathlib import Path
+
+
+def scan_for_secrets(target_path: str = ".") -> list[dict]:
+    """
+    Scans files in target_path for hardcoded secrets, keys, and tokens.
+    Excludes common virtual env and version control directories.
+    """
+    patterns = {
+        "OpenAI API Key": re.compile(r"sk-proj-[a-zA-Z0-9]{48}"),
+        "Anthropic API Key": re.compile(r"sk-ant-api03-[a-zA-Z0-9-_]{80,150}"),
+        "Google Gemini API Key": re.compile(r"AIzaSy[a-zA-Z0-9-_]{33}"),
+        "Generic Private Key": re.compile(r"-----BEGIN [A-Z ]+ PRIVATE KEY-----"),
+    }
+
+    # Generic pattern to catch variables like token = 'xxx' or password = "xxx"
+    generic_pattern = re.compile(r"\b(password|secret|passwd|token|api_key)\s*=\s*['\"]([^'\"]{8,})['\"]", re.IGNORECASE)
+
+    findings = []
+    exclude_dirs = {".venv", ".git", ".obsidian", "__pycache__", "node_modules"}
+
+    path = Path(target_path)
+    if not path.exists():
+        return findings
+
+    # Walk files
+    files_to_scan = []
+    if path.is_file():
+        files_to_scan.append(path)
+    else:
+        for p in path.rglob("*"):
+            if p.is_file():
+                # Skip excluded directories
+                if any(part in exclude_dirs for part in p.parts):
+                    continue
+                # Skip binary files by extension
+                if p.suffix.lower() in {".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".db"}:
+                    continue
+                files_to_scan.append(p)
+
+    for f in files_to_scan:
+        try:
+            content = f.read_text(encoding="utf-8", errors="ignore")
+            lines = content.splitlines()
+            for idx, line in enumerate(lines, 1):
+                # 1. Check strong patterns
+                for name, regex in patterns.items():
+                    if regex.search(line):
+                        findings.append({
+                            "type": name,
+                            "file": str(f),
+                            "line": idx,
+                            "context": line.strip()
+                        })
+                # 2. Check generic pattern
+                match = generic_pattern.search(line)
+                if match:
+                    # Skip common test mock data and env lookups
+                    val = match.group(2)
+                    if not any(x in val.lower() for x in ("mock", "test", "env", "dummy", "placeholder", "os.get")):
+                        findings.append({
+                            "type": "Generic Secret",
+                            "file": str(f),
+                            "line": idx,
+                            "context": line.strip()
+                        })
+        except Exception:
+            continue
+
+    return findings
+
+
 if __name__ == "__main__":
     # If run as CLI, default to scanning the current workspace
     default_targets = ["."]

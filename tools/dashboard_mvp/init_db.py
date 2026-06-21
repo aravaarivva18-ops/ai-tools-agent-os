@@ -24,7 +24,7 @@ def init_database():
             default_admin = User(
                 email="admin@targetmedia.ru",
                 password_hash=get_password_hash("admin12345"),
-                role="admin"
+                role="admin",
             )
             db.add(default_admin)
             db.commit()
@@ -47,6 +47,7 @@ def init_database():
         db.rollback()
     finally:
         db.close()
+
 
 if __name__ == "__main__":
     init_database()

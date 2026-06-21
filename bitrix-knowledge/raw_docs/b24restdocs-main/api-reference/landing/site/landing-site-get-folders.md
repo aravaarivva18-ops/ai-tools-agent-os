@@ -1,0 +1,435 @@
+# Get Site Folders landing.site.getFolders
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`landing`](../../scopes/permissions.md)
+>
+> Who can execute the method: any user with "view" access permission for the site
+
+The method `landing.site.getFolders` returns a list of site folders.
+
+## Method Parameters
+
+{% include [Note on required parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **scope**
+[`string`](../../data-types.md) | Internal scope of the landing pages. It is not related to the REST scope `landing` in the method name.
+
+The value of `scope` must correspond to the type of site [(detailed description)](../types.md) ||
+|| **siteId***
+[`integer`](../../data-types.md) | Identifier of the site for which folders are requested.
+
+The site identifier can be obtained using the method [landing.site.getList](./landing-site-get-list.md) or from the result of the method [landing.site.add](./landing-site-add.md) ||
+|| **filter**
+[`object`](../../data-types.md) | Filter by folder fields [(detailed description)](#filter) ||
+|#
+
+### Filter Parameter {#filter}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **ID**
+[`integer`](../../data-types.md) | Identifier of the folder ||
+|| **PARENT_ID**
+[`integer`](../../data-types.md) \| `null` | Identifier of the parent folder. If `0`, `null`, `false`, or an empty string is passed, the value will be converted to `null`, which selects top-level folders ||
+|| **INDEX_ID**
+[`integer`](../../data-types.md) | Identifier of the folder's index page ||
+|| **ACTIVE**
+[`string`](../../data-types.md) | Active flag `Y/N` ||
+|| **DELETED**
+[`string`](../../data-types.md) | Deletion flag `Y/N` ||
+|| **=DELETED**
+[`string`](../../data-types.md) | Exact match for the deletion flag. If `DELETED` and `=DELETED` are not present in the request, the method automatically adds `=DELETED: "N"` ||
+|| **TITLE**
+[`string`](../../data-types.md) | Title of the folder ||
+|| **CODE**
+[`string`](../../data-types.md) | Symbolic code of the folder ||
+|| **CREATED_BY_ID**
+[`integer`](../../data-types.md) | Identifier of the user who created the folder ||
+|| **MODIFIED_BY_ID**
+[`integer`](../../data-types.md) | Identifier of the user who modified the folder ||
+|| **DATE_CREATE**
+[`datetime`](../../data-types.md) | Date and time of folder creation ||
+|| **DATE_MODIFY**
+[`datetime`](../../data-types.md) | Date and time of folder modification ||
+|#
+
+## Code Examples
+
+{% include [Note on examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+      -H "Content-Type: application/json" \
+      -d '{
+        "siteId": 1817,
+        "filter": {
+          "PARENT_ID": 0,
+          "=DELETED": "N",
+          "ACTIVE": "Y"
+        }
+      }' \
+      "https://**put.your-domain-here**/rest/**user_id**/**webhook_code**/landing.site.getFolders.json"
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+      -H "Content-Type: application/json" \
+      -d '{
+        "siteId": 1817,
+        "filter": {
+          "PARENT_ID": 0,
+          "=DELETED": "N",
+          "ACTIVE": "Y"
+        },
+        "auth": "**put_access_token_here**"
+      }' \
+      "https://**put.your-domain-here**/rest/landing.site.getFolders.json"
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of each Folder returned in result[]
+    type Folder = {
+      ID: string
+      PARENT_ID: string | null
+      SITE_ID: string
+      INDEX_ID: string | null
+      ACTIVE: string
+      DELETED: string
+      TITLE: string
+      CODE: string
+      CREATED_BY_ID: string
+      MODIFIED_BY_ID: string
+      DATE_CREATE: string
+      DATE_MODIFY: string
+    }
+
+    try {
+      // landing.site.getFolders returns a single page (max 50 records). For the whole result set
+      // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+      // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+      // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+      // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+      const response = await $b24.actions.v2.call.make<Folder[]>({
+        method: 'landing.site.getFolders',
+        params: {
+          siteId: 1817,
+          filter: {
+            PARENT_ID: 0,
+            '=DELETED': 'N',
+            ACTIVE: 'Y',
+          },
+          start: 0,
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Folders count:', result.length, 'First folder:', result[0])
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function getSiteFolders() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          // landing.site.getFolders returns a single page (max 50 records). For the whole result set
+          // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+          // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+          // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+          // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+          const response = await $b24.actions.v2.call.make({
+            method: 'landing.site.getFolders',
+            params: {
+              siteId: 1817,
+              filter: {
+                PARENT_ID: 0,
+                '=DELETED': 'N',
+                ACTIVE: 'Y',
+              },
+              start: 0,
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Folders count:', result.length, 'First folder:', result[0])
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', getSiteFolders)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'landing.site.getFolders',
+                [
+                    'siteId' => 1817,
+                    'filter' => [
+                        'PARENT_ID' => 0,
+                        '=DELETED' => 'N',
+                        'ACTIVE' => 'Y',
+                    ],
+                ]
+            );
+
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+
+        echo 'Success: ' . print_r($result, true);
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error getting folders: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'landing.site.getFolders',
+        {
+            siteId: 1817,
+            filter: {
+                PARENT_ID: 0,
+                '=DELETED': 'N',
+                ACTIVE: 'Y'
+            }
+        },
+        function(result)
+        {
+            if (result.error())
+            {
+                console.error(result.error());
+            }
+            else
+            {
+                console.info(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'landing.site.getFolders',
+        [
+            'siteId' => 1817,
+            'filter' => [
+                'PARENT_ID' => 0,
+                '=DELETED' => 'N',
+                'ACTIVE' => 'Y',
+            ],
+        ]
+    );
+
+    if (isset($result['error']))
+    {
+        echo 'Error: ' . $result['error_description'];
+    }
+    else
+    {
+        echo '<pre>';
+        print_r($result['result']);
+        echo '</pre>';
+    }
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+    "result": [
+        {
+            "ID": "1",
+            "PARENT_ID": null,
+            "SITE_ID": "3",
+            "INDEX_ID": "9",
+            "ACTIVE": "Y",
+            "DELETED": "N",
+            "TITLE": "test page transfer",
+            "CODE": "change",
+            "CREATED_BY_ID": "1",
+            "MODIFIED_BY_ID": "29",
+            "DATE_CREATE": "11/12/2021 08:39:53 pm",
+            "DATE_MODIFY": "12/28/2021 03:04:04 pm"
+        },
+        {
+            "ID": "33",
+            "PARENT_ID": null,
+            "SITE_ID": "3",
+            "INDEX_ID": null,
+            "ACTIVE": "Y",
+            "DELETED": "N",
+            "TITLE": "mobile",
+            "CODE": "mobile",
+            "CREATED_BY_ID": "29",
+            "MODIFIED_BY_ID": "29",
+            "DATE_CREATE": "12/08/2021 10:23:37 am",
+            "DATE_MODIFY": "12/08/2021 10:24:48 am"
+        },
+        {
+            "ID": "3",
+            "PARENT_ID": null,
+            "SITE_ID": "3",
+            "INDEX_ID": "45",
+            "ACTIVE": "Y",
+            "DELETED": "N",
+            "TITLE": "attachment 1",
+            "CODE": "attachment1",
+            "CREATED_BY_ID": "1",
+            "MODIFIED_BY_ID": "29",
+            "DATE_CREATE": "11/12/2021 08:39:53 pm",
+            "DATE_MODIFY": "12/03/2021 08:10:21 am"
+        }
+    ],
+    "time": {
+        "start": 1773257990,
+        "finish": 1773257990.091689,
+        "duration": 0.0916891098022461,
+        "processing": 0,
+        "date_start": "2026-03-11T22:39:50+03:00",
+        "date_finish": "2026-03-11T22:39:50+03:00",
+        "operating_reset_at": 1773258590,
+        "operating": 0
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`object[]`](../../data-types.md) | List of site folders [(detailed description)](#folder). The method may return `result: []` without an error if there are no folders on the site or if the user does not have "view" access permission for the specified site ||
+|| **time**
+[`time`](../../data-types.md#time) | Information about the execution time of the request ||
+|#
+
+#### Folder Object {#folder}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **ID**
+[`string`](../../data-types.md) | Identifier of the folder ||
+|| **PARENT_ID**
+[`string`](../../data-types.md) \| `null` | Identifier of the parent folder ||
+|| **SITE_ID**
+[`string`](../../data-types.md) | Identifier of the site ||
+|| **INDEX_ID**
+[`string`](../../data-types.md) \| `null` | Identifier of the folder's index page ||
+|| **ACTIVE**
+[`string`](../../data-types.md) | Active flag `Y/N` ||
+|| **DELETED**
+[`string`](../../data-types.md) | Deletion flag `Y/N` ||
+|| **TITLE**
+[`string`](../../data-types.md) | Title of the folder ||
+|| **CODE**
+[`string`](../../data-types.md) | Symbolic code of the folder ||
+|| **CREATED_BY_ID**
+[`string`](../../data-types.md) | Identifier of the user who created the folder ||
+|| **MODIFIED_BY_ID**
+[`string`](../../data-types.md) | Identifier of the user who modified the folder ||
+|| **DATE_CREATE**
+[`string`](../../data-types.md) | Date and time of creation in string format ||
+|| **DATE_MODIFY**
+[`string`](../../data-types.md) | Date and time of modification in string format ||
+|#
+
+## Error Handling
+
+HTTP Status: **400**
+
+```json
+{
+    "error": "MISSING_PARAMS",
+    "error_description": "Not enough parameters for the call, missing: siteId"
+}
+```
+
+{% include notitle [error handling](../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** ||
+|| `MISSING_PARAMS` | The required parameter `siteId` is missing ||
+|| `ACCESS_DENIED` | Insufficient general rights to call landing methods ||
+|| `TYPE_ERROR` | Data type error in method call parameters ||
+|| `SYSTEM_ERROR` | Internal error while executing the method ||
+|#
+
+{% include [system errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./landing-site-add-folder.md)
+- [{#T}](./landing-site-update-folder.md)
+- [{#T}](./landing-site-mark-folder-delete.md)
+- [{#T}](./landing-site-mark-folder-undelete.md)
+- [{#T}](./landing-site-publication-folder.md)
+- [{#T}](./landing-site-unpublic-folder.md)

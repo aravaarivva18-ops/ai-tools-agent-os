@@ -1,0 +1,19 @@
+title: User Fields  
+href: index.md  
+items:  
+  - name: Overview of Methods  
+    href: index.md  
+  - name: Create User Field  
+    href: crm-quote-user-field-add.md  
+  - name: Update User Field  
+    href: crm-quote-user-field-update.md    
+  - name: Get User Field by ID  
+    href: crm-quote-user-field-get.md  
+  - name: Get List of User Fields  
+    href: crm-quote-user-field-list.md  
+  - name: Delete User Field  
+    href: crm-quote-user-field-delete.md  
+  - name: Events  
+    include:  
+      path: events/b24-toc.yaml  
+      mode: link  

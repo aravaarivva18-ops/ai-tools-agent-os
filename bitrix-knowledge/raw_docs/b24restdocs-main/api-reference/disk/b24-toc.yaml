@@ -1,0 +1,29 @@
+title: Drive
+href: index.md
+items:
+  - name: Overview of Methods
+    href: index.md
+  - name: Version
+    include:
+      path: version/b24-toc.yaml
+      mode: link
+  - name: Folder
+    include:
+      path: folder/b24-toc.yaml
+      mode: link
+  - name: Access Permissions
+    include:
+      path: rights/b24-toc.yaml
+      mode: link
+  - name: Attached File
+    include:
+      path: attached-object/b24-toc.yaml
+      mode: link
+  - name: File
+    include:
+      path: file/b24-toc.yaml
+      mode: link
+  - name: Storage
+    include:
+      path: storage/b24-toc.yaml
+      mode: link

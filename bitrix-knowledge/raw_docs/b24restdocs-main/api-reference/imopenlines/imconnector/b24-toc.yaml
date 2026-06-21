@@ -1,0 +1,31 @@
+title: Open Channels Connectors  
+href: index.md  
+items:  
+  - name: Overview of Methods  
+    href: index.md  
+  - name: Register a Connector  
+    href: imconnector-register.md  
+  - name: Activate a Connector  
+    href: imconnector-activate.md  
+  - name: Get Connector Status  
+    href: imconnector-status.md  
+  - name: Set Connector Settings  
+    href: imconnector-connector-data-set.md  
+  - name: Get List of Connectors  
+    href: imconnector-list.md  
+  - name: Unregister a Connector  
+    href: imconnector-unregister.md  
+  - name: Send Messages to Bitrix24  
+    href: imconnector-send-messages.md  
+  - name: Modify Sent Messages  
+    href: imconnector-update-messages.md  
+  - name: Delete Sent Messages  
+    href: imconnector-delete-messages.md  
+  - name: Update Delivery Status  
+    href: imconnector-send-status-delivery.md  
+  - name: Set New Chat Name  
+    href: imconnector-chat-name-set.md  
+  - name: Events  
+    include:  
+      path: events/b24-toc.yaml  
+      mode: link  

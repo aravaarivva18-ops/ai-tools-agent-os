@@ -1,0 +1,359 @@
+# Get the values of the parent product fields catalog.product.sku.get
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`catalog`](../../../scopes/permissions.md)
+>
+> Who can execute the method: administrator
+
+The method returns the values of the parent product fields by identifier.
+
+## Method Parameters
+
+{% include [Note about required parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id***
+[`catalog_product_sku.id`](../../data-types.md#catalog_product_sku) | Identifier of the parent product.
+
+To obtain the identifiers of parent products, you need to use [catalog.product.sku.list](./catalog-product-sku-list.md) ||
+|#
+
+## Code Examples
+
+{% include [Note about examples](../../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id":1289}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/catalog.product.sku.get
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id":1289,"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/catalog.product.sku.get
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame, ISODate } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of the payload returned in result (match the "response handling" section of the page)
+    type SkuGetResult = {
+      sku: {
+        active: string
+        available: string
+        bundle: string
+        canBuyZero: string
+        code: string
+        createdBy: number
+        dateActiveFrom: ISODate | null
+        dateActiveTo: ISODate | null
+        dateCreate: ISODate | null
+        detailPicture: { id: string; url: string; urlMachine: string } | null
+        detailText: string | null
+        detailTextType: string
+        height: number
+        iblockId: number
+        iblockSectionId: number
+        id: number
+        length: number
+        measure: number
+        modifiedBy: number
+        name: string
+        previewPicture: { id: string; url: string; urlMachine: string } | null
+        previewText: string | null
+        previewTextType: string
+        property258: { value: string; valueId: string }
+        property259: { value: string; valueId: string }[]
+        purchasingCurrency: string
+        purchasingPrice: string
+        quantity: number
+        sort: number
+        subscribe: string
+        timestampX: ISODate | null
+        type: number
+        vatId: number
+        vatIncluded: string
+        weight: number
+        width: number
+        xmlId: string
+      }
+    }
+
+    try {
+      const response = await $b24.actions.v2.call.make<SkuGetResult>({
+        method: 'catalog.product.sku.get',
+        params: {
+          id: 1289,
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info(result.sku.id, result.sku.name, result.sku.type)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function getProductSku() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'catalog.product.sku.get',
+            params: {
+              id: 1289,
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info(result.sku.id, result.sku.name, result.sku.type)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', getProductSku)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'catalog.product.sku.get',
+                [
+                    'id' => 1289
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        echo 'Success: ' . print_r($result, true);
+        echo 'Info: ' . print_r($result, true);
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error getting product SKU: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'catalog.product.sku.get', {
+            'id': 1289
+        },
+        function(result) {
+            if (result.error()) {
+                console.error(result.error());
+            } else {
+                console.info(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'catalog.product.sku.get',
+        [
+            'id' => 1289
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP status: **200**
+
+```json
+{
+    "result": {
+        "sku": {
+            "active": "Y",
+            "available": "N",
+            "bundle": "N",
+            "canBuyZero": "Y",
+            "code": "product_sku",
+            "createdBy": 1,
+            "dateActiveFrom": "2024-05-28T10:00:00+02:00",
+            "dateActiveTo": "2024-05-29T10:00:00+02:00",
+            "dateCreate": "2024-05-27T10:00:00+02:00",
+            "detailPicture": {
+                "id": "6552",
+                "url": "\/rest\/catalog.product.download?fields%5BfieldName%5D=detailPicture\u0026fields%5BfileId%5D=6552\u0026fields%5BproductId%5D=1289",
+                "urlMachine": "\/rest\/catalog.product.download?fields%5BfieldName%5D=detailPicture\u0026fields%5BfileId%5D=6552\u0026fields%5BproductId%5D=1289"
+            },
+            "detailText": null,
+            "detailTextType": "text",
+            "height": 100,
+            "iblockId": 23,
+            "iblockSectionId": 47,
+            "id": 1289,
+            "length": 100,
+            "measure": 5,
+            "modifiedBy": 1,
+            "name": "Parent Product",
+            "previewPicture": {
+                "id": "6551",
+                "url": "\/rest\/catalog.product.download?fields%5BfieldName%5D=previewPicture\u0026fields%5BfileId%5D=6551\u0026fields%5BproductId%5D=1289",
+                "urlMachine": "\/rest\/catalog.product.download?fields%5BfieldName%5D=previewPicture\u0026fields%5BfileId%5D=6551\u0026fields%5BproductId%5D=1289"
+            },
+            "previewText": null,
+            "previewTextType": "text",
+            "property258": {
+                "value": "test",
+                "valueId": "9877"
+            },
+            "property259": [
+                {
+                    "value": "test1",
+                    "valueId": "9878"
+                },
+                {
+                    "value": "test2",
+                    "valueId": "9879"
+                }
+            ],
+            "purchasingCurrency": "USD",
+            "purchasingPrice": "1000.000000",
+            "quantity": 10,
+            "sort": 100,
+            "subscribe": "Y",
+            "timestampX": "2024-06-17T16:03:20+02:00",
+            "type": 6,
+            "vatId": 1,
+            "vatIncluded": "Y",
+            "weight": 100,
+            "width": 100,
+            "xmlId": "1243"
+        }
+    },
+    "time": {
+        "start": 1718636890.413679,
+        "finish": 1718636891.096817,
+        "duration": 0.6831381320953369,
+        "processing": 0.27536606788635254,
+        "date_start": "2024-06-17T18:08:10+02:00",
+        "date_finish": "2024-06-17T18:08:11+02:00"
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`object`](../../../data-types.md) | Root element of the response ||
+|| **sku**
+[`catalog_product_sku`](../../data-types.md#catalog_product_sku) | Object with information about the parent product ||
+|| **time**
+[`time`](../../../data-types.md) | Information about the request execution time ||
+|#
+
+## Error Handling
+
+HTTP status: **400**
+
+```json
+{
+    "error":200040300010,
+    "error_description":"Access Denied"
+}
+```
+
+{% include notitle [error handling](../../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** ||
+|| `200040300000` | The information block with the specified identifier does not exist
+|| 
+|| `200040300040` | Insufficient rights to read the information block element
+|| 
+|| `200040300010` | Insufficient rights to read the trade catalog
+|| 
+|| `100` | The `id` parameter is not specified
+|| 
+|| `0` | The parent product does not exist
+|| 
+|| `0` | Other errors (e.g., fatal errors)
+|| 
+|#
+
+{% include [system errors](../../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./catalog-product-sku-add.md)
+- [{#T}](./catalog-product-sku-update.md)
+- [{#T}](./catalog-product-sku-list.md)
+- [{#T}](./catalog-product-sku-download.md)
+- [{#T}](./catalog-product-sku-delete.md)
+- [{#T}](./catalog-product-sku-get-fields-by-filter.md)

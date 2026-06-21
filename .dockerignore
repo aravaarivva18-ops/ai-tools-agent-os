@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.pytest_cache/
+.pytest_cache
+.git/
+.gitignore
+vault/
+*.pdf
+*.md
+.env
+.env.example
+docs/
+.agents/
+.smart-env/
+.obsidian/

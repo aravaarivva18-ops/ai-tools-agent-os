@@ -1,0 +1,32 @@
+title: Widgets in CRM  
+href: index.md  
+items:  
+  - name: Context menu item in the list of entities  
+    href: index.md  
+  - name: Dropdown menu item above the list of entities  
+    href: list-toolbar.md  
+  - name: Tab in the detail form of the entity  
+    href: detail-tab.md  
+  - name: Button above the timeline of the entity  
+    href: detail-activity.md  
+  - name: Extended capabilities of the button above the timeline  
+    href: detail-activity-area.md  
+  - name: Dropdown menu item of the top button in the entity  
+    href: detail-toolbar.md  
+  - name: Context menu item of the activity in the entity  
+    href: activity-timeline-menu.md  
+  - name: Dropdown menu item of the document generator  
+    href: document-generator-button.md  
+  - name: Dropdown menu item of the top button in the Automation rule designer  
+    href: robot-designer-toolbar.md  
+  - name: Dropdown menu item in the Sales Funnels  
+    href: funnels-toolbar.md  
+  - name: Item in the left menu of CRM analytics  
+    href: analytics-menu.md  
+  - name: Dropdown menu item of the top button in CRM analytics  
+    href: analytics-toolbar.md  
+  - name: Autofilling details in the CRM card
+    include:
+      path: requisites-autocomplete/b24-toc.yaml
+      mode: link
+

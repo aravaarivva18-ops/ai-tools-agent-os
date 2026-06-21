@@ -37,7 +37,7 @@ def test_create_ui_skill_includes_modern_stack():
     assert "framer motion" in content.lower(), "Framer Motion should be recommended in UI-themed skill templates"
     assert "gsap" in content.lower(), "GSAP should be recommended in UI-themed skill templates"
     assert "tailwind" in content.lower(), "Tailwind CSS should be recommended in UI-themed skill templates"
-    
+
     # Verify folder structure
     assert (TEST_SKILLS_WORKSPACE / "skills" / "fancy-landing" / "components").exists()
     assert (TEST_SKILLS_WORKSPACE / "skills" / "fancy-landing" / "styles").exists()
@@ -57,7 +57,7 @@ def test_create_non_ui_skill_does_not_include_ui_stack():
 
     assert "framer motion" not in content.lower(), "Framer Motion should not be bloated in non-UI skills"
     assert "gsap" not in content.lower(), "GSAP should not be bloated in non-UI skills"
-    
+
     # Verify folder structure
     assert (TEST_SKILLS_WORKSPACE / "skills" / "data-parser" / "scripts").exists()
     assert not (TEST_SKILLS_WORKSPACE / "skills" / "data-parser" / "components").exists()

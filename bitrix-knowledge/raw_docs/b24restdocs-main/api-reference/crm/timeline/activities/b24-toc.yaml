@@ -1,0 +1,37 @@
+title: Activities
+href: index.md
+items:
+  - name: Overview of Methods
+    href: index.md
+  - name: System Activity
+    include:
+      path: activity-base/b24-toc.yaml
+      mode: link
+  - name: Configurable Activity
+    include:
+      path: configurable/b24-toc.yaml
+      mode: link
+  - name: Universal Activity
+    include:
+      path: todo/b24-toc.yaml
+      mode: link    
+  - name: Linking Activities to CRM Objects
+    include:
+      path: binding/b24-toc.yaml
+      mode: link
+  - name: Custom Activity Types
+    include:
+      path: types/b24-toc.yaml
+      mode: link
+  - name: Additional Content Blocks
+    include:
+      path: layout-blocks/b24-toc.yaml
+      mode: link
+  - name: Events
+    include:
+      path: events/b24-toc.yaml
+      mode: link
+  - name: App Embedding
+    include:
+      path: app-embedding/b24-toc.yaml
+      mode: link

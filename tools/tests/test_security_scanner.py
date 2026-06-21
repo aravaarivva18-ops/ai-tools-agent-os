@@ -7,6 +7,7 @@ from tools.security.security_scanner import (
     build_bandit_command,
     get_verified_python_path,
     run_security_scan,
+    scan_for_secrets,
 )
 
 
@@ -67,3 +68,25 @@ def test_run_security_scan_with_invalid_python(monkeypatch):
     assert returncode == 127
     assert "Python executable not found at /invalid/path/to/python" in stderr
     assert stdout == ""
+
+
+def test_scan_for_secrets_positive(tmp_path):
+    """Positive test: Verifies that common API secrets are successfully detected."""
+    bad_file = tmp_path / "secrets.py"
+    bad_file.write_text("openai_api_key = 'sk-proj-A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4'\n")
+
+    findings = scan_for_secrets(str(tmp_path))
+    assert len(findings) == 1
+    assert findings[0]["type"] == "OpenAI API Key"
+    assert findings[0]["file"] == str(bad_file)
+    assert findings[0]["line"] == 1
+
+
+def test_scan_for_secrets_negative(tmp_path):
+    """Negative test: Verifies that clean code returns zero secret findings."""
+    clean_file = tmp_path / "clean.py"
+    clean_file.write_text("def run():\n    db_password = os.getenv('DB_PASS')\n")
+
+    findings = scan_for_secrets(str(tmp_path))
+    assert len(findings) == 0
+

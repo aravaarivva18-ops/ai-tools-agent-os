@@ -84,6 +84,18 @@ class AgentSkillsManager:
             for keyword in ["ui", "landing", "animation", "hover", "scroll", "frontend", "css", "web"]
         )
 
+        # Check if the skill is Prototype-themed (throwaway spike)
+        is_prototype = any(
+            keyword in normalized_name or keyword in description.lower()
+            for keyword in ["prototype", "spike", "draft", "throwaway", "proof-of-concept"]
+        )
+
+        # Check if the skill is Grill/Docs-alignment themed
+        is_grill = any(
+            keyword in normalized_name or keyword in description.lower()
+            for keyword in ["grill", "interview", "spec", "docs-align"]
+        )
+
         if is_scale:
             tech_stack = """- **Core Technology**: Python 3.12+ (automation scripts)
 - **APIs & Integrations**: Calendar, Email and Tasks APIs (Google Workspace / Microsoft Graph)
@@ -111,6 +123,18 @@ class AgentSkillsManager:
             design_principles = """- Utilize rich aesthetics (gradients, glassmorphism, tailored HSL colors).
 - Enforce smooth micro-animations and interactive hover effects.
 - Reject static placeholders; design visual layouts using generate_image first."""
+        elif is_prototype:
+            tech_stack = """- **Core Technology**: Minimal Python 3.12+ (single file) or single-file HTML/JS
+- **Data Persistence**: SQLite (in-memory or local file database) or file-based scratch files"""
+            design_principles = """- Throwaway Prototyping: Build rapid spikes to test design hypotheses. Reject maintainability and complex architectures.
+- Keep it Flat: Max 1 level of abstraction. Write code directly in scratch/ folder without modular overhead.
+- Fast Cleanup: No unit tests required for prototypes. Bezжалостно delete or rewrite cleanly with TDD after validation."""
+        elif is_grill:
+            tech_stack = """- **APIs & MCPs**: Context7 MCP (resolve-library-id -> query-docs on context7.com)
+- **Slash Commands**: /grill-me for interactive developer interview"""
+            design_principles = """- Docs-First Alignment: Always query context7.com documentation first before generating implementation details.
+- Interrogative Strategy: Grill the user on ambiguous requirements. Resolve design decisions and parameters via one-question-at-a-time interview.
+- Define Boundaries: Explicitly verify inputs, outputs, assumptions, and developer-saved time (ROI)."""
         else:
             tech_stack = """- **Core Technology**: Python 3.12+ / sqlite3 / FastAPI"""
             design_principles = """- Karpathy Vibe Coding: Always follow clean, simple Python structures. Max 2 levels of abstraction.

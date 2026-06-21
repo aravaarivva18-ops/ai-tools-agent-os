@@ -1,0 +1,33 @@
+title: voximplant  
+href: index.md  
+items:  
+  - name: Overview of Methods  
+    href: index.md  
+  - name: Start a Callback  
+    href: voximplant-callback-start.md  
+  - name: Make an Auto-Call with MP3 Playback  
+    href: voximplant-infocall-start-with-sound.md  
+  - name: Make an Auto-Call with a Voice Automation Rule  
+    href: voximplant-infocall-start-with-text.md  
+  - name: Get a List of Available Voices for Text-to-Speech  
+    href: voximplant-tts-voices-get.md  
+  - name: Retrieve Call History  
+    href: voximplant-statistic-get.md  
+  - name: Events  
+    include:  
+      path: events/b24-toc.yaml  
+      mode: link  
+  - name: Manage SIP Connections  
+    include:  
+      path: sip/b24-toc.yaml  
+      mode: link  
+  - name: Manage Lines  
+    include:  
+      path: lines/b24-toc.yaml  
+      mode: link  
+  - name: Manage Users  
+    include:  
+      path: users/b24-toc.yaml  
+      mode: link  
+  - name: Get Links for Navigating Telephony Pages  
+    href: voximplant-url-get.md  

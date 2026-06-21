@@ -21,13 +21,16 @@ async def main():
     print("Импорт планов и логов из Google Sheets...")
     sync_google_sheets_data(db, GOOGLE_SPREADSHEET_ID, GOOGLE_CREDENTIALS_PATH)
 
-    print(f"Запуск ручной синхронизации для проекта ID 1 с {start_date} по {end_date}...")
+    print(
+        f"Запуск ручной синхронизации для проекта ID 1 с {start_date} по {end_date}..."
+    )
     success = await sync_yandex_data(db, 1, start_date, end_date)
     if success:
         print("Синхронизация успешно завершена!")
     else:
         print("Синхронизация завершилась с ошибкой.")
     db.close()
+
 
 if __name__ == "__main__":
     asyncio.run(main())
