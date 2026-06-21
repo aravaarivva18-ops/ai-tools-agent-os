@@ -15,15 +15,15 @@ except ImportError:
 try:
     from tools.prompt_validator import (
         check_constitution_health,
-        normalize_gemini_constitution_headings,
         ensure_core_imperatives_block,
+        normalize_gemini_constitution_headings,
     )
 except ImportError:
     try:
         from prompt_validator import (
             check_constitution_health,
-            normalize_gemini_constitution_headings,
             ensure_core_imperatives_block,
+            normalize_gemini_constitution_headings,
         )
     except ImportError:
         check_constitution_health = None

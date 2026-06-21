@@ -2,13 +2,13 @@ import tempfile
 from pathlib import Path
 
 from tools.prompt_validator import (
+    check_constitution_health,
     check_overlap,
     check_sequential_sections,
     ensure_core_imperatives_block,
+    estimate_overlap,
     normalize_gemini_constitution_headings,
     validate_constitution_system,
-    check_constitution_health,
-    estimate_overlap,
 )
 
 

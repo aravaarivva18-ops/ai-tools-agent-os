@@ -33,6 +33,8 @@ Every meaningful change requires a DOX pass before the task is done. Update the 
 - [[bitrix-knowledge/AGENTS.md]] — Persistent 1C-Bitrix knowledge base & Obsidian RAG index.
 - [[youtube-faceless-pipeline/AGENTS.md]] — Script generation, scene rendering, and upload CLI.
 - [[dashboard-hand-on-pulse/AGENTS.md]] — Client Streamlit dashboard for Target Media.
+- [[tools/prompt_validator.py]] — нормализация и health check конституции
+- [[tools/self_improve.py]] — главный автоцикл улучшения
 
 ---
 
