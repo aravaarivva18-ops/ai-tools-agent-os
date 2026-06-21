@@ -4,6 +4,10 @@ import sys
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(WORKSPACE_ROOT))
+
+from tools.prompt_validator import validate_constitution_system  # noqa: E402
+
 RULES_FILES = [
     WORKSPACE_ROOT / "CLAUDE.md",
     WORKSPACE_ROOT / "AGENTS.md",
@@ -98,8 +102,11 @@ def main():
     if not check_jit_skills():
         success = False
 
+    if not validate_constitution_system():
+        success = False
+
     if success:
-        print("OK: Все ссылки целы, JIT-навыки синхронизированы.")
+        print("OK: Все ссылки целы, JIT-навыки синхронизированы, конституция валидна.")
         sys.exit(0)
     else:
         print("FAIL: Найдены ошибки в регламентах.", file=sys.stderr)

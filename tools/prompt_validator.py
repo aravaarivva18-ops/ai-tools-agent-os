@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+import re
+import sys
+from pathlib import Path
+
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
+
+CONSTITUTION_PATH = Path("/Users/rus/GEMINI_ANTIGRAVITY.md")
+STUDENT_GUIDE_PATH = Path("/Users/rus/STUDENT_GUIDE.md")
+CLAUDE_PATH = WORKSPACE_ROOT / "CLAUDE.md"
+AGENTS_PATH = WORKSPACE_ROOT / "AGENTS.md"
+
+
+def check_sequential_sections(path: Path) -> bool:
+    """Проверяет последовательную нумерацию разделов в конституции."""
+    if not path.exists():
+        print(f"[ERROR] Constitution file not found: {path}", file=sys.stderr)
+        return False
+
+    content = path.read_text(encoding="utf-8")
+    # Ищем заголовки вида: ## 🏛️ 1. Название
+    # Паттерн: ## [emoji] [номер]. [название]
+    pattern = re.compile(r"^##\s+(?:\S+)\s+(\d+)\.\s+(.+)$", re.MULTILINE)
+    matches = pattern.findall(content)
+
+    if not matches:
+        print("[ERROR] No numbered sections found in constitution.", file=sys.stderr)
+        return False
+
+    expected_number = 1
+    has_errors = False
+    for num_str, title in matches:
+        num = int(num_str)
+        if num != expected_number:
+            print(
+                f"[ERROR] Несогласованная нумерация в конституции: ожидался раздел {expected_number}, найден {num} ({title})",
+                file=sys.stderr,
+            )
+            has_errors = True
+        expected_number = num + 1
+
+    return not has_errors
+
+
+def get_protocol_paragraphs(path: Path, keywords: list) -> set:
+    """Извлекает нормализованные абзацы, содержащие ключевые слова протоколов."""
+    if not path.exists():
+        return set()
+
+    content = path.read_text(encoding="utf-8")
+    # Разделяем на абзацы по двойному переносу строки
+    paragraphs = content.split("\n\n")
+    protocol_paras = set()
+
+    for p in paragraphs:
+        p_clean = p.strip().lower()
+        if any(kw.lower() in p_clean for kw in keywords):
+            # Нормализуем текст (удаляем пунктуацию и пробелы)
+            normalized = "".join(char for char in p_clean if char.isalnum())
+            if len(normalized) > 20:  # игнорируем слишком короткие строки
+                protocol_paras.add(normalized)
+
+    return protocol_paras
+
+
+def check_overlap(path1: Path, path2: Path, keywords: list) -> float:
+    """Вычисляет коэффициент overlap (Jaccard similarity) между абзацами протоколов."""
+    paras1 = get_protocol_paragraphs(path1, keywords)
+    paras2 = get_protocol_paragraphs(path2, keywords)
+
+    if not paras1 or not paras2:
+        return 0.0
+
+    intersection = paras1.intersection(paras2)
+    union = paras1.union(paras2)
+
+    return len(intersection) / len(union)
+
+
+def validate_constitution_system() -> bool:
+    """Проводит полный аудит системы конституции и сопутствующих правил."""
+    success = True
+
+    print("=== Аудит нумерации разделов конституции ===")
+    if not check_sequential_sections(CONSTITUTION_PATH):
+        success = False
+    else:
+        print("OK: Разделы пронумерованы последовательно.")
+
+    print("\n=== Аудит перекрытия (Overlap) протоколов ===")
+    keywords = ["Solo Loop", "Stealth Stop", "YAGNI", "Self-Healing"]
+
+    # Сравниваем конституцию с гайдом студента
+    guide_overlap = check_overlap(CONSTITUTION_PATH, STUDENT_GUIDE_PATH, keywords)
+    print(f"Overlap Constitution <-> Student Guide: {guide_overlap * 100:.2f}%")
+    if guide_overlap > 0.08:
+        print(
+            f"[ERROR] Избыточное дублирование с гайдом студента: {guide_overlap * 100:.2f}% > 8%",
+            file=sys.stderr,
+        )
+        success = False
+
+    # Сравниваем конституцию с CLAUDE.md
+    claude_overlap = check_overlap(CONSTITUTION_PATH, CLAUDE_PATH, keywords)
+    print(f"Overlap Constitution <-> CLAUDE.md: {claude_overlap * 100:.2f}%")
+    if claude_overlap > 0.08:
+        print(
+            f"[ERROR] Избыточное дублирование с CLAUDE.md: {claude_overlap * 100:.2f}% > 8%",
+            file=sys.stderr,
+        )
+        success = False
+
+    if success:
+        print("\nOK: Все проверки структуры и overlap пройдены успешно.")
+    else:
+        print(
+            "\nFAIL: Обнаружены нарушения стандартов YAGNI и структурирования.",
+            file=sys.stderr,
+        )
+
+    return success
+
+
+def main():
+    if not validate_constitution_system():
+        sys.exit(1)
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
