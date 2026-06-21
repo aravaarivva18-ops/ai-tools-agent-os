@@ -1,48 +1,41 @@
-# 🧬 Specification & Plan: Modern UI/Animation Stack JIT Skills (v3.2)
+# 🧬 Specification & Plan: Architecture Decisions & UI Stack Integration (v3.2)
 
-Спецификация и план интеграции современных библиотек анимаций и UI-стека (Framer Motion, GSAP, Tailwind CSS, R3F) в автогенератор JIT-навыков.
+Сводный план архитектурных решений, интеграции современных библиотек анимации (UI Stack) и оценки сторонних AI-инструментов.
 
 ---
 
 ## 🏛️ 1. Context (Контекст)
-Изучено видео «Вайбкодим БЕЗУМНЫЕ сайты с помощью Claude», где подробно рассмотрено создание передовых интерфейсов (эффекты масок при наведении, скролл-анимации, 3D элементы). Для повышения качества генерации UI-кода в Antigravity JIT-навыки расширены шаблонами для передового frontend-стека.
+В рамках эволюции Antigravity Solo Loop v10 проведено исследование и аудит сторонних решений на соответствие принципам YAGNI, TDD и минимизации абстракций.
 
 ---
 
 ## 🎯 2. Scope (Границы проекта)
-* **Анализ стека**:
-  - **Framer Motion**: Для интерактивных Hover-масок и простых переходов.
-  - **GSAP (GreenSock)**: Для сложных таймлайнов, привязанных к скроллу.
-  - **React Three Fiber (R3F) / Three.js**: Для внедрения 3D моделей (например, космонавтов).
-  - **Tailwind CSS**: Для быстрой и лаконичной стилизации.
-* **Интеграция**:
-  - Модифицировать метод `create_skill` в [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py). При детекции ключевых слов UI, анимаций или фронтенда, автоматически генерировать специализированный шаблон JIT-навыка с предписанным стеком и правилами дизайна.
-* **Тестирование**:
-  - Написать TDD автотесты [test_ui_stack.py](file:///Users/rus/ai-tools/tools/tests/test_ui_stack.py) для верификации условной генерации шаблонов.
 
----
+### Решение 1. Интеграция Context7 (Принято)
+* **Статус**: Интегрировано.
+* **Описание**: Установлен и настроен инструмент [context7.com](https://context7.com/) с помощью `npx ctx7 setup --antigravity --yes`. Он предоставляет актуальную документацию по библиотекам через MCP-сервер (инструменты `resolve-library-id`, `query-docs`).
 
-## 📊 3. Prioritization (MoSCoW)
-* **Must Have**:
-  - Детекция UI-тегов при создании навыка.
-  - TDD автотесты.
-  - Прохождение общего тест-пакета `tools/tests/` (100% green).
+### Решение 2. Claude Code Router (Отклонено / Rejected)
+* **Статус**: Отклонен (Rejected).
+* **Обоснование (YAGNI)**: Наш локальный Python-агент `agy` работает напрямую через SDK и не требует развертывания Node.js HTTP-прокси для перенаправления запросов.
+
+### Решение 3. Spec Kit (Отклонено / Rejected)
+* **Статус**: Отклонен (Rejected).
+* **Обоснование (YAGNI)**: Внедрение CLI `specify-cli` дублирует существующий легковесный функционал планирования `PlanningWithFiles` на базе Markdown-плана.
+
+### Решение 4. Claude Taskmaster (Отклонено / Rejected)
+* **Статус**: Отклонен (Rejected).
+* **Обоснование (YAGNI)**: Управление планами задач и шагами полностью закрывается простым инструментом `PlanningWithFiles` в Python, база данных задач и зависимости излишни.
+
+### Решение 5. Интеграция UI Stack (Принято)
+* **Статус**: Интегрировано.
+* **Описание**: Улучшен генератор навыков [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py). При создании UI-навыков генерируется папка `components/` и `styles/` вместо `scripts/`, а шаблон `SKILL.md` дополняется рекомендациями по стеку: **Framer Motion, GSAP, Tailwind CSS, Three.js**.
 
 ---
 
 ## ✅ 4. Definition of Done (DoD)
-- [x] Анализ видео и стека выполнен.
-- [x] Метод `create_skill` в `agent_skills.py` обновлен.
-- [x] TDD автотесты [test_ui_stack.py](file:///Users/rus/ai-tools/tools/tests/test_ui_stack.py) написаны.
-- [x] Все тесты `tools/tests/` зеленые (94/94 passed).
+- [x] Все YAGNI-решения зафиксированы и обоснованы.
+- [x] Оптимизирован pre-commit хук для staged-файлов.
+- [x] Написаны TDD автотесты для всех принятых решений.
+- [ ] Все тесты `tools/tests/` зеленые (94/94 passed).
 - [ ] Запущен `self_improve.py` и `collect_handoffs.py`.
-- [ ] Изменения закоммичены в git с соблюдением Conventional Commits.
-
----
-
-## 📅 5. Пошаговый план (5-Line Plan)
-1. **OSINT-анализ**: Изучить метаданные видео о «безумных» сайтах и вычленить стек.
-2. **Адаптация кода**: Реализовать генерацию UI-шаблонов в `tools/agent_skills.py`.
-3. **TDD тесты**: Написать [test_ui_stack.py](file:///Users/rus/ai-tools/tools/tests/test_ui_stack.py).
-4. **Синхронизация**: Применить план в `implementation_plan.md`.
-5. **Фиксация результатов**: Запустить тесты, `self_improve.py`, `collect_handoffs.py` и сделать коммит.

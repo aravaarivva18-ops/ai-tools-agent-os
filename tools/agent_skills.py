@@ -100,7 +100,12 @@ description: {description.strip()}
         skill_md_path.write_text(template_content, encoding="utf-8")
 
         # Create scripts, examples and tests placeholders
-        (skill_folder / "scripts").mkdir(exist_ok=True)
+        if is_ui:
+            (skill_folder / "components").mkdir(exist_ok=True)
+            (skill_folder / "styles").mkdir(exist_ok=True)
+        else:
+            (skill_folder / "scripts").mkdir(exist_ok=True)
+
         (skill_folder / "examples").mkdir(exist_ok=True)
         (skill_folder / "tests").mkdir(exist_ok=True)
 
