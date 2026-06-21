@@ -1,0 +1,51 @@
+{
+  "video_file": "/Users/rus/ai-tools/youtube-faceless-pipeline/output/final_video.mp4",
+  "thumbnail_file": "/Users/rus/ai-tools/youtube-faceless-pipeline/output/thumbnail.jpg",
+  "title": "Autonomous AI Agents: Productivity (autonomous ai agents ...",
+  "description": "🔥 Autonomous AI Agents: Productivity (autonomous ai agents ... — This is how Autonomous AI Agents will change everything in 2026!\nDiscover the latest artificial intelligence trends and workflows.\n\n📌 TIMESTAMPS:\n0:00 - Introduction\n0:15 - Key Trends of 2026\n0:45 - Wrap up & Subscribe\n\n📱 FOLLOW US ON SOCIALS:\nInstagram: @AIFacelessShorts\nTikTok: @AIFacelessStudio\n\n#AI #ArtificialIntelligence #Technology #Shorts #Productivity #TechTrends",
+  "tags": [
+    "tech 2026",
+    "ai",
+    "tech",
+    "trends",
+    "ai agents",
+    "faceless",
+    "autonomous agents",
+    "ai shorts",
+    "productivity (Autonomous AI Agents 2026)",
+    "productivity tips",
+    "ai workflows"
+  ],
+  "privacy_status": "public",
+  "made_for_kids": false,
+  "license": "youtube",
+  "category": "Science & Technology",
+  "adsense_checklist": [
+    {
+      "id": "c1",
+      "task": "Отсутствие защищенной копирайтом фоновой музыки (использовать безлицензионную).",
+      "status": "passed"
+    },
+    {
+      "id": "c2",
+      "task": "Отсутствие кликбейта, вводящего зрителя в заблуждение (заголовок совпадает с контентом).",
+      "status": "passed"
+    },
+    {
+      "id": "c3",
+      "task": "Оригинальный визуальный ряд (уникальные AI-генерации картинок с текстом).",
+      "status": "passed"
+    },
+    {
+      "id": "c4",
+      "task": "Отсутствие нецензурной лексики и деликатных тем в первые 30 секунд видео.",
+      "status": "passed"
+    },
+    {
+      "id": "c5",
+      "task": "Естественный темп и интонация озвучки TTS (Samantha/Premium голос).",
+      "status": "passed"
+    }
+  ],
+  "prepared_at": "2026-06-21T18:04:39Z"
+}

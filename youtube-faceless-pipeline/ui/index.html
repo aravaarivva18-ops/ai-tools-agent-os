@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI YouTube Faceless Studio Premium</title>
+    <!-- Подключаем шрифты Outfit (для заголовков) и Inter (для интерфейса) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome для иконок в стиле Target Media -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* Дизайн-токены Yandex DataLens BI & Emil Kowalski Physics */
+            --bg-color: #0b0f17;
+            --panel-bg: rgba(20, 25, 35, 0.7);
+            --panel-bg-hover: rgba(28, 35, 49, 0.85);
+            --border-color: rgba(255, 255, 255, 0.05);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            --accent-purple: #3890ff;
+            --accent-purple-glow: rgba(56, 144, 255, 0.25);
+            --accent-cyan: #00f2fe;
+            --accent-cyan-glow: rgba(0, 242, 254, 0.25);
+            --accent-pink: #4f46e5;
+            --text-main: #f1f5f9;
+            --text-muted: #8a94a6;
+            --text-dark: #4b5563;
+            --success: #24a148;
+            --success-glow: rgba(36, 161, 72, 0.1);
+            --danger: #da3637;
+            --card-radius: 12px; /* Более строгие углы BI-панелей */
+            
+            /* Пресеты пружин Эмиля Ковальски */
+            --spring-snappy: linear(0.1075, 0.2422, 0.3721, 0.4864, 0.5828, 0.6624, 0.7273, 0.78, 0.8226, 0.857, 0.8848, 0.9072, 0.9252, 0.9398, 0.9515, 0.9609, 0.9685, 0.9746, 0.9796, 0.9835, 0.9867, 0.9893, 0.9914, 0.9931, 0.9944, 0.9955, 0.9964, 0.9971, 0.9976, 0.9981, 0.9985, 0.9988, 0.999, 0.9992, 0.9994, 0.9995, 0.9996, 0.9997, 0.9997, 0.9998, 0.9998, 0.9999, 0.9999, 0.9999, 0.9999, 0.9999, 1.0);
+            --spring-pop: linear(0.096, 0.25, 0.4298, 0.6104, 0.7742, 0.9105, 1.0146, 1.086, 1.1277, 1.1447, 1.1427, 1.1276, 1.1047, 1.0787, 1.0529, 1.0298, 1.0108, 0.9964, 0.9867, 0.9812, 0.9791, 0.9797, 0.982, 0.9854, 0.9892, 0.9928, 0.9961, 0.9987, 1.0007, 1.002, 1.0028, 1.003, 1.0029, 1.0025, 1.002, 1.0015, 1.001, 1.0005, 1.0001, 0.9999, 0.9997, 0.9996, 0.9996, 0.9996, 0.9996, 0.9997, 0.9998, 0.9999, 0.9999, 1.0);
+            --spring-smooth: linear(0.0307, 0.0814, 0.1441, 0.213, 0.284, 0.3543, 0.4219, 0.4857, 0.5449, 0.5991, 0.6482, 0.6925, 0.732, 0.7671, 0.7982, 0.8255, 0.8494, 0.8703, 0.8885, 0.9043, 0.918, 0.9298, 0.94, 0.9488, 0.9563, 0.9628, 0.9683, 0.9731, 0.9771, 0.9806, 0.9835, 0.986, 0.9882, 0.99, 0.9915, 0.9928, 0.994, 0.9949, 0.9957, 0.9964, 0.9969, 0.9974, 0.9978, 0.9982, 0.9985, 0.9987, 0.9989, 0.9991, 0.9992, 0.9994, 0.9995, 0.9995, 0.9996, 0.9997, 0.9997, 0.9998, 0.9998, 0.9998, 0.9999, 0.9999, 0.9999, 0.9999, 0.9999, 0.9999, 1.0);
+            
+            --transition-smooth: 0.35s var(--spring-smooth);
+            --transition-pop: 0.2s var(--spring-pop);
+            --transition-snappy: 0.2s var(--spring-snappy);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+            position: relative;
+        }
+
+        /* Тонкий красивый скроллбар BI */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f283a;
+            border-radius: 4px;
+            transition: background 0.2s var(--spring-smooth);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #313f5c;
+        }
+
+        /* Заголовок */
+        header {
+            width: 100%;
+            max-width: 1300px;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: -0.03em;
+        }
+
+        .logo span {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 0.25rem 0.6rem;
+            border: 1px solid rgba(56, 144, 255, 0.3);
+            background: rgba(56, 144, 255, 0.05);
+            border-radius: 6px;
+            color: var(--accent-purple);
+            -webkit-text-fill-color: var(--accent-purple);
+        }
+
+        /* Навигация / Вкладки с пружинной физикой */
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.5rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: transform 0.2s var(--spring-pop), background-color 0.2s var(--spring-smooth), color 0.2s var(--spring-smooth);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            will-change: transform;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .tab-btn:active {
+            transform: scale(0.93);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-purple);
+            color: white;
+            box-shadow: 0 4px 12px var(--accent-purple-glow);
+        }
+
+        /* Главный контейнер */
+        main {
+            width: 100%;
+            max-width: 1300px;
+            padding: 2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            z-index: 1;
+        }
+
+        .tab-content {
+            display: none;
+            will-change: opacity, transform;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: slideUp 0.4s var(--spring-smooth) forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Премиальная панель с глассморфизмом (BI-style) */
+        .glass-card {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s var(--spring-smooth), background-color 0.3s var(--spring-smooth), box-shadow 0.3s var(--spring-smooth);
+        }
+
+        .glass-card:hover {
+            border-color: var(--border-hover);
+            background-color: var(--panel-bg-hover);
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+        }
+
+        /* Секция ввода */
+        .generator-form {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .form-header {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .form-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .input-box-wrapper {
+            display: flex;
+            gap: 1.25rem;
+            width: 100%;
+        }
+
+        .input-glow-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: rgba(10, 15, 22, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.4rem;
+            color: var(--text-main);
+            font-size: 1.05rem;
+            font-family: inherit;
+            font-weight: 400;
+            transition: border-color 0.2s var(--spring-smooth), box-shadow 0.2s var(--spring-smooth);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            background: rgba(10, 15, 22, 0.8);
+            box-shadow: 0 0 12px rgba(56, 144, 255, 0.2), 
+                        inset 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        /* Премиум кнопка генерации с пружиной */
+        .btn-generate {
+            background: var(--accent-purple);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: transform 0.2s var(--spring-pop), background-color 0.2s var(--spring-smooth), box-shadow 0.2s var(--spring-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 12px var(--accent-purple-glow);
+            will-change: transform;
+        }
+
+        .btn-generate:hover {
+            background: #1e70e0;
+            box-shadow: 0 8px 20px rgba(56, 144, 255, 0.4);
+        }
+
+        .btn-generate:active {
+            transform: scale(0.95);
+        }
+
+        .btn-generate:disabled {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-dark);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Suggestions */
+        .suggestions-list {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .suggestion-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: transform 0.2s var(--spring-pop), border-color 0.2s var(--spring-smooth), color 0.2s var(--spring-smooth), background-color 0.2s var(--spring-smooth);
+            will-change: transform;
+        }
+
+        .suggestion-card:hover {
+            background: rgba(56, 144, 255, 0.05);
+            border-color: var(--accent-purple);
+            color: var(--text-main);
+            transform: scale(1.02);
+        }
+        }
+
+        /* --- ЛОАДЕР --- */
+        .loader-panel {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+            padding: 4rem 2rem;
+        }
+
+        .pulse-loader {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top-color: var(--accent-purple);
+            border-bottom-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        }
+
+        .loader-circle-inner {
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            border: 3px solid transparent;
+            border-left-color: var(--accent-pink);
+            border-right-color: var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .steps-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.4rem;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-smooth);
+        }
+
+        .step-row.active {
+            border-color: var(--accent-purple);
+            background: rgba(56, 144, 255, 0.03);
+            box-shadow: 0 0 12px rgba(56, 144, 255, 0.1);
+        }
+
+        .step-row.completed {
+            border-color: var(--success);
+            background: rgba(36, 161, 72, 0.02);
+        }
+
+        .step-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            transition: var(--transition-smooth);
+        }
+
+        .step-row.active .step-num {
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+        }
+
+        .step-row.completed .step-num {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            transition: var(--transition-smooth);
+        }
+
+        .step-row.active .step-title {
+            color: var(--text-main);
+        }
+
+        .step-row.completed .step-title {
+            color: var(--success);
+        }
+
+        .step-status {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dark);
+        }
+
+        .step-row.active .step-status {
+            color: var(--accent-cyan);
+            animation: pulseText 1.5s infinite;
+        }
+
+        .step-row.completed .step-status {
+            color: var(--success);
+        }
+
+        @keyframes pulseText {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        /* --- СЕТКА РЕЗУЛЬТАТОВ --- */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            will-change: opacity, transform;
+            animation: slideUp 0.5s var(--spring-smooth) forwards;
+        }
+
+        @media (min-width: 1024px) {
+            .workspace-grid {
+                grid-template-columns: 400px 1fr;
+            }
+        }
+
+        /* Левая панель: Медиаплеер */
+        .media-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .preview-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: border-color 0.3s var(--spring-smooth), background-color 0.3s var(--spring-smooth);
+        }
+
+        .preview-card:hover {
+            border-color: var(--border-hover);
+            background-color: var(--panel-bg-hover);
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 9/16;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-wrapper {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .thumbnail-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s var(--spring-smooth);
+        }
+
+        .thumbnail-wrapper img:hover {
+            transform: scale(1.03);
+        }
+
+        /* Правая панель: Детали & SEO */
+        .info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .seo-item {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            position: relative;
+            transition: border-color 0.3s var(--spring-smooth), background-color 0.3s var(--spring-smooth);
+        }
+
+        .seo-item:hover {
+            border-color: var(--border-hover);
+            background-color: var(--panel-bg-hover);
+        }
+
+        .seo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .seo-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+        }
+
+        .seo-content-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-main);
+            white-space: pre-wrap;
+        }
+
+        .btn-action-copy {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s var(--spring-pop), background-color 0.2s var(--spring-smooth), color 0.2s var(--spring-smooth);
+            will-change: transform;
+        }
+
+        .btn-action-copy:hover {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            color: white;
+            box-shadow: 0 4px 12px var(--accent-purple-glow);
+        }
+
+        .btn-action-copy:active {
+            transform: scale(0.95);
+        }
+
+        .badge-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+
+        .badge-tag-item {
+            background: rgba(56, 144, 255, 0.05);
+            border: 1px solid rgba(56, 144, 255, 0.15);
+            color: var(--accent-purple);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Загрузка на YouTube */
+        .upload-section {
+            border: 1px solid rgba(56, 144, 255, 0.2);
+            box-shadow: 0 6px 20px rgba(56, 144, 255, 0.05);
+        }
+
+        .upload-info {
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .upload-info code {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            font-family: monospace;
+        }
+
+        .btn-publish {
+            width: 100%;
+            background: #0891b2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s var(--spring-pop), background-color 0.2s var(--spring-smooth), box-shadow 0.2s var(--spring-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px var(--accent-cyan-glow);
+            will-change: transform;
+        }
+
+        .btn-publish:hover {
+            background: #00f2fe;
+            color: #0b0f17;
+            box-shadow: 0 8px 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .btn-publish:active {
+            transform: scale(0.97);
+        }
+
+        /* --- ВКЛАДКА МОНЕТИЗАЦИИ --- */
+        .monetization-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .monetization-intro {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .monetization-intro h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .monetization-intro p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .checklist-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.25rem;
+            border-radius: var(--card-radius);
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s var(--spring-pop), border-color 0.2s var(--spring-smooth), background-color 0.2s var(--spring-smooth);
+            will-change: transform;
+        }
+
+        .checklist-card:hover {
+            border-color: rgba(36, 161, 72, 0.2);
+            background: rgba(36, 161, 72, 0.02);
+            transform: translateX(4px);
+        }
+
+        .checklist-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(36, 161, 72, 0.15);
+            border: 1px solid var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--success);
+            font-weight: 800;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .checklist-info h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--text-main);
+        }
+
+        .checklist-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* --- ВКЛАДКА АНАЛИТИКИ --- */
+        .analytics-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .stat-premium-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: transform 0.2s var(--spring-pop), border-color 0.2s var(--spring-smooth), background-color 0.2s var(--spring-smooth);
+            will-change: transform;
+        }
+
+        .stat-premium-card:hover {
+            background: var(--panel-bg-hover);
+            border-color: var(--accent-purple);
+            box-shadow: 0 8px 20px rgba(56, 144, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .stat-premium-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-premium-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .stat-premium-diff {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .chart-box-premium {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .chart-head-premium {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-head-premium h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        /* Сообщения об ошибках */
+        .error-message {
+            display: none;
+            background: rgba(218, 54, 55, 0.08);
+            border: 1px solid rgba(218, 54, 55, 0.25);
+            color: var(--danger);
+            padding: 1rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            animation: slideUp 0.3s var(--spring-smooth) forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Задний анимированный фон с неоновым свечением (Neon Backdrops) -->
+    <div style="position: fixed; top: -10%; left: -10%; width: 50vw; height: 50vh; background: radial-gradient(circle, rgba(56,144,255,0.05) 0%, transparent 70%); filter: blur(80px); pointer-events: none; z-index: 0;"></div>
+    <div style="position: fixed; bottom: -10%; right: -10%; width: 50vw; height: 50vh; background: radial-gradient(circle, rgba(79,70,229,0.05) 0%, transparent 70%); filter: blur(80px); pointer-events: none; z-index: 0;"></div>
+
+    <header>
+        <div class="logo">AI Studio <span>Faceless Studio Premium</span></div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('generator')">Студия</button>
+            <button class="tab-btn" onclick="switchTab('monetization')">Монетизация</button>
+            <button class="tab-btn" onclick="switchTab('analytics')" id="tab-analytics-btn">Аналитика</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ОШИБКИ -->
+        <div class="error-message" id="error-box"></div>
+
+        <!-- 1. ВКЛАДКА: СТУДИЯ -->
+        <div class="tab-content active" id="content-generator">
+            <section class="glass-card" id="config-panel">
+                <div class="generator-form">
+                    <div class="form-header">
+                        <h2>Создать Новое Видео</h2>
+                        <p>Введите тему или выберите одну из актуальных концепций 2026 года для генерации видеоролика, обложки и SEO метаданных.</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="niche-input">Ниша / Тема контента</label>
+                        <div class="input-box-wrapper">
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="niche-input" placeholder="Например: tech/AI/productivity" value="tech/AI/productivity (Autonomous AI Agents 2026)">
+                            </div>
+                            <button class="btn-generate" id="btn-submit">
+                                Запустить генерацию
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="suggestions-list">
+                        <div class="suggestion-card" onclick="selectSuggestion('tech/AI/productivity (Autonomous AI Agents 2026)')">Autonomous AI Agents 2026</div>
+                        <div class="suggestion-card" onclick="selectSuggestion('tech/AI/compliance (EU AI Act 2026)')">EU AI Act compliance 2026</div>
+                        <div class="suggestion-card" onclick="selectSuggestion('security/AI/cybersecurity (AutoJack Agent RCE)')">AutoJack Agent RCE Vulnerability</div>
+                        <div class="suggestion-card" onclick="selectSuggestion('tech/computex2026/chipstack (Level-5 CAD Engineer)')">computex 2026: Level-5 chip engineer</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ЛОАДЕР -->
+            <section class="glass-card loader-panel" id="loader-panel">
+                <div class="pulse-loader">
+                    <div class="loader-circle"></div>
+                    <div class="loader-circle-inner"></div>
+                </div>
+                <div class="steps-wrapper">
+                    <div class="step-row" id="step-1">
+                        <div class="step-left">
+                            <div class="step-num">1</div>
+                            <div class="step-title">Исследование трендов (last30days)</div>
+                        </div>
+                        <div class="step-status">Ожидание</div>
+                    </div>
+                    <div class="step-row" id="step-2">
+                        <div class="step-left">
+                            <div class="step-num">2</div>
+                            <div class="step-title">Проверка на уникальность (Duplicate check)</div>
+                        </div>
+                        <div class="step-status">Ожидание</div>
+                    </div>
+                    <div class="step-row" id="step-3">
+                        <div class="step-left">
+                            <div class="step-num">3</div>
+                            <div class="step-title">Оптимизация SEO метаданных & Thumbnail</div>
+                        </div>
+                        <div class="step-status">Ожидание</div>
+                    </div>
+                    <div class="step-row" id="step-4">
+                        <div class="step-left">
+                            <div class="step-num">4</div>
+                            <div class="step-title">Сшивка аудио и видеорядов через FFmpeg</div>
+                        </div>
+                        <div class="step-status">Ожидание</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- РЕЗУЛЬТАТЫ СТУДИИ -->
+            <div class="workspace-grid" id="results-panel" style="display: none;">
+                <!-- Левая колонка (Плеер + Превью Thumbnail) -->
+                <div class="media-panel">
+                    <div class="preview-card">
+                        <div class="preview-header">
+                            <div class="seo-label">Готовый Shorts (9:16)</div>
+                            <div class="preview-badge">1080p • MP4</div>
+                        </div>
+                        <div class="video-wrapper">
+                            <video id="output-video" controls loop>
+                                <source src="" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+
+                    <div class="preview-card">
+                        <div class="preview-header">
+                            <div class="seo-label">Превью обложки (High CTR)</div>
+                            <div class="preview-badge">JPEG • 16:9</div>
+                        </div>
+                        <div class="thumbnail-wrapper">
+                            <img src="" id="output-thumbnail" alt="Thumbnail Preview">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Правая колонка (SEO, Загрузка, Чеклист) -->
+                <div class="info-panel">
+                    <div class="seo-item">
+                        <button class="btn-action-copy" onclick="copyText('meta-title-text')">Копировать</button>
+                        <div class="seo-label">Оптимизированный заголовок</div>
+                        <div style="margin-top: 1rem;" class="seo-content-box" id="meta-title-text"></div>
+                    </div>
+
+                    <div class="seo-item">
+                        <button class="btn-action-copy" onclick="copyText('meta-desc-text')">Копировать</button>
+                        <div class="seo-label">Описание и таймкоды</div>
+                        <div style="margin-top: 1rem;" class="seo-content-box" id="meta-desc-text"></div>
+                    </div>
+
+                    <div class="seo-item">
+                        <div class="seo-label">Ключевые теги (SEO)</div>
+                        <div class="badge-tags" id="meta-tags-container" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="seo-item upload-section">
+                        <div class="seo-label">Публикация на YouTube</div>
+                        <p class="upload-info" style="margin-top: 0.75rem;">
+                            Сформирован готовый JSON-пакет загрузки на сервере по пути:<br>
+                            <code id="package-path-text"></code>
+                        </p>
+                        <button class="btn-publish" id="btn-upload">
+                            Опубликовать видеоролик
+                        </button>
+                    </div>
+                    
+                    <button class="btn-generate" style="margin-top: 1rem;" onclick="resetForm()">
+                        Создать еще одно видео
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ВКЛАДКА: МОНЕТИЗАЦИЯ -->
+        <div class="tab-content" id="content-monetization">
+            <section class="glass-card monetization-card">
+                <div class="monetization-intro">
+                    <h3>Чеклист прохождения AdSense</h3>
+                    <p>Наш алгоритм автоматически проверяет сгенерированный контент по пяти критериям ручной модерации YouTube.</p>
+                </div>
+                <div class="checklist-grid" id="adsense-checklist-container">
+                    <!-- Будет заполнено при генерации -->
+                </div>
+            </section>
+        </div>
+
+        <!-- 3. ВКЛАДКА: АНАЛИТИКА -->
+        <div class="tab-content" id="content-analytics">
+            <section class="glass-card analytics-dashboard">
+                <div class="form-header">
+                    <h2>Панель Аналитики (Analytics Dashboard)</h2>
+                    <p>Статистика по просмотрам, CTR удержанию и расчетному доходу от AdSense монетизации.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-premium-card">
+                        <div class="stat-premium-label">Просмотры</div>
+                        <div class="stat-premium-val" id="stat-views">-</div>
+                        <div class="stat-premium-diff">▲ +12% за 24ч</div>
+                    </div>
+                    <div class="stat-premium-card">
+                        <div class="stat-premium-label">Показ / Клик (CTR)</div>
+                        <div class="stat-premium-val" id="stat-ctr">-</div>
+                        <div class="stat-premium-diff">▲ Выше среднего</div>
+                    </div>
+                    <div class="stat-premium-card">
+                        <div class="stat-premium-label">Ср. удержание</div>
+                        <div class="stat-premium-val" id="stat-retention">-</div>
+                        <div class="stat-premium-diff">▲ Отличный показатель</div>
+                    </div>
+                    <div class="stat-premium-card">
+                        <div class="stat-premium-label">Доход AdSense</div>
+                        <div class="stat-premium-val" id="stat-revenue">-</div>
+                        <div class="stat-premium-diff">▲ +$3.20 сегодня</div>
+                    </div>
+                </div>
+
+                <div class="chart-box-premium">
+                    <div class="chart-head-premium">
+                        <h3>Динамика просмотров (Views/Hour)</h3>
+                    </div>
+                    <svg class="chart-svg" viewBox="0 0 800 250">
+                        <defs>
+                            <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="var(--accent-cyan)" />
+                                <stop offset="100%" stop-color="var(--accent-purple)" />
+                            </linearGradient>
+                            <linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="var(--accent-cyan)" stop-opacity="0.45" />
+                                <stop offset="100%" stop-color="var(--accent-purple)" stop-opacity="0.0" />
+                            </linearGradient>
+                        </defs>
+                        
+                        <path class="chart-area" d="M 50 200 C 150 210, 250 180, 350 140 C 450 90, 550 40, 750 20 L 750 220 L 50 220 Z" />
+                        <path class="chart-line" d="M 50 200 C 150 210, 250 180, 350 140 C 450 90, 550 40, 750 20" />
+                        
+                        <circle cx="50" cy="200" r="6" fill="var(--accent-cyan)" />
+                        <circle cx="170" cy="210" r="6" fill="var(--accent-cyan)" />
+                        <circle cx="290" cy="180" r="6" fill="var(--accent-cyan)" />
+                        <circle cx="410" cy="140" r="6" fill="var(--accent-purple)" />
+                        <circle cx="530" cy="90" r="6" fill="var(--accent-purple)" />
+                        <circle cx="750" cy="20" r="6" fill="var(--accent-purple)" />
+                        
+                        <text x="50" y="240" fill="var(--text-muted)" text-anchor="middle" font-size="12">00:00</text>
+                        <text x="170" y="240" fill="var(--text-muted)" text-anchor="middle" font-size="12">04:00</text>
+                        <text x="290" y="240" fill="var(--text-muted)" text-anchor="middle" font-size="12">08:00</text>
+                        <text x="410" y="240" fill="var(--text-muted)" text-anchor="middle" font-size="12">12:00</text>
+                        <text x="530" y="240" fill="var(--text-muted)" text-anchor="middle" font-size="12">16:00</text>
+                        <text x="750" y="240" fill="var(--text-muted)" text-anchor="middle" font-size="12">20:00</text>
+                    </svg>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        let currentPackagePath = "";
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.add('active');
+                }
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`content-${tabId}`).classList.add('active');
+            
+            if (tabId === 'analytics') {
+                loadAnalytics();
+            }
+        }
+
+        function selectSuggestion(val) {
+            document.getElementById('niche-input').value = val;
+        }
+
+        function showStep(stepNum) {
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`step-${i}`);
+                if (i < stepNum) {
+                    el.className = 'step-row completed';
+                    el.querySelector('.step-status').innerText = 'Пройдено';
+                    el.querySelector('.step-num').innerText = '✓';
+                } else if (i === stepNum) {
+                    el.className = 'step-row active';
+                    el.querySelector('.step-status').innerText = 'В процессе';
+                    el.querySelector('.step-num').innerText = i;
+                } else {
+                    el.className = 'step-row';
+                    el.querySelector('.step-status').innerText = 'Ожидание';
+                    el.querySelector('.step-num').innerText = i;
+                }
+            }
+        }
+
+        function copyText(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Скопировано в буфер обмена!');
+            });
+        }
+
+        async function loadAnalytics() {
+            try {
+                const res = await fetch('/api/analytics');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('stat-views').innerText = data.summary.total_views.toLocaleString();
+                    document.getElementById('stat-ctr').innerText = data.summary.average_ctr;
+                    document.getElementById('stat-retention').innerText = data.summary.average_retention;
+                    document.getElementById('stat-revenue').innerText = `$${data.summary.estimated_revenue_usd.toFixed(2)}`;
+                }
+            } catch (err) {
+                console.error("Failed to load analytics", err);
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('results-panel').style.display = 'none';
+            document.getElementById('config-panel').style.display = 'block';
+            document.getElementById('error-box').style.display = 'none';
+            document.getElementById('niche-input').disabled = false;
+            document.getElementById('btn-submit').disabled = false;
+        }
+
+        document.getElementById('btn-submit').addEventListener('click', async () => {
+            const niche = document.getElementById('niche-input').value.trim();
+            const errorBox = document.getElementById('error-box');
+            const submitBtn = document.getElementById('btn-submit');
+            
+            if (!niche) {
+                errorBox.innerText = 'Пожалуйста, укажите нишу/тему видео.';
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            errorBox.style.display = 'none';
+            submitBtn.disabled = true;
+            document.getElementById('config-panel').style.display = 'none';
+            document.getElementById('loader-panel').style.display = 'flex';
+
+            showStep(1);
+            
+            try {
+                const valRes = await fetch('/api/validate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ niche })
+                });
+                
+                if (!valRes.ok) {
+                    const errData = await valRes.json();
+                    throw new Error(errData.detail || 'Нарушение политики YouTube.');
+                }
+
+                setTimeout(() => showStep(2), 2500);
+                setTimeout(() => showStep(3), 5000);
+                setTimeout(() => showStep(4), 8500);
+
+                const genRes = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ niche })
+                });
+
+                if (!genRes.ok) {
+                    const errData = await genRes.json();
+                    throw new Error(errData.detail || 'Не удалось сгенерировать видео.');
+                }
+
+                const data = await genRes.json();
+
+                document.getElementById('loader-panel').style.display = 'none';
+                
+                const videoEl = document.getElementById('output-video');
+                videoEl.src = data.video_url;
+                videoEl.load();
+                
+                document.getElementById('output-thumbnail').src = data.thumbnail_url;
+
+                document.getElementById('meta-title-text').innerText = data.metadata.title;
+                document.getElementById('meta-desc-text').innerText = data.metadata.description;
+                
+                const tagsContainer = document.getElementById('meta-tags-container');
+                tagsContainer.innerHTML = '';
+                data.metadata.tags.forEach(tag => {
+                    const span = document.createElement('span');
+                    span.className = 'badge-tag-item';
+                    span.innerText = `#${tag}`;
+                    tagsContainer.appendChild(span);
+                });
+
+                currentPackagePath = data.metadata.upload_package_path;
+                document.getElementById('package-path-text').innerText = currentPackagePath;
+
+                const chkContainer = document.getElementById('adsense-checklist-container');
+                chkContainer.innerHTML = '';
+                data.metadata.adsense_checklist.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'checklist-card';
+                    card.innerHTML = `
+                        <div class="checklist-badge">✓</div>
+                        <div class="checklist-info">
+                            <h4>Пройдено</h4>
+                            <p>${item.task}</p>
+                        </div>
+                    `;
+                    chkContainer.appendChild(card);
+                });
+
+                document.getElementById('results-panel').style.display = 'grid';
+
+            } catch (err) {
+                document.getElementById('loader-panel').style.display = 'none';
+                document.getElementById('config-panel').style.display = 'block';
+                submitBtn.disabled = false;
+                errorBox.innerText = `Ошибка: ${err.message}`;
+                errorBox.style.display = 'block';
+            }
+        });
+
+        document.getElementById('btn-upload').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-upload');
+            btn.disabled = true;
+            btn.innerText = "Идет загрузка пакета...";
+            
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ package_path: currentPackagePath })
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    alert(data.instructions + `\n\nСсылка на видео: ${data.youtube_url}`);
+                } else {
+                    const err = await res.json();
+                    alert(`Не удалось опубликовать: ${err.detail}`);
+                }
+            } catch (err) {
+                alert(`Ошибка соединения: ${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Опубликовать видеоролик";
+            }
+        });
+    </script>
+</body>
+</html>
