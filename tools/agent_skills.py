@@ -72,6 +72,12 @@ class AgentSkillsManager:
             for keyword in ["seo", "geo", "traffic", "keywords", "crawler"]
         )
 
+        # Check if the skill is MCP-themed
+        is_mcp = any(
+            keyword in normalized_name or keyword in description.lower()
+            for keyword in ["mcp", "protocol", "model-context"]
+        )
+
         # Check if the skill is UI-themed (for animations, hover, scroll, frontend)
         is_ui = any(
             keyword in normalized_name or keyword in description.lower()
@@ -91,6 +97,13 @@ class AgentSkillsManager:
 - **AI Crawler Strategy**: Robots.txt and AI crawlers customization (allow/disallow rules for agents)"""
             design_principles = """- EEAT Signals: Build author biography, credentials, and reference citations.
 - GEO Optimization: Citations structure, structured JSON-LD data, and clear FAQ patterns to rank in AI Search Engines (Perplexity, Gemini)."""
+        elif is_mcp:
+            tech_stack = """- **Core Technology**: Anthropic MCP SDK (Python)
+- **Communication Protocol**: JSON-RPC over Standard I/O (stdin/stdout)
+- **Minimalist Stack**: SQLite for local persistence (levelsio YAGNI)"""
+            design_principles = """- Model Context Protocol: Follow official Anthropic SDK guidelines for tool declaration and schema-driven input validation.
+- Karpathy Vibe Coding: Write clean, straightforward Python handlers with max 2 levels of abstraction. Keep logic flat and readable.
+- levelsio YAGNI: Reject unnecessary frameworks; use fast stdio/json communication."""
         elif is_ui:
             tech_stack = """- **Core Technology**: React / Next.js, Tailwind CSS
 - **Animations**: Framer Motion (for hover masks & simple transitions), GSAP (for scroll-tied timelines)
@@ -100,8 +113,8 @@ class AgentSkillsManager:
 - Reject static placeholders; design visual layouts using generate_image first."""
         else:
             tech_stack = """- **Core Technology**: Python 3.12+ / sqlite3 / FastAPI"""
-            design_principles = """- Always follow clean, simple Python structures.
-- Max 2 levels of abstraction.
+            design_principles = """- Karpathy Vibe Coding: Always follow clean, simple Python structures. Max 2 levels of abstraction.
+- levelsio YAGNI: Restrict architecture to minimalist data schemes. Reject premature abstractions and keep logic flat.
 - Validate output structure using Pydantic models."""
 
         # Standardized JIT SKILL template

@@ -43,11 +43,15 @@
 * **Статус**: Интегрировано.
 * **Описание**: Добавлен сбор и анализ метрик эффективности делегирования в [self_improve.py](file:///Users/rus/ai-tools/tools/self_improve.py). Теперь инструмент сканирует каталог `skills/`, классифицирует все сгенерированные JIT-навыки (Scale/Productivity, SEO/GEO, UI Stack, Generic) и рассчитывает общее время выкупа (Buyback Time) в часах, формируя соответствующий раздел в еженедельном отчете `self_improvement_report.md`.
 
+### Решение 9. Интеграция паттернов MCP, Karpathy Vibe Coding и levelsio YAGNI (Принято)
+* **Статус**: Интегрировано.
+* **Описание**: Улучшен генератор навыков [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py). Добавлен триггер `is_mcp` для генерации шаблонов под разработку MCP-серверов с официальным SDK Anthropic (JSON-RPC over stdio). В общие принципы проектирования по умолчанию интегрированы стандарты **Karpathy Vibe Coding** (линейный код, макс 2 уровня абстракции) и **levelsio YAGNI** (минималистичный стек, SQLite, отказ от усложненных фреймворков).
+
 ---
 
 ## ✅ 4. Definition of Done (DoD)
 - [x] Все YAGNI-решения зафиксированы и обоснованы.
 - [x] Оптимизирован pre-commit хук для staged-файлов.
 - [x] Написаны TDD автотесты для всех принятых решений.
-- [x] Все тесты `tools/tests/` зеленые (98/98 passed).
+- [x] Все тесты `tools/tests/` зеленые (100/100 passed).
 - [x] Запущен `self_improve.py` и `collect_handoffs.py`.
