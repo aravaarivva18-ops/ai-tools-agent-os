@@ -40,10 +40,10 @@ Every meaningful change requires a DOX pass before the task is done. Update the 
 Основные стандарты:
 - **Solo Loop v10**: Субагенты запрещены. Статус сессии считывается из `implementation_plan.md` через `PlanningWithFiles`. Выводы сжимаются через `SoloLoopV10`.
 - **Валидация и Схемы**: Строгая валидация по BaseModel и экспорт Agno-style схем через `tools/tool_validator.py`.
-- **Навыки**: Управление JIT-навыками через `tools/agent_skills.py`.
+- **Навыки**: Управление JIT-навыками через [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py) с поддержкой тем: `is_ui` (Framer Motion, GSAP, Tailwind, Three.js), `is_seo` (Programmatic SEO, EEAT, GEO), `is_scale` (Dan Martell 10-80-10, SOP, Pre-delegation, Buyback Loop) и `is_mcp` (Anthropic MCP SDK, SQLite YAGNI).
 - **Окружение**: Python 3.12+ (`uv run`), форматирование Ruff (`ruff.toml`).
 - **Плагины**: Обязательно использование `agent-skills` (слэш-команды), `fablize` (DoD и доказательства) и `ponytail` (YAGNI/контроль абстракций).
-- **YAGNI**: Ponytail mode `full`, максимум 2 уровня абстракции.
-- **Процесс**: Spec -> Research -> Plan -> Implement -> Test (`tools/test_healer.py` со Stealth Stop на 3-й раз) -> Ship (`tools/self_improve.py`).
+- **YAGNI & Code Style**: Философия Karpathy Vibe Coding (линейный код, макс 2 уровня абстракции) и levelsio YAGNI (минималистичный стек, SQLite).
+- **Процесс**: Spec -> Research -> Plan -> Implement -> Test (`tools/test_healer.py` со Stealth Stop на 3-й раз) -> Ship (`tools/self_improve.py` с авто-классификацией и замером времени выкупа).
 
 

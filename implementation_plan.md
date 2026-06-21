@@ -47,11 +47,15 @@
 * **Статус**: Интегрировано.
 * **Описание**: Улучшен генератор навыков [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py). Добавлен триггер `is_mcp` для генерации шаблонов под разработку MCP-серверов с официальным SDK Anthropic (JSON-RPC over stdio). В общие принципы проектирования по умолчанию интегрированы стандарты **Karpathy Vibe Coding** (линейный код, макс 2 уровня абстракции) и **levelsio YAGNI** (минималистичный стек, SQLite, отказ от усложненных фреймворков).
 
+### Решение 10. Глобальное обновление конституций, гайдов и баз знаний под v10 (Принято)
+* **Статус**: Интегрировано.
+* **Описание**: Проведена синхронизация всей системной документации с последними изменениями. Обновлены файлы [GEMINI_ANTIGRAVITY.md](file:///Users/rus/GEMINI_ANTIGRAVITY.md), [STUDENT_GUIDE.md](file:///Users/rus/STUDENT_GUIDE.md), [CLAUDE.md](file:///Users/rus/ai-tools/CLAUDE.md), [AGENTS.md](file:///Users/rus/ai-tools/AGENTS.md) и база знаний гем-бота [gemini_bot_knowledge_base.md](file:///Users/rus/ai-tools/attachments/gemini_bot_knowledge_base.md). В них зафиксированы: Solo Loop v10, JIT-категоризация навыков (UI, SEO, Scale, MCP), автозамер времени выкупа (Buyback Loop), а также стандарты Karpathy Vibe Coding и levelsio YAGNI. Написаны TDD автотесты для контроля знаний в `test_knowledge_update.py`.
+
 ---
 
 ## ✅ 4. Definition of Done (DoD)
 - [x] Все YAGNI-решения зафиксированы и обоснованы.
 - [x] Оптимизирован pre-commit хук для staged-файлов.
 - [x] Написаны TDD автотесты для всех принятых решений.
-- [x] Все тесты `tools/tests/` зеленые (100/100 passed).
+- [x] Все тесты `tools/tests/` зеленые (101/101 passed).
 - [x] Запущен `self_improve.py` и `collect_handoffs.py`.
