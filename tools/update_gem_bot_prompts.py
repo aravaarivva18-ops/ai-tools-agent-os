@@ -15,11 +15,11 @@ def main() -> None:
 
     # Check source files on Desktop
     files_to_import = {
-        "gemini_bot_knowledge_base.md": "Gemini Bot Knowledge Base",
-        "gem_bot_audit_specialist.md": "Gem Bot Audit Specialist",
-        "gem_bot_prompt_architect.md": "Gem Bot Prompt Architect",
-        "gem_bot_prompt_generator.md": "Gem Bot Prompt Generator",
-        "gem_bot_developer.md": "Gem Bot Developer Agent",
+        "gemini_universal_bot.md": [
+            "Gemini Universal Bot",
+            "Gemini Bot Knowledge Base",
+            "Gemini Bot System Prompt",
+        ],
     }
 
     conn = sqlite3.connect(DB_PATH)
@@ -27,7 +27,7 @@ def main() -> None:
     cursor = conn.cursor()
 
     try:
-        for filename, role_name in files_to_import.items():
+        for filename, role_names in files_to_import.items():
             file_path = DESKTOP_DIR / filename
             if not file_path.exists():
                 print(f"Warning: File {file_path} not found. Skipping.")
@@ -35,40 +35,7 @@ def main() -> None:
 
             content = file_path.read_text(encoding="utf-8")
 
-            # For gemini_bot_knowledge_base.md, we also extract the System Prompt section
-            if filename == "gemini_bot_knowledge_base.md":
-                # Save the whole knowledge base
-                cursor.execute(
-                    "INSERT OR REPLACE INTO prompts (act, prompt, for_devs, contributor) VALUES (?, ?, ?, ?)",
-                    (role_name, content, 1, "rus"),
-                )
-                print(f"Imported/Updated: {role_name}")
-
-                # Extract and save only the System Instructions (Section 6)
-                sys_prompt_match = content.split(
-                    "## ⚙️ 6. Системная инструкция для внешнего Gemini-бота (System Prompt)"
-                )
-                if len(sys_prompt_match) > 1:
-                    # Get content after heading, strip leading markdown code blocks if any
-                    sys_prompt_content = sys_prompt_match[1].strip()
-                    # If it contains code block markers, let's clean it up slightly or keep it as is
-                    # Keep everything from ```markdown to ``` at the end (or just the content inside)
-                    # Let's extract the markdown code block content if it exists
-                    import re
-
-                    code_block_match = re.search(
-                        r"```markdown\s+(.*?)\s+```", sys_prompt_content, re.DOTALL
-                    )
-                    if code_block_match:
-                        sys_prompt_content = code_block_match.group(1).strip()
-
-                    cursor.execute(
-                        "INSERT OR REPLACE INTO prompts (act, prompt, for_devs, contributor) VALUES (?, ?, ?, ?)",
-                        ("Gemini Bot System Prompt", sys_prompt_content, 1, "rus"),
-                    )
-                    print("Imported/Updated: Gemini Bot System Prompt")
-            else:
-                # Save standard role
+            for role_name in role_names:
                 cursor.execute(
                     "INSERT OR REPLACE INTO prompts (act, prompt, for_devs, contributor) VALUES (?, ?, ?, ?)",
                     (role_name, content, 1, "rus"),
