@@ -60,13 +60,24 @@ class AgentSkillsManager:
 
         skill_md_path = skill_folder / "SKILL.md"
 
+        # Check if the skill is SEO/GEO-themed
+        is_seo = any(
+            keyword in normalized_name or keyword in description.lower()
+            for keyword in ["seo", "geo", "traffic", "keywords", "crawler"]
+        )
+
         # Check if the skill is UI-themed (for animations, hover, scroll, frontend)
         is_ui = any(
             keyword in normalized_name or keyword in description.lower()
             for keyword in ["ui", "landing", "animation", "hover", "scroll", "frontend", "css", "web"]
         )
 
-        if is_ui:
+        if is_seo:
+            tech_stack = """- **Core Technology**: Programmatic SEO (Python / sqlite3 / jinja2)
+- **AI Crawler Strategy**: Robots.txt and AI crawlers customization (allow/disallow rules for agents)"""
+            design_principles = """- EEAT Signals: Build author biography, credentials, and reference citations.
+- GEO Optimization: Citations structure, structured JSON-LD data, and clear FAQ patterns to rank in AI Search Engines (Perplexity, Gemini)."""
+        elif is_ui:
             tech_stack = """- **Core Technology**: React / Next.js, Tailwind CSS
 - **Animations**: Framer Motion (for hover masks & simple transitions), GSAP (for scroll-tied timelines)
 - **3D Elements**: React Three Fiber (R3F) / Three.js (for 3D models like astronauts)"""

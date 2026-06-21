@@ -31,11 +31,15 @@
 * **Статус**: Интегрировано.
 * **Описание**: Улучшен генератор навыков [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py). При создании UI-навыков генерируется папка `components/` и `styles/` вместо `scripts/`, а шаблон `SKILL.md` дополняется рекомендациями по стеку: **Framer Motion, GSAP, Tailwind CSS, Three.js**.
 
+### Решение 6. Интеграция SEO/GEO-оптимизации (Принято)
+* **Статус**: Интегрировано.
+* **Описание**: Улучшен генератор навыков [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py). При создании SEO/GEO-навыков (триггеры `seo`, `geo`, `traffic`, `keywords`, `crawler`) шаблон `SKILL.md` дополняется стеком programmatic SEO (Python / sqlite3 / jinja2), настройками robots.txt для AI-роботов, а также требованиями к EEAT-сигналам и GEO-оптимизации для ИИ-поисковиков (Perplexity, Gemini).
+
 ---
 
 ## ✅ 4. Definition of Done (DoD)
 - [x] Все YAGNI-решения зафиксированы и обоснованы.
 - [x] Оптимизирован pre-commit хук для staged-файлов.
 - [x] Написаны TDD автотесты для всех принятых решений.
-- [ ] Все тесты `tools/tests/` зеленые (94/94 passed).
-- [ ] Запущен `self_improve.py` и `collect_handoffs.py`.
+- [x] Все тесты `tools/tests/` зеленые (96/96 passed).
+- [x] Запущен `self_improve.py` и `collect_handoffs.py`.
