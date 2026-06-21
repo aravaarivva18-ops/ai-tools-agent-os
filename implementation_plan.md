@@ -35,11 +35,15 @@
 * **Статус**: Интегрировано.
 * **Описание**: Улучшен генератор навыков [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py). При создании SEO/GEO-навыков (триггеры `seo`, `geo`, `traffic`, `keywords`, `crawler`) шаблон `SKILL.md` дополняется стеком programmatic SEO (Python / sqlite3 / jinja2), настройками robots.txt для AI-роботов, а также требованиями к EEAT-сигналам и GEO-оптимизации для ИИ-поисковиков (Perplexity, Gemini).
 
+### Решение 7. Интеграция принципов масштабирования и продуктивности по методологии Дэна Мартелла (Принято)
+* **Статус**: Интегрировано.
+* **Описание**: Улучшен генератор навыков [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py). При создании навыков масштабирования и автоматизации процессов (триггеры `scale`, `productivity`, `business`, `automation`, `sop`, `delegate`, `time`) в шаблон `SKILL.md` внедряются рекомендации по автоматическому замеру сохраненного времени (Buyback Loop), правила делегирования 10-80-10, а также разработка процессов в виде воспроизводимых инструкций (SOP) и DRIP-матрицы.
+
 ---
 
 ## ✅ 4. Definition of Done (DoD)
 - [x] Все YAGNI-решения зафиксированы и обоснованы.
 - [x] Оптимизирован pre-commit хук для staged-файлов.
 - [x] Написаны TDD автотесты для всех принятых решений.
-- [x] Все тесты `tools/tests/` зеленые (96/96 passed).
+- [x] Все тесты `tools/tests/` зеленые (98/98 passed).
 - [x] Запущен `self_improve.py` и `collect_handoffs.py`.

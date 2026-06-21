@@ -60,6 +60,12 @@ class AgentSkillsManager:
 
         skill_md_path = skill_folder / "SKILL.md"
 
+        # Check if the skill is Business Scaling/Productivity-themed (Dan Martell insights)
+        is_scale = any(
+            keyword in normalized_name or keyword in description.lower()
+            for keyword in ["scale", "productivity", "business", "automation", "sop", "delegate", "time"]
+        )
+
         # Check if the skill is SEO/GEO-themed
         is_seo = any(
             keyword in normalized_name or keyword in description.lower()
@@ -72,7 +78,14 @@ class AgentSkillsManager:
             for keyword in ["ui", "landing", "animation", "hover", "scroll", "frontend", "css", "web"]
         )
 
-        if is_seo:
+        if is_scale:
+            tech_stack = """- **Core Technology**: Python 3.12+ (automation scripts)
+- **APIs & Integrations**: Calendar, Email and Tasks APIs (Google Workspace / Microsoft Graph)
+- **Time Auditing**: Automatic logging of start/end timestamps and execution cost"""
+            design_principles = """- 10-80-10 Rule: Ensure agent implements the core 80% work based on 10% explicit specs, outputting results for human final 10% review.
+- DRIP Matrix & SOP: Design autonomous tasks to execute well-defined, low-energy processes via sequential, repeatable scripts.
+- Buyback Loop: Log "Time Saved" metrics at the end of each run to measure delegation efficiency."""
+        elif is_seo:
             tech_stack = """- **Core Technology**: Programmatic SEO (Python / sqlite3 / jinja2)
 - **AI Crawler Strategy**: Robots.txt and AI crawlers customization (allow/disallow rules for agents)"""
             design_principles = """- EEAT Signals: Build author biography, credentials, and reference citations.
