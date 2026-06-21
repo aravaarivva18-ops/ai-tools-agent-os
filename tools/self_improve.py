@@ -552,6 +552,30 @@ def main() -> None:
         sys.exit(1)
 
     apply_improvement_record(handoff_notes_path, metrics)
+
+    # Log self-improvement event into dashboard.db
+    log_change = None
+    try:
+        from tools.dashboard_logger import log_change
+    except ImportError:
+        try:
+            from dashboard_logger import log_change
+        except ImportError:
+            pass
+
+    if log_change:
+        try:
+            log_change(
+                project_name="Парковка Уфа",
+                description=f"Self-Improvement Loop completed. Sessions parsed: {metrics.get('total_sessions', 0)}, friction points found: {metrics.get('total_friction_points', 0)}.",
+                reason="Automated agent self-evolution and rules synchronization",
+                expected_effect="Agent stability and rules coherence optimization",
+            )
+        except Exception as e:
+            print(f"Warning: Could not log self-improvement event to dashboard.db: {e}")
+    else:
+        print("Warning: dashboard_logger.log_change not found. Skipping DB log.")
+
     print("🚀 Self-Improvement Loop iteration completed successfully.")
 
 

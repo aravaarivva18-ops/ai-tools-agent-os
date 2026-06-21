@@ -6,9 +6,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import json
 from datetime import date, datetime, timedelta
 
-from dashboard_mvp.config import GOOGLE_CREDENTIALS_PATH, GOOGLE_SPREADSHEET_ID
-from dashboard_mvp.db import Base, engine, get_db
-from dashboard_mvp.models import (
+from db import Base, engine, get_db
+from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from models import (
     Changelog,
     Client,
     Integration,
@@ -19,15 +22,13 @@ from dashboard_mvp.models import (
     SourceMapping,
     User,
 )
-from dashboard_mvp.security_utils import create_access_token, verify_password
-from dashboard_mvp.sync import sync_google_sheets_data, sync_yandex_data
-from dashboard_mvp.yandex_oauth import exchange_code_for_tokens, get_yandex_auth_url
-from fastapi import Depends, FastAPI, HTTPException, Query
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
-from fastapi.staticfiles import StaticFiles
 from security.security_scanner import run_security_scan, scan_for_secrets
+from security_utils import create_access_token, verify_password
 from sqlalchemy.orm import Session
+from sync import sync_google_sheets_data, sync_yandex_data
+from yandex_oauth import exchange_code_for_tokens, get_yandex_auth_url
+
+from config import GOOGLE_CREDENTIALS_PATH, GOOGLE_SPREADSHEET_ID
 
 app = FastAPI(title="Аналитический дашборд «Рука на пульсе» API")
 
@@ -612,7 +613,7 @@ def setup_test_project(db: Session = Depends(get_db)):
     # Автоматически импортируем планы KPI и логи изменений из Excel
     excel_path = "/Users/rus/Downloads/dashboard_input_pack_mvp_filled_parking_ufa.xlsx"
     if os.path.exists(excel_path):
-        from dashboard_mvp.sync import sync_excel_data
+        from sync import sync_excel_data
 
         sync_excel_data(db, excel_path)
     else:
@@ -635,18 +636,18 @@ def setup_test_project(db: Session = Depends(get_db)):
 def run_security_dashboard_scan():
     """Запускает сканирование безопасности монорепозитория (Bandit SAST + Поиск секретов)."""
     # Корневой путь монорепозитория
-    root_dir = os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    )
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     # 1. Запуск Bandit
     exclude_dirs = [
-        ".venv",
-        ".git",
-        ".obsidian",
-        "__pycache__",
-        "node_modules",
-        "ai-ads",
+        os.path.join(root_dir, ".venv"),
+        os.path.join(root_dir, "tools", ".venv"),
+        os.path.join(root_dir, "tools", ".gemini"),
+        os.path.join(root_dir, ".git"),
+        os.path.join(root_dir, ".obsidian"),
+        os.path.join(root_dir, "__pycache__"),
+        os.path.join(root_dir, "node_modules"),
+        os.path.join(root_dir, "ai-ads"),
     ]
     skip_tests = ["B101", "B110", "B112", "B310", "B311", "B404", "B603", "B607"]
 

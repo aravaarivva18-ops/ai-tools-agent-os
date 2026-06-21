@@ -12,6 +12,78 @@ except ImportError:
     except ImportError:
         SoloLoopV10 = None
 
+try:
+    from tools.dashboard_logger import log_change
+except ImportError:
+    try:
+        from dashboard_logger import log_change
+    except ImportError:
+        log_change = None
+
+try:
+    from tools.diff_applier import apply_blocks, parse_blocks
+except ImportError:
+    try:
+        from diff_applier import apply_blocks, parse_blocks
+    except ImportError:
+        parse_blocks, apply_blocks = None, None
+
+
+def apply_patch_file(target_file, patch_file_or_text):
+    """
+    Applies a SEARCH/REPLACE patch to target_file using diff_applier (diff-only).
+    Returns: (success, error_message)
+    """
+    if not parse_blocks or not apply_blocks:
+        return False, "diff_applier module not found or import failed."
+
+    if not os.path.exists(target_file):
+        return False, f"Target file {target_file} not found."
+
+    # Read target content
+    with open(target_file, encoding="utf-8") as f:
+        content = f.read()
+
+    # Read patch
+    if os.path.exists(patch_file_or_text):
+        with open(patch_file_or_text, encoding="utf-8") as f:
+            patch_text = f.read()
+    else:
+        patch_text = patch_file_or_text
+
+    blocks = parse_blocks(patch_text)
+    if not blocks:
+        return False, "No SEARCH/REPLACE blocks found in patch."
+
+    success, new_content, err_msg = apply_blocks(content, blocks)
+    if not success:
+        return False, f"Patch apply failed: {err_msg}"
+
+    # Backup
+    backup_path = target_file + ".bak"
+    with open(backup_path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+    # Write changes
+    with open(target_file, "w", encoding="utf-8") as f:
+        f.write(new_content)
+
+    # Verify AST
+    if target_file.endswith(".py"):
+        try:
+            import ast
+
+            ast.parse(new_content)
+            return True, None
+        except Exception as e:
+            # Restore backup
+            os.replace(backup_path, target_file)
+            return False, f"AST verification failed: {e}"
+    else:
+        if os.path.exists(backup_path):
+            os.remove(backup_path)
+        return True, None
+
 
 def run_test_file(test_file_path, timeout=10):
     """
@@ -150,14 +222,122 @@ def parse_pytest_error(stdout_text):
 
 
 if __name__ == "__main__":
+    import argparse
+
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     loop = SoloLoopV10(project_root) if SoloLoopV10 else None
 
-    # CLI Интерфейс
-    if len(sys.argv) < 2:
+    parser = argparse.ArgumentParser(
+        description="Test Healer CLI Tool with Sandbox Hardening"
+    )
+    parser.add_argument("test_file", nargs="?", help="Path to test file to execute")
+    parser.add_argument(
+        "--target", help="Target source file to patch before running tests"
+    )
+    parser.add_argument(
+        "--patch", help="SEARCH/REPLACE patch file path or direct patch text"
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=10, help="Test execution timeout in seconds"
+    )
+
+    args = parser.parse_args()
+
+    # Case 1: Sandbox Patch & Verify
+    if args.target and args.patch:
+        if not args.test_file:
+            print("Error: test_file must be specified when using --target and --patch")
+            sys.exit(1)
+
+        print(f"Applying patch to {args.target}...")
+        if log_change:
+            log_change(
+                "Self-Healing",
+                f"Attempting to patch {args.target} for test {args.test_file}",
+            )
+
+        # Check target existence
+        if not os.path.exists(args.target):
+            print(f"Error: Target file {args.target} not found.")
+            sys.exit(1)
+
+        # Apply patch with automatic backup and AST check
+        patched_ok, patch_err = apply_patch_file(args.target, args.patch)
+        if not patched_ok:
+            print(f"❌ Patch application failed: {patch_err}")
+            if log_change:
+                log_change(
+                    "Self-Healing", f"Patch failed for {args.target}: {patch_err}"
+                )
+            sys.exit(1)
+
+        print(
+            f"Running tests in {args.test_file} to verify patch (timeout={args.timeout}s)..."
+        )
+        success, stdout, stderr = run_test_file(args.test_file, timeout=args.timeout)
+
+        # Track execution in Solo Loop
+        if loop:
+            track_res = loop.track_execution(
+                args.test_file, success, stdout + "\n" + stderr
+            )
+            if track_res["stealth_stop"]:
+                print(track_res["compressed_output"])
+                # Rollback patch on Stealth Stop
+                backup_path = args.target + ".bak"
+                if os.path.exists(backup_path):
+                    os.replace(backup_path, args.target)
+                sys.exit(3)
+            output_to_parse = track_res["compressed_output"]
+        else:
+            output_to_parse = stdout
+
+        if success:
+            print(
+                f"✅ Success! Patch resolved the issue. Changes kept in {args.target}."
+            )
+            if log_change:
+                log_change(
+                    "Self-Healing", f"Successfully healed {args.target} via patch"
+                )
+            # Remove backup on success
+            backup_path = args.target + ".bak"
+            if os.path.exists(backup_path):
+                try:
+                    os.remove(backup_path)
+                except Exception:
+                    pass
+            sys.exit(0)
+        else:
+            print("❌ Tests still failing after patch. Rolling back changes...")
+            # Restore backup
+            backup_path = args.target + ".bak"
+            if os.path.exists(backup_path):
+                os.replace(backup_path, args.target)
+
+            if log_change:
+                log_change(
+                    "Self-Healing",
+                    f"Patch failed to fix {args.target} (tests still failing)",
+                )
+
+            print("\n❌ Tests Failed. Generating Clean Traceback for AI:")
+            print("=" * 60)
+            errors = parse_pytest_error(output_to_parse)
+            if errors:
+                for err in errors:
+                    print(f"Target Test: {err['test_name']}")
+                    print(f"Traceback Summary:\n{err['message']}")
+                    print("-" * 60)
+            else:
+                print(output_to_parse)
+            sys.exit(1)
+
+    # Case 2: Process auto-heal queue
+    if not args.test_file:
         from pathlib import Path
 
-        # Пытаемся прочитать из очереди авто-исцеления
+        # Read auto-heal queue
         queue_path = Path(project_root) / "vault" / "auto_heal_queue.json"
         if queue_path.exists():
             try:
@@ -170,16 +350,24 @@ if __name__ == "__main__":
                     )
                     all_success = True
                     for cand in candidates:
-                        # Разрешаем путь относительно корня
+                        # Resolve path relative to project root
                         cand_path = Path(cand)
                         if not cand_path.is_absolute():
                             cand_path = Path(project_root) / cand
 
                         if cand_path.exists():
                             print(f"\nHealing candidate: {cand}")
-                            success, stdout, stderr = run_test_file(str(cand_path))
+                            if log_change:
+                                log_change(
+                                    "Self-Healing",
+                                    f"Attempting to heal queue candidate: {cand}",
+                                )
 
-                            # Отслеживаем выполнение в Solo Loop
+                            success, stdout, stderr = run_test_file(
+                                str(cand_path), timeout=args.timeout
+                            )
+
+                            # Track execution in Solo Loop
                             if loop:
                                 track_res = loop.track_execution(
                                     str(cand_path), success, stdout + "\n" + stderr
@@ -193,10 +381,20 @@ if __name__ == "__main__":
 
                             if success:
                                 print(f"✅ Success: Tests in {cand} passed cleanly.")
+                                if log_change:
+                                    log_change(
+                                        "Self-Healing",
+                                        f"Successfully healed queue candidate: {cand}",
+                                    )
                             else:
                                 print(
                                     f"❌ Tests Failed in {cand}. Generating Clean Traceback for AI:"
                                 )
+                                if log_change:
+                                    log_change(
+                                        "Self-Healing",
+                                        f"Failed healing queue candidate: {cand}",
+                                    )
                                 print("=" * 60)
                                 errors = parse_pytest_error(output_to_parse)
                                 if errors:
@@ -215,18 +413,24 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"Error reading auto-heal queue: {e}")
 
-        print("Usage: python3 test_healer.py <test_file_path>")
+        print(
+            "Usage: python3 test_healer.py <test_file_path> [--target <target_file> --patch <patch_file>]"
+        )
         sys.exit(1)
 
-    test_path = sys.argv[1]
+    # Case 3: Diagnostics for a single test file
+    test_path = args.test_file
     if not os.path.exists(test_path):
         print(f"Error: File {test_path} not found.")
         sys.exit(1)
 
     print(f"Running tests in {test_path}...")
-    success, stdout, stderr = run_test_file(test_path)
+    if log_change:
+        log_change("Self-Healing", f"Running diagnostic test run for: {test_path}")
 
-    # Отслеживаем выполнение в Solo Loop
+    success, stdout, stderr = run_test_file(test_path, timeout=args.timeout)
+
+    # Track execution in Solo Loop
     if loop:
         track_res = loop.track_execution(test_path, success, stdout + "\n" + stderr)
         if track_res["stealth_stop"]:
@@ -238,9 +442,13 @@ if __name__ == "__main__":
 
     if success:
         print("Success: All tests passed cleanly.")
+        if log_change:
+            log_change("Self-Healing", f"Tests passed cleanly for: {test_path}")
         sys.exit(0)
     else:
         print("\n❌ Tests Failed. Generating Clean Traceback for AI:")
+        if log_change:
+            log_change("Self-Healing", f"Tests failed for: {test_path}")
         print("=" * 60)
         errors = parse_pytest_error(output_to_parse)
         if errors:

@@ -6,9 +6,10 @@ from datetime import date
 # Добавляем корневую директорию проекта в path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from dashboard_mvp.config import GOOGLE_CREDENTIALS_PATH, GOOGLE_SPREADSHEET_ID
-from dashboard_mvp.db import SessionLocal
-from dashboard_mvp.sync import sync_google_sheets_data, sync_yandex_data
+from db import SessionLocal
+from sync import sync_google_sheets_data, sync_yandex_data
+
+from config import GOOGLE_CREDENTIALS_PATH, GOOGLE_SPREADSHEET_ID
 
 
 async def main():

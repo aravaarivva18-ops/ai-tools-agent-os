@@ -61,7 +61,6 @@ exclude = [
     '^venv/',
     '^\.venv/',
     '^tools/tests/',
-    '^tools/test_.*\.py$',
     '^geo-seo/tests/',
 ]
 

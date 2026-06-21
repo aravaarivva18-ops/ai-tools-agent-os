@@ -108,11 +108,17 @@ def scan_for_secrets(target_path: str = ".") -> list[dict]:
     if path.is_file():
         files_to_scan.append(path)
     else:
-        for p in path.rglob("*"):
-            if p.is_file():
-                # Skip excluded directories
-                if any(part in exclude_dirs for part in p.parts):
-                    continue
+        for root, dirs, files in os.walk(target_path):
+            # Prune excluded, hidden and documentation-heavy directories in-place to avoid walking down them
+            dirs[:] = [
+                d
+                for d in dirs
+                if d not in exclude_dirs
+                and not d.startswith(".")
+                and d not in ("bitrix-knowledge", "vault")
+            ]
+            for file in files:
+                p = Path(root) / file
                 # Skip binary files by extension
                 if p.suffix.lower() in {
                     ".png",
@@ -169,7 +175,7 @@ def scan_for_secrets(target_path: str = ".") -> list[dict]:
                                 "context": line.strip(),
                             }
                         )
-        except Exception:  # noqa: S110
+        except Exception:
             pass
 
     return findings

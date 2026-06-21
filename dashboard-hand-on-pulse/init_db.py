@@ -4,9 +4,9 @@ import sys
 # Добавляем корневую директорию проекта в path, чтобы корректно импортировать модули
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from dashboard_mvp.db import Base, SessionLocal, engine
-from dashboard_mvp.models import Source, User
-from dashboard_mvp.security_utils import get_password_hash
+from db import Base, SessionLocal, engine
+from models import Source, User
+from security_utils import get_password_hash
 
 
 def init_database():

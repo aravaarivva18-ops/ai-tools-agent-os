@@ -74,6 +74,39 @@ def main() -> None:
                 )
                 print(f"Imported/Updated: {role_name}")
 
+        # Import Antigravity Constitution
+        constitution_path = Path("/Users/rus/GEMINI_ANTIGRAVITY.md")
+        if constitution_path.exists():
+            content = constitution_path.read_text(encoding="utf-8")
+            cursor.execute(
+                "INSERT OR REPLACE INTO prompts (act, prompt, for_devs, contributor) VALUES (?, ?, ?, ?)",
+                ("Antigravity Constitution", content, 1, "rus"),
+            )
+            print("Imported/Updated: Antigravity Constitution")
+        else:
+            print(f"Warning: Constitution not found at {constitution_path}")
+
+        # Import ADR files from vault/adr/
+        adr_dir = Path("/Users/rus/ai-tools/vault/adr")
+        if adr_dir.exists():
+            for adr_file in adr_dir.glob("*.md"):
+                content = adr_file.read_text(encoding="utf-8")
+                # Parse header
+                lines = content.splitlines()
+                first_line = lines[0] if lines else ""
+                title = (
+                    first_line.replace("#", "").strip()
+                    if first_line.startswith("#")
+                    else adr_file.stem
+                )
+
+                role_name = f"ADR: {title}"
+                cursor.execute(
+                    "INSERT OR REPLACE INTO prompts (act, prompt, for_devs, contributor) VALUES (?, ?, ?, ?)",
+                    (role_name, content, 1, "rus"),
+                )
+                print(f"Imported/Updated: {role_name}")
+
         conn.commit()
 
         # Rebuild FTS index

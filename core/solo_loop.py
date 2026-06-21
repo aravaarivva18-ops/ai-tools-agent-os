@@ -37,6 +37,62 @@ class SoloLoopV10:
         state = self.planner.restore_state()
         return state
 
+    def compact_context(self, history_steps: list[dict[str, Any]]) -> dict[str, Any]:
+        """Summarizes history steps and cleans up detailed logs (summarize -> clean).
+
+        Args:
+            history_steps: A list of dicts with 'command', 'success', 'output'.
+
+        Returns:
+            dict: Containing 'summary_text', 'cleaned_steps'.
+        """
+        if not history_steps:
+            return {"summary_text": "No history to compact.", "cleaned_steps": []}
+
+        successful_commands = []
+        failed_commands = []
+        unique_errors = set()
+        cleaned_steps = []
+
+        for step in history_steps:
+            cmd = step.get("command", "unknown")
+            success = step.get("success", False)
+            output = step.get("output", "")
+
+            # Clean up output using compress_log to reduce token usage
+            compressed_output = self.compress_log(
+                output, max_lines=5, is_error=not success
+            )
+
+            cleaned_steps.append(
+                {"command": cmd, "success": success, "output": compressed_output}
+            )
+
+            if success:
+                successful_commands.append(cmd)
+            else:
+                failed_commands.append(cmd)
+                err_sig = self._extract_error_signature(output)
+                if err_sig:
+                    unique_errors.add(err_sig)
+
+        # Build a concise summary text
+        summary_parts = []
+        if successful_commands:
+            summary_parts.append(
+                f"Successfully executed: {', '.join(successful_commands)}"
+            )
+        if failed_commands:
+            summary_parts.append(f"Failed commands: {', '.join(failed_commands)}")
+        if unique_errors:
+            summary_parts.append("Distinct errors encountered:")
+            for err in unique_errors:
+                summary_parts.append(f"- {err}")
+
+        summary_text = "\n".join(summary_parts)
+
+        return {"summary_text": summary_text, "cleaned_steps": cleaned_steps}
+
     def track_execution(
         self, command: str, success: bool, output: str
     ) -> dict[str, Any]:

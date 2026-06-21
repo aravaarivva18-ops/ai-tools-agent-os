@@ -1,7 +1,8 @@
 from datetime import UTC, datetime, timedelta
 
 import httpx
-from dashboard_mvp.config import (
+
+from config import (
     YANDEX_CLIENT_ID,
     YANDEX_CLIENT_SECRET,
     YANDEX_REDIRECT_URI,

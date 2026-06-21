@@ -40,6 +40,7 @@ def test_pipeline_positive_cycle():
     Также проверяет наличие A/B заголовков и длительность видео > 90 секунд.
     """
     import json
+
     generator = content_gen.VideoGenerator(output_dir=TEST_OUTPUT_DIR)
     # Настраиваем путь к тестовой БД
     generator.seo.database_path = os.path.join(
@@ -80,7 +81,7 @@ def test_pipeline_positive_cycle():
             {
                 "text": "Мы регулярно публикуем самые актуальные обзоры передовых технологий, практические руководства по интеграции нейронных сетей и эксклюзивные интервью с ведущими мировыми экспертами в области искусственного интеллекта и робототехники.",
                 "visual_prompt": "Futuristic conference hall with dynamic digital projections",
-            }
+            },
         ],
     }
 
@@ -121,17 +122,27 @@ def test_pipeline_positive_cycle():
                     )
 
                     # Проверка A/B заголовков в метаданных и в пакете загрузки
-                    assert "title_a" in metadata, "Вариант A заголовка отсутствует в метаданных"
-                    assert "title_b" in metadata, "Вариант B заголовка отсутствует в метаданных"
+                    assert "title_a" in metadata, (
+                        "Вариант A заголовка отсутствует в метаданных"
+                    )
+                    assert "title_b" in metadata, (
+                        "Вариант B заголовка отсутствует в метаданных"
+                    )
 
                     with open(metadata["upload_package_path"], encoding="utf-8") as f:
                         package_data = json.load(f)
-                    assert package_data.get("title_a") == metadata["title_a"], "Неверный title_a в пакете загрузки"
-                    assert package_data.get("title_b") == metadata["title_b"], "Неверный title_b в пакете загрузки"
+                    assert package_data.get("title_a") == metadata["title_a"], (
+                        "Неверный title_a в пакете загрузки"
+                    )
+                    assert package_data.get("title_b") == metadata["title_b"], (
+                        "Неверный title_b в пакете загрузки"
+                    )
 
                     # Проверка длительности сгенерированного видео
                     duration = generator._get_audio_duration(video_path)
-                    assert duration > 90.0, f"Длительность видео {duration} с должна быть больше 90 с"
+                    assert duration > 90.0, (
+                        f"Длительность видео {duration} с должна быть больше 90 с"
+                    )
 
 
 def test_pipeline_negative_invalid_niche():

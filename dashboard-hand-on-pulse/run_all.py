@@ -46,9 +46,9 @@ def setup_database_and_mock_data():
     """Инициализирует базу данных и загружает тестовые данные из Excel."""
     print("Инициализация базы данных и подготовка окружения...")
     try:
-        from dashboard_mvp.db import SessionLocal
-        from dashboard_mvp.init_db import init_database
-        from dashboard_mvp.main import setup_test_project
+        from db import SessionLocal
+        from init_db import init_database
+        from main import setup_test_project
 
         # 1. Запуск инициализации схемы БД и дефолтного админа
         init_database()

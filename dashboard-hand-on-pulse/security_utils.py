@@ -2,7 +2,8 @@ from datetime import UTC, datetime, timedelta
 
 import bcrypt
 import jwt
-from dashboard_mvp.config import JWT_ALGORITHM, JWT_SECRET
+
+from config import JWT_ALGORITHM, JWT_SECRET
 
 
 def get_password_hash(password: str) -> str:

@@ -43,6 +43,7 @@ ignore = [
     "S310",    # Audit URL open for urllib (used across marketing/sales scripts)
     "S603",    # subprocess check (used for executing test processes locally)
     "S607",    # subprocess partial path (used for pytest execution in tests)
+    "S110",    # try-except-pass checks (standard database/file cleanup patterns)
 ]
 
 # Allow fixable rules to be automatically resolved by ruff
@@ -71,9 +72,9 @@ max-complexity = 20
 "tools/lead_swarm.py" = ["E722", "F401", "F841", "ARG001"]
 "tools/llm_wiki.py" = ["E722", "F401", "F841", "ARG001"]
 "tools/diff_applier.py" = ["E741"]
-"tools/dashboard_mvp/*.py" = ["C408", "E741", "S105", "S106", "B904", "S110", "F841", "W293"]
-"**/dashboard_mvp/*.py" = ["C408", "E741", "S105", "S106", "B904", "S110", "F841", "W293"]
-"**/dashboard_mvp/tests/*.py" = ["S101", "S108", "ARG001", "ARG002", "S105", "S106"]
+"dashboard-hand-on-pulse/*.py" = ["C408", "E741", "S105", "S106", "B904", "S110", "F841", "W293"]
+"**/dashboard-hand-on-pulse/*.py" = ["C408", "E741", "S105", "S106", "B904", "S110", "F841", "W293"]
+"**/dashboard-hand-on-pulse/tests/*.py" = ["S101", "S108", "ARG001", "ARG002", "S105", "S106"]
 "tools/security/security_scanner.py" = ["C901"]
 
 [format]

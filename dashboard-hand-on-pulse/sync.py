@@ -4,7 +4,8 @@ from datetime import date, datetime, timedelta
 import gspread
 import httpx
 import openpyxl
-from dashboard_mvp.models import (
+from google.oauth2.service_account import Credentials
+from models import (
     Changelog,
     Integration,
     MarketingFact,
@@ -13,7 +14,6 @@ from dashboard_mvp.models import (
     Source,
     SourceMapping,
 )
-from google.oauth2.service_account import Credentials
 from sqlalchemy.orm import Session
 
 

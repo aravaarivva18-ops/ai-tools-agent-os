@@ -1,4 +1,4 @@
-from dashboard_mvp.db import Base
+from db import Base
 from sqlalchemy import Column, Date, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 

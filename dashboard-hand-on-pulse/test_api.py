@@ -2,17 +2,17 @@ import os
 from datetime import date
 
 import pytest
-from dashboard_mvp.db import Base, get_db
-from dashboard_mvp.main import app
-from dashboard_mvp.models import (
+from db import Base, get_db
+from fastapi.testclient import TestClient
+from main import app
+from models import (
     Integration,
     MarketingFact,
     MarketingPlan,
     Source,
     User,
 )
-from dashboard_mvp.security_utils import get_password_hash
-from fastapi.testclient import TestClient
+from security_utils import get_password_hash
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 

@@ -22,7 +22,9 @@ check-all: check test
 
 test:
 	uv run --package geo-seo pytest geo-seo/tests/ -v
-	uv run pytest tools/ tools/tests/ -v
+	uv run pytest tools/tests/ -v
+	uv run pytest dashboard-hand-on-pulse/ -v
+	uv run pytest youtube-faceless-pipeline/ -v
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +

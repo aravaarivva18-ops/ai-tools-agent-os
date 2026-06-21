@@ -17,8 +17,10 @@
 - [ai-sales/](file:///Users/rus/ai-tools/ai-sales/) — аудит продаж, анализ лидов и генерация PDF-отчетов.
 - [ai-marketing/](file:///Users/rus/ai-tools/ai-marketing/) — анализ маркетинговых стратегий и генерация PDF-отчетов.
 - [ai-legal/](file:///Users/rus/ai-tools/ai-legal/) — анализ юридических договоров, генерация типовых контрактов и PDF.
+- [youtube-faceless-pipeline/](file:///Users/rus/ai-tools/youtube-faceless-pipeline/) — автогенерация сценариев, озвучка, рендеринг сцен и загрузка видео на YouTube.
+- [dashboard-hand-on-pulse/](file:///Users/rus/ai-tools/dashboard-hand-on-pulse/) — Streamlit-дашборд «Рука на пульсе» для Таргет Медиа (клиентский продукт).
 - [skills/](file:///Users/rus/ai-tools/skills/) — специализированные навыки ИИ-агентов (модульные инструкции).
-- [tools/](file:///Users/rus/ai-tools/tools/) — общие утилиты и дашборд мониторинга (`dashboard.py`).
+- [tools/](file:///Users/rus/ai-tools/tools/) — вспомогательные скрипты разработки и утилиты.
 
 ## 🔌 Подключение навыков по запросу (Just-In-Time Skills)
 Перед выполнением любой задачи **обязательно** ознакомьтесь с соответствующим файлом навыка в папке `skills/`:
@@ -48,10 +50,10 @@
 - **Валидация и Схемы**: Валидировать выходы LLM по Pydantic моделям и генерировать схемы инструментов через `tools/tool_validator.py`.
 - **Целостность документации**: При обновлении конституций, гайдов и баз знаний сохранять точные тестовые маркеры (например, домены вида `context7.com`), проверяемые TDD-тестами.
 - **Изоляция прототипов**: Временный код (Spikes) сохраняется строго в папках `scratch/`. Импорт файлов из `scratch/` в основные рабочие модули категорически запрещен.
-- **Навыки**: Использовать [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py) для JIT-генерации шаблонов: `is_ui` (Framer Motion, GSAP, Tailwind, Three.js), `is_seo` (Programmatic SEO, EEAT, GEO), `is_scale` (Dan Martell 10-80-10, SOP, Pre-delegation Checklist, Buyback Loop) and `is_mcp` (Anthropic MCP SDK, JSON-RPC, SQLite YAGNI).
+- **Навыки**: Использовать [agent_skills.py](file:///Users/rus/ai-tools/tools/agent_skills.py) для JIT-генерации шаблонов: `is_ui` (Framer Motion, GSAP, Vanilla CSS, Three.js; Tailwind CSS по умолчанию запрещен), `is_seo` (Programmatic SEO, EEAT, GEO), `is_scale` (Dan Martell 10-80-10, SOP, Pre-delegation Checklist, Buyback Loop) и `is_mcp` (Anthropic MCP SDK, JSON-RPC, SQLite YAGNI).
 - **Плагины**: Обязательно использование `agent-skills` (слэш-команды), `fablize` (DoD и доказательства) и `ponytail` (YAGNI/контроль абстракций).
-- **YAGNI (Ponytail) & TDD**: Философия Karpathy Vibe Coding (плоский линейный код, макс 2 уровня абстракции) и levelsio YAGNI (минималистичный стек, SQLite). Любой код сопровождается тестами.
+- **YAGNI (Ponytail) & TDD**: Философия Karpathy Vibe Coding (плоский линейный код, макс 2 уровня абстракции) и levelsio YAGNI (минималистичный стек, SQLite). Любой код сопровождается тестами. В ходе YAGNI-аудита v10 удалено 14% bloat из `tools/` (избыточные файлы данных).
 - **Self-Healing & Self-Improvement**: При ошибках раннер `tools/test_healer.py` перехватывает сбои (Stealth Stop на 3-й раз). В конце сессии - [self_improve.py](file:///Users/rus/ai-tools/tools/self_improve.py) с классификацией навыков и подсчетом времени выкупа (Buyback Time).
 - **Абсолютные пути**: Использовать `file:///Users/rus/` для локального хоста macOS. Пути `/home/workdir/` запрещены.
-- **Безопасность (SAST)**: Для запуска Bandit использовать `python3 -m bandit` из окружения `uv`.
+- **Безопасность (SAST)**: Для запуска Bandit использовать `python3 -m bandit` из окружения `uv`. SAST-сканер секретов оптимизирован (выполнение за 0.33с за счет os.walk обрезки `.venv`, `vault` и `bitrix-knowledge`).
 

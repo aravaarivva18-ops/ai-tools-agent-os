@@ -8,6 +8,7 @@ RULES_FILES = [
     WORKSPACE_ROOT / "CLAUDE.md",
     WORKSPACE_ROOT / "AGENTS.md",
     WORKSPACE_ROOT / ".cursorrules",
+    WORKSPACE_ROOT / "youtube-faceless-pipeline/AGENTS.md",
     Path("/Users/rus/GEMINI_ANTIGRAVITY.md"),
     Path("/Users/rus/STUDENT_GUIDE.md"),
 ]

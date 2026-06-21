@@ -119,3 +119,45 @@ def test_solo_loop_log_compression():
     assert "AssertionError: error occurred" in comp_error
 
     assert (time.perf_counter() - start) < 0.1
+
+
+def test_solo_loop_compaction_positive():
+    """Positive test for context compaction."""
+    from core.solo_loop import SoloLoopV10
+
+    loop = SoloLoopV10(TEST_WORKSPACE)
+
+    history = [
+        {
+            "command": "pytest",
+            "success": True,
+            "output": "Passed 10 tests.\nEverything ok.",
+        },
+        {"command": "ruff check .", "success": True, "output": "No issues found."},
+        {
+            "command": "mypy .",
+            "success": False,
+            "output": "Error: Incompatible types in assignment\nFound 1 error.",
+        },
+    ]
+
+    res = loop.compact_context(history)
+    assert "Successfully executed: pytest, ruff check ." in res["summary_text"]
+    assert "Failed commands: mypy ." in res["summary_text"]
+    assert "Error: Incompatible types in assignment" in res["summary_text"]
+
+    # Check that individual outputs are kept but potentially cleaned
+    assert len(res["cleaned_steps"]) == 3
+    assert res["cleaned_steps"][0]["command"] == "pytest"
+    assert res["cleaned_steps"][0]["success"] is True
+
+
+def test_solo_loop_compaction_negative():
+    """Negative test for context compaction with empty history."""
+    from core.solo_loop import SoloLoopV10
+
+    loop = SoloLoopV10(TEST_WORKSPACE)
+
+    res = loop.compact_context([])
+    assert res["summary_text"] == "No history to compact."
+    assert res["cleaned_steps"] == []

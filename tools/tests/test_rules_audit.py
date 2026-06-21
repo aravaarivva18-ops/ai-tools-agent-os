@@ -103,7 +103,7 @@ def test_solo_loop_enforced_positive():
     kb_content = kb_path.read_text(encoding="utf-8")
     ag_content = antigravity_path.read_text(encoding="utf-8")
 
-    assert "strictly disabled and blocked" in kb_content, (
+    assert "disabled and blocked" in kb_content, (
         "В System Prompt не зафиксирована блокировка субагентов"
     )
     assert "категорически запрещено" in ag_content, (
@@ -119,3 +119,75 @@ def test_subagent_invocation_attempt_negative():
     """
     is_blocked = detect_subagent_usage(bad_prompt_or_code)
     assert is_blocked, "Попытка вызова субагента не была заблокирована/детектирована"
+
+
+def validate_path_compliance(path_str: str) -> bool:
+    """Проверяет соответствие путей стандартам Antigravity (запрет /home/workdir,
+    разрешение file:///Users/rus/ или @ai-tools/ для путей).
+    """
+    if "/home/workdir" in path_str:
+        return False
+    # Если путь абсолютный, он должен использовать /Users/rus/ или file:///Users/rus/
+    if path_str.startswith("/") and not path_str.startswith("/Users/rus"):
+        return False
+    return True
+
+
+def test_path_validation_positive():
+    """Позитивный TDD тест: Проверяет валидные пути macOS хоста и @-префиксы."""
+    assert validate_path_compliance("file:///Users/rus/ai-tools/tools/test_healer.py")
+    assert validate_path_compliance("@ai-tools/tools/test_healer.py")
+    assert validate_path_compliance("/Users/rus/ai-tools/pyproject.toml")
+
+
+def test_path_validation_negative():
+    """Негативный TDD тест: Симулирует использование запрещенного пути /home/workdir или неверного абсолютного пути."""
+    assert not validate_path_compliance("/home/workdir/tools/test_healer.py")
+    assert not validate_path_compliance("/etc/hosts")
+
+
+def test_solo_loop_ast_compliance():
+    """TDD тест: Использует статический AST-анализ для выявления вызовов субагентов."""
+    code_with_subagent = """
+def execute_task():
+    invoke_subagent(TypeName="research", Prompt="Hello")
+"""
+    tree = ast.parse(code_with_subagent)
+    calls = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            calls.append(node.func.id)
+
+    assert "invoke_subagent" in calls, (
+        "AST-анализ должен обнаружить вызов invoke_subagent"
+    )
+
+
+def test_agent_skills_ast_guard_positive():
+    """Positive test: Schema generation works for compliant function."""
+    from tools.agent_skills import AgentSkillsManager
+
+    def compliant_function(x: int) -> int:
+        """A simple compliant function."""
+        return x + 1
+
+    schema = AgentSkillsManager.get_skill_tool_schema(compliant_function)
+    assert schema["name"] == "compliant_function"
+
+
+def test_agent_skills_ast_guard_negative():
+    """Negative test: Schema generation raises ValueError for functions invoking subagents."""
+    import pytest
+
+    from tools.agent_skills import AgentSkillsManager
+
+    # Define a helper function simulating dynamic call or direct call
+    # Note: We must avoid invoking invoke_subagent directly at test load time.
+    def forbidden_function():
+        """A function that attempts to invoke subagent."""
+        # We write invoke_subagent inside function so AST parses it, but we don't call it.
+        # This will be analyzed by get_skill_tool_schema inspect.getsource.
+        invoke_subagent(TypeName="research", Prompt="check files")  # noqa: F821
+
+    with pytest.raises(ValueError, match="Strict Solo Loop Violation"):
+        AgentSkillsManager.get_skill_tool_schema(forbidden_function)

@@ -569,6 +569,74 @@ def render_summary_screen():
     st.markdown(table_html, unsafe_allow_html=True)
 
 
+def add_changelog_events_to_plotly(fig, change_logs, y_data=None, y_default=0.0):
+    """Draws vertical dash lines and hover markers for changelog events on plotly charts."""
+    if not change_logs:
+        return
+
+    # Pre-build a dictionary mapping of dates to values for O(1) loop lookup
+    y_map = {}
+    if y_data is not None and not y_data.empty:
+        try:
+            for _, row in y_data.iterrows():
+                dt_key = pd.to_datetime(row.iloc[0]).strftime("%Y-%m-%d")
+                y_map[dt_key] = float(row.iloc[1])
+        except Exception:
+            pass
+
+    dates = []
+    texts = []
+    y_coords = []
+
+    for log in change_logs:
+        log_date = log.get("date")
+        if not log_date:
+            continue
+
+        desc = log.get("description", "")
+        effect = log.get("expected_effect", "")
+        reason = log.get("comment", "")
+
+        hover_text = f"<b>Событие:</b> {desc}"
+        if effect:
+            hover_text += f"<br><b>Ожидаемый эффект:</b> {effect}"
+        if reason:
+            hover_text += f"<br><b>Причина:</b> {reason}"
+
+        dates.append(log_date)
+        texts.append(hover_text)
+
+        y_val = y_map.get(log_date, y_default)
+        y_coords.append(y_val)
+
+        # Add vertical line
+        fig.add_vline(
+            x=log_date,
+            line_width=1.5,
+            line_dash="dash",
+            line_color="#f85149",
+            opacity=0.6,
+        )
+
+    fig.add_trace(
+        go.Scatter(
+            x=dates,
+            y=y_coords,
+            mode="markers",
+            name="Событие / Изменение",
+            marker=dict(
+                size=12,
+                color="#f85149",
+                symbol="star-triangle-up",
+                line=dict(width=1.5, color="#ffffff"),
+            ),
+            text=texts,
+            hoverinfo="text",
+            showlegend=True,
+        )
+    )
+
+
 # ---------------------------------------------------------
 # ЭКРАН 2. Детальная карточка клиента
 # ---------------------------------------------------------
@@ -703,6 +771,10 @@ def render_client_card():
                 orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1
             ),
         )
+        # Накладываем события изменений
+        add_changelog_events_to_plotly(
+            fig_spent, change_logs_source, df_chart[["Date", "CumSpent"]]
+        )
         st.plotly_chart(fig_spent, use_container_width=True)
 
     # 2. Распределение лидов по целям
@@ -740,6 +812,10 @@ def render_client_card():
                 orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1
             ),
         )
+        # Накладываем события изменений
+        add_changelog_events_to_plotly(
+            fig_leads, change_logs_source, df_chart[["Date", "Leads"]], y_default=1.0
+        )
         st.plotly_chart(fig_leads, use_container_width=True)
 
     # 3. График динамики CPL
@@ -771,6 +847,10 @@ def render_client_card():
         yaxis=dict(showgrid=True, gridcolor="#e5e5e7"),
         margin=dict(l=40, r=40, t=40, b=40),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+    # Накладываем события изменений
+    add_changelog_events_to_plotly(
+        fig_cpl, change_logs_source, df_chart[["Date", "CPL"]], y_default=200.0
     )
     st.plotly_chart(fig_cpl, use_container_width=True)
 

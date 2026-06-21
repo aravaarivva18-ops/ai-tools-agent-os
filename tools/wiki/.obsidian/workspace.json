@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Log.md",
+                "file": "Hermes_Business_Plan_Audit.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Log"
+              "title": "Hermes_Business_Plan_Audit"
             }
           }
         ]
@@ -187,8 +187,8 @@
   "active": "a0a78771a3dd0888",
   "lastOpenFiles": [
     "index.md",
+    "Log.md",
     "Hermes_Business_Plan_Audit.md",
-    "ComfyUI_Workflow.md",
-    "Log.md"
+    "ComfyUI_Workflow.md"
   ]
 }

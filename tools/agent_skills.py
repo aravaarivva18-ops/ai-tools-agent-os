@@ -5,7 +5,10 @@ Coordinates creation of standardized JIT skills, validation of LLM outputs,
 and extraction of declarative tool schemas using tool_validator.
 """
 
+import ast
+import inspect
 import os
+import textwrap
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -140,9 +143,10 @@ class AgentSkillsManager:
 - Karpathy Vibe Coding: Write clean, straightforward Python handlers with max 2 levels of abstraction. Keep logic flat and readable.
 - levelsio YAGNI: Reject unnecessary frameworks; use fast stdio/json communication."""
         elif is_ui:
-            tech_stack = """- **Core Technology**: React / Next.js, Tailwind CSS
+            tech_stack = """- **Core Technology**: HTML, Vanilla JS, Vanilla CSS
 - **Animations**: Framer Motion (for hover masks & simple transitions), GSAP (for scroll-tied timelines)
-- **3D Elements**: React Three Fiber (R3F) / Three.js (for 3D models like astronauts)"""
+- **3D Elements**: React Three Fiber (R3F) / Three.js (for 3D models like astronauts)
+- **CSS Framework**: Tailwind CSS is disabled by default; use Vanilla CSS unless Tailwind is explicitly requested by the user"""
             design_principles = """- Utilize rich aesthetics (gradients, glassmorphism, tailored HSL colors).
 - Enforce smooth micro-animations and interactive hover effects.
 - Reject static placeholders; design visual layouts using generate_image first."""
@@ -210,4 +214,17 @@ description: {description.strip()}
 
         Wraps declarative schema generator from tool_validator.
         """
+        try:
+            source = inspect.getsource(func)
+            source = textwrap.dedent(source)
+            tree = ast.parse(source)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+                    if node.func.id in ("invoke_subagent", "define_subagent"):
+                        raise ValueError(
+                            f"Strict Solo Loop Violation: Forbidden call to '{node.func.id}' found in function '{func.__name__}' source code."
+                        )
+        except (TypeError, OSError):
+            pass
+
         return generate_tool_schema(func)

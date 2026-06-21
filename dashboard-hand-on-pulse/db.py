@@ -1,6 +1,7 @@
-from dashboard_mvp.config import DATABASE_URL
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
+
+from config import DATABASE_URL
 
 # Настройки для движка БД
 connect_args = {}

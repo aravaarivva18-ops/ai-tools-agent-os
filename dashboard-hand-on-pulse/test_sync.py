@@ -2,8 +2,8 @@ import os
 from datetime import datetime
 
 import pytest
-from dashboard_mvp.db import Base
-from dashboard_mvp.models import (
+from db import Base
+from models import (
     Changelog,
     Client,
     Integration,
@@ -13,9 +13,9 @@ from dashboard_mvp.models import (
     Source,
     SourceMapping,
 )
-from dashboard_mvp.sync import sync_excel_data, sync_yandex_data
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sync import sync_excel_data, sync_yandex_data
 
 TEST_DB_FILE = "./test_sync_temp.db"
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{TEST_DB_FILE}"

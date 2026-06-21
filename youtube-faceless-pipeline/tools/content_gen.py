@@ -115,28 +115,28 @@ class VideoGenerator:
             scenes = [
                 {
                     "text": "Привет! В две тысячи двадцать шестом году автономные ИИ-агенты вышли на совершенно новый уровень и теперь они способны управлять реальными коммерческими проектами и бизнесами полностью самостоятельно без какого-либо вмешательства со стороны человека.",
-                    "visual_prompt": "Futuristic clean laboratory with glowing neon cyan lines, professional dashboard displayed on screen, hyperrealistic, dark mood"
+                    "visual_prompt": "Futuristic clean laboratory with glowing neon cyan lines, professional dashboard displayed on screen, hyperrealistic, dark mood",
                 },
                 {
                     "text": "В основе всей этой невероятной системы лежит передовая архитектура Solo Loop. ИИ-агент самостоятельно ставит себе задачи, пишет программный код, разворачивает облачные серверы, настраивает базы данных и проводит полную SEO-оптимизацию.",
-                    "visual_prompt": "Abstract cybernetic brain connection nodes, digital neural network interface, glowing blue particles, cinematic lighting"
+                    "visual_prompt": "Abstract cybernetic brain connection nodes, digital neural network interface, glowing blue particles, cinematic lighting",
                 },
                 {
                     "text": "Автономные онлайн-магазины, интеллектуальные рекламные кампании в соцсетях и автоматический юридический аудит сложных контрактов — все эти рутинные процессы теперь выполняются роботами со скоростью, превышающей человеческую в десятки раз.",
-                    "visual_prompt": "Digital data stream matrix, golden particle effects flowing through dark virtual corridor, high technology background"
+                    "visual_prompt": "Digital data stream matrix, golden particle effects flowing through dark virtual corridor, high technology background",
                 },
                 {
                     "text": "Новейшие технологические решения, такие как революционная платформа ChipStack AI, наглядно продемонстрировали на выставке Computex 2026, что виртуальные инженеры могут проектировать сложнейшие микропроцессоры за считанные минуты.",
-                    "visual_prompt": "Detailed silicon microchip layout glowing green, virtual schematic blueprint overlay, high tech render"
+                    "visual_prompt": "Detailed silicon microchip layout glowing green, virtual schematic blueprint overlay, high tech render",
                 },
                 {
                     "text": "В этой новой реальности человек смещается в роль высокоуровневого рецензента и контролера по знаменитому правилу Dan Martell 10-80-10, экономя колоссальное количество своего драгоценного времени и ментальной энергии.",
-                    "visual_prompt": "Minimalist digital productivity space, smooth neon purple highlights, elegant dashboard showing time saved"
+                    "visual_prompt": "Minimalist digital productivity space, smooth neon purple highlights, elegant dashboard showing time saved",
                 },
                 {
                     "text": "Если вы хотите узнать, как запустить и масштабировать свой собственный полностью автоматизированный ИИ-бизнес, обязательно подписывайтесь на наш канал. Мы покажем вам весь процесс разработки от А до Я!",
-                    "visual_prompt": "Futuristic neon red subscribe button hovering in dynamic abstract cyberspace backdrop, cinematic render"
-                }
+                    "visual_prompt": "Futuristic neon red subscribe button hovering in dynamic abstract cyberspace backdrop, cinematic render",
+                },
             ]
         else:
             scenes = [
@@ -227,7 +227,7 @@ class VideoGenerator:
                 try:
                     font = PIL.ImageFont.truetype(font_path, 40)
                     break
-                except Exception:  # noqa: S110 # nosec B110
+                except Exception:  # nosec B110
                     pass
 
         if font is None:
@@ -355,7 +355,7 @@ class VideoGenerator:
                     try:
                         font = PIL.ImageFont.truetype(font_path, 46)
                         break
-                    except Exception:  # noqa: S110 # nosec B110
+                    except Exception:  # nosec B110
                         pass
 
             if font is None:
@@ -411,7 +411,7 @@ class VideoGenerator:
                 curr_y += h + 15
 
             image.save(image_path, "JPEG")
-        except Exception:  # noqa: S110 # nosec B110
+        except Exception:  # nosec B110
             pass
 
     def assemble_scene_video(
