@@ -190,6 +190,21 @@ def estimate_overlap(text: str) -> float:
     return min(count / 20.0, 1.0)  # нормализованный score
 
 
+def get_constitution_health_score(path: Path = None) -> int:
+    """Возвращает нормализованную оценку здоровья конституции от 0 до 100."""
+    health = check_constitution_health(path)
+    if health.get("status") == "missing":
+        return 0
+    score = 100
+    if health.get("bloat"):
+        score -= 15
+    if health.get("overlap_score", 0) > 0.08:
+        score -= 10
+    if health.get("sections", 0) > 45:
+        score -= 5
+    return max(score, 0)
+
+
 def main():
     if not validate_constitution_system():
         sys.exit(1)

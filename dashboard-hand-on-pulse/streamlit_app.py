@@ -5,9 +5,13 @@ import requests
 import streamlit as st
 
 try:
-    from tools.prompt_validator import check_constitution_health
+    from tools.prompt_validator import (
+        check_constitution_health,
+        get_constitution_health_score,
+    )
 except ImportError:
     check_constitution_health = None
+    get_constitution_health_score = None
 
 # ---------------------------------------------------------
 # Настройка страницы
@@ -308,12 +312,13 @@ def render_sidebar():
         if check_constitution_health:
             health = check_constitution_health()
             if health.get("status") != "missing":
+                score = get_constitution_health_score() if get_constitution_health_score else 100
                 h_status = health.get("health", "unknown").upper()
-                h_color = "#4CAF50" if h_status == "GOOD" else "#FF9800"
+                h_color = "#4CAF50" if score >= 90 else "#FF9800"
                 st.markdown(
                     f"<p style='font-size:10px; color:#888888; margin-top:20px;'>"
-                    f"Constitution: <span style='color:{h_color}; font-weight:bold;'>{h_status}</span> "
-                    f"(Sec: {health.get('sections')}, Overlap: {health.get('overlap_score'):.2f})"
+                    f"Constitution Health: <span style='color:{h_color}; font-weight:bold;'>{score}/100</span> ({h_status})<br>"
+                    f"Sec: {health.get('sections')}, Overlap: {health.get('overlap_score'):.2f}"
                     f"</p>",
                     unsafe_allow_html=True,
                 )

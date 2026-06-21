@@ -9,6 +9,7 @@ from tools.prompt_validator import (
     estimate_overlap,
     normalize_gemini_constitution_headings,
     validate_constitution_system,
+    get_constitution_health_score,
 )
 
 
@@ -137,5 +138,24 @@ def test_constitution_health_bloat(tmp_path):
 def test_estimate_overlap():
     assert estimate_overlap("Solo Loop and Stealth Stop") == 2.0 / 20.0
     assert estimate_overlap("No keywords") == 0.0
+
+
+def test_get_constitution_health_score(tmp_path):
+    temp_file = tmp_path / "GEMINI_ANTIGRAVITY.md"
+    # Positive case: good health, no overlap, small file
+    temp_file.write_text(
+        "# GEMINI_ANTIGRAVITY\n\n## 🏛️ Core Rules Summary\n\n## 1. Section One\nSolo Loop\n",
+        encoding="utf-8",
+    )
+    assert get_constitution_health_score(temp_file) == 100
+
+    # Bloat case: -15 score
+    temp_file.write_text(
+        "# GEMINI_ANTIGRAVITY\n\n## 🏛️ Core Rules Summary\n\n## 1. Section One\n" + ("A" * 60000),
+        encoding="utf-8",
+    )
+    # 100 - 15 (bloat) = 85
+    assert get_constitution_health_score(temp_file) == 85
+
 
 
