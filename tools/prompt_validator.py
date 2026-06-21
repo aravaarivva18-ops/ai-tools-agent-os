@@ -217,7 +217,8 @@ def enforce_anti_clutter(file_path: str) -> bool:
     # 2. Разрешено писать в конституцию, гайд студента и их бакапы в /Users/rus/
     allowed_external_prefixes = [
         "/Users/rus/GEMINI_ANTIGRAVITY.md",
-        "/Users/rus/STUDENT_GUIDE.md"
+        "/Users/rus/STUDENT_GUIDE.md",
+        "/Users/rus/Desktop/gemini_bot_knowledge_base.md"
     ]
     if any(path_str.startswith(prefix) for prefix in allowed_external_prefixes):
         return True

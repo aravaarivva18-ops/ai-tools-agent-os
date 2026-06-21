@@ -591,7 +591,7 @@ def main() -> None:
     if log_change:
         try:
             log_change(
-                project_name="Парковка Уфа",
+                project_name="System",
                 description=f"Self-Improvement Loop completed. Sessions parsed: {metrics.get('total_sessions', 0)}, friction points found: {metrics.get('total_friction_points', 0)}.",
                 reason="Automated agent self-evolution and rules synchronization",
                 expected_effect="Agent stability and rules coherence optimization",
@@ -687,7 +687,7 @@ def maintain_constitution(constitution_path: Path = None) -> None:
         if log_change:
             try:
                 log_change(
-                    project_name="Парковка Уфа",
+                    project_name="System",
                     description=f"Automated health-driven maintenance of GEMINI_ANTIGRAVITY.md. Health: {health}",
                     reason="Enforce constitution health and rules structure alignment",
                     expected_effect="Sequential rules consistency and size health",

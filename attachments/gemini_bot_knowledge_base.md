@@ -123,7 +123,7 @@ Pre-delegation Checklist:
 
 Реализация:
 1. Использовать @ai-tools/tools/dashboard_logger.py для логирования изменений.
-2. При вызове оптимизации в seo_optimizer.py записывать факт изменения мета-тегов в changelog проекта "Парковка Уфа".
+2. При вызове оптимизации в seo_optimizer.py записывать факт изменения мета-тегов в changelog проекта "<PROJECT_NAME>".
 3. Покрыть TDD тестом в test_seo_optimizer.py.
 4. Проверить Ruff линтером и pytest.
 
