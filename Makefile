@@ -12,6 +12,10 @@ format:
 check-rules:
 	python3 tools/check_rules.py
 
+normalize-constitution:
+	uv run python tools/normalize_constitution.py --apply
+	uv run python tools/update_gem_bot_prompts.py
+
 check: check-rules
 	uv run ruff check .
 	uv run ruff format --check .
