@@ -20,6 +20,10 @@ def main() -> None:
             "Gemini Bot Knowledge Base",
             "Gemini Bot System Prompt",
         ],
+        "gemini_bot_instructions.md": [
+            "Gemini Bot Instructions",
+            "Gemini Bot Usage Instructions",
+        ],
     }
 
     conn = sqlite3.connect(DB_PATH)
