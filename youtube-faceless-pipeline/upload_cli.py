@@ -48,6 +48,8 @@ class YouTubeUploader:
             "video_file": video_path,
             "thumbnail_file": thumbnail_path,
             "title": metadata.get("title", "Untitled Video"),
+            "title_a": metadata.get("title_a", ""),
+            "title_b": metadata.get("title_b", ""),
             "description": metadata.get("description", ""),
             "tags": metadata.get("tags", []),
             "privacy_status": "public",

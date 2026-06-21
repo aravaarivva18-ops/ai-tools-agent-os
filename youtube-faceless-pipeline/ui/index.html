@@ -1012,9 +1012,15 @@
                 <!-- Правая колонка (SEO, Загрузка, Чеклист) -->
                 <div class="info-panel">
                     <div class="seo-item">
-                        <button class="btn-action-copy" onclick="copyText('meta-title-text')">Копировать</button>
-                        <div class="seo-label">Оптимизированный заголовок</div>
-                        <div style="margin-top: 1rem;" class="seo-content-box" id="meta-title-text"></div>
+                        <button class="btn-action-copy" onclick="copyText('meta-title-a-text')">Копировать</button>
+                        <div class="seo-label">Заголовок Вариант A (Профессиональный)</div>
+                        <div style="margin-top: 1rem;" class="seo-content-box" id="meta-title-a-text"></div>
+                    </div>
+
+                    <div class="seo-item">
+                        <button class="btn-action-copy" onclick="copyText('meta-title-b-text')">Копировать</button>
+                        <div class="seo-label">Заголовок Вариант B (Кликбейтный CTR)</div>
+                        <div style="margin-top: 1rem;" class="seo-content-box" id="meta-title-b-text"></div>
                     </div>
 
                     <div class="seo-item">
@@ -1256,7 +1262,8 @@
                 
                 document.getElementById('output-thumbnail').src = data.thumbnail_url;
 
-                document.getElementById('meta-title-text').innerText = data.metadata.title;
+                document.getElementById('meta-title-a-text').innerText = data.metadata.title_a || data.metadata.title;
+                document.getElementById('meta-title-b-text').innerText = data.metadata.title_b || data.metadata.title;
                 document.getElementById('meta-desc-text').innerText = data.metadata.description;
                 
                 const tagsContainer = document.getElementById('meta-tags-container');

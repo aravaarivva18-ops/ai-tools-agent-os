@@ -64,17 +64,29 @@ class SEOOptimizer:
         """
         raw_title = raw_script.get("title", "Untitled Video")
 
-        # 1. Оптимизация заголовка (делаем его более цепляющим и < 60 символов)
-        # Убираем лишние слова, добавляем сильные слова и эмодзи
+        # Очищаем тему
         clean_title = raw_title.replace("The Future of ", "").replace("Future of ", "")
-        optimized_title = f"Autonomous AI Agents: {clean_title} 🚀"
-        if len(optimized_title) > 60:
-            optimized_title = optimized_title[:57] + "..."
+
+        # Парсим русские подтемы для таргетированных A/B тестов
+        ru_match = re.search(r"([А-Яа-я\s:,?!\-\"0-9]+)", raw_title)
+        if ru_match and len(ru_match.group(1).strip()) > 5:
+            topic_ru = ru_match.group(1).strip()
+            topic_ru = re.sub(r"^:\s*", "", topic_ru)
+            optimized_title_a = f"ИИ Агенты 2026: {topic_ru}"
+            optimized_title_b = "ИИ ведет бизнес БЕЗ человека в 2026? 😱"
+        else:
+            optimized_title_a = f"Autonomous AI Agents: {clean_title} 🚀"
+            optimized_title_b = "Can AI Run Your Business? Agents in 2026 😱"
+
+        if len(optimized_title_a) > 60:
+            optimized_title_a = optimized_title_a[:57] + "..."
+        if len(optimized_title_b) > 60:
+            optimized_title_b = optimized_title_b[:57] + "..."
 
         # 2. Создание оптимизированного описания
         # YouTube ценит первые 2 строки описания. Они должны содержать ключевые слова.
         description_lines = [
-            f"🔥 {optimized_title} — This is how Autonomous AI Agents will change everything in 2026!",
+            f"🔥 {optimized_title_a} — This is how Autonomous AI Agents will change everything in 2026!",
             "Discover the latest artificial intelligence trends and workflows.",
             "",
             "📌 TIMESTAMPS:",
@@ -105,7 +117,9 @@ class SEOOptimizer:
         )
 
         return {
-            "title": optimized_title,
+            "title": optimized_title_a,
+            "title_a": optimized_title_a,
+            "title_b": optimized_title_b,
             "description": optimized_description,
             "tags": seo_tags,
         }

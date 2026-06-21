@@ -1,63 +1,90 @@
-# Спецификация и План реализации YouTube Faceless Pipeline v2.0
+# Spec: YouTube Faceless Pipeline v2.1 — Production Video Run
 
-Этот документ описывает расширенную версию пайплайна генерации Shorts-видео с интеграцией SEO оптимизации, защиты от дублирования контента (Jaccard similarity check), генератора обложек (Thumbnail) и загрузчика (Upload CLI), готовых для прохождения монетизации YouTube AdSense.
+## Objective
+Произвести и оптимизировать первое полноценное видео для публикации на YouTube по теме: `"Autonomous AI Agents 2026: Как ИИ ведёт бизнес без человека"`. Видео должно соответствовать требованиям долгого формата (длительность $T_{video} > 90\text{ с}$), иметь оптимизированный SEO-пакет с A/B заголовками, превью-обложку и пройти проверку на уникальность сценария (сходство по Жаккару $< 40\%$).
 
-## 1. Общие сведения и KPI
+## Tech Stack
+- **Язык**: Python 3.12+ (Google Python Style Guide)
+- **Библиотеки**: `Pillow`, `FastAPI`, `uvicorn`, `jinja2`
+- **Инструменты**: `ffmpeg` (локальная сборка), macOS `say` CLI (генерация речи)
+- **Внешние API**: Pollinations AI (генерация изображений)
+- **Тестирование**: `pytest`, `pytest-asyncio`
 
-*   **Цель**: Автоматизировать создание первого публичного видео по теме **"Autonomous AI Agents 2026"** с использованием реальных данных исследования `last30days` и свести к минимуму ручные операции.
-*   **KPI**:
-    *   Уникальность контента: сходство с прошлыми сценариями `< 40%`.
-    *   Время генерации видео и обложки: `< 15 минут`.
-    *   Готовность к монетизации (AdSense): 100% прохождение встроенного чеклиста безопасности.
-    *   Время загрузки/отклика UI: `< 2 секунд`.
-    *   Успешность тестов: `100% Pass`.
+## Commands
+- **Тестирование**: `uv run pytest youtube-faceless-pipeline/tests/test_pipeline.py`
+- **Проверка Ruff**: `uv run ruff check youtube-faceless-pipeline`
+- **Проверка Bandit**: `uv run python -m bandit -r youtube-faceless-pipeline -x youtube-faceless-pipeline/tests`
+- **Локальный запуск**: `python3 youtube-faceless-pipeline/main.py --serve --port 8000`
 
-### Архитектурная схема взаимодействия v2.0
-```mermaid
-graph TD
-    A[Web UI / CLI] -->|1. Запуск генерации| B[main.py / FastAPI]
-    B -->|2. Поиск трендов 2026| C[last30days.py]
-    B -->|3. Генерация сценария| D[tools/content_gen.py]
-    D -->|4. Проверка уникальности| E[seo_optimizer.py]
-    D -->|5. Генерация обложки & SEO| E
-    D -->|6. Сборка видео & Озвучка| F[FFmpeg & say CLI]
-    D -->|7. Подготовка пакета загрузки| G[upload_cli.py]
-    G -->|8. Чеклист монетизации & Аналитика| A
+## Project Structure
+- [youtube-faceless-pipeline/](file:///Users/rus/ai-tools/youtube-faceless-pipeline/)
+  - [tools/content_gen.py](file:///Users/rus/ai-tools/youtube-faceless-pipeline/tools/content_gen.py) — Генератор видео, TTS и сшивки FFmpeg.
+  - [seo_optimizer.py](file:///Users/rus/ai-tools/youtube-faceless-pipeline/seo_optimizer.py) — Оптимизация метаданных, A/B заголовки и Jaccard check.
+  - [upload_cli.py](file:///Users/rus/ai-tools/youtube-faceless-pipeline/upload_cli.py) — Сборка upload package и чеклист AdSense.
+  - [main.py](file:///Users/rus/ai-tools/youtube-faceless-pipeline/main.py) — FastAPI бэкенд и CLI точка входа.
+  - [ui/index.html](file:///Users/rus/ai-tools/youtube-faceless-pipeline/ui/index.html) — Premium Dark BI веб-панель.
+  - [tests/test_pipeline.py](file:///Users/rus/ai-tools/youtube-faceless-pipeline/tests/test_pipeline.py) — Тесты пайплайна.
+
+## Code Style
+Соблюдение Google Python Style Guide: импорт только модулей и пакетов.
+```python
+import os
+import urllib.request
+from typing import Any  # Исключение для typing
 ```
 
----
+## Testing Strategy
+- Юнит-тесты на генерацию длинных видео ($T_{video} > 90\text{ с}$).
+- Тесты на корректность парсинга A/B вариантов заголовков.
+- Офлайн-тестирование пайплайна (с моками сетевых запросов).
 
-## 2. Реализованные компоненты и файлы
+## Boundaries
+- **Always**: Запускать линтеры Ruff и SAST Bandit перед фиксацией изменений.
+- **Ask first**: Изменение параметров сборки FFmpeg.
+- **Never**: Передавать секреты или API-ключи в открытом виде.
 
-1.  **[tools/content_gen.py](file:///Users/rus/ai-tools/youtube-faceless-pipeline/tools/content_gen.py)**:
-    *   Интегрирует все этапы: `fetch_trends` -> `generate_script` -> `check_similarity` -> `optimize_metadata` -> `generate_image` (обложка + сцены) -> `generate_speech` -> `assemble_scene_video` -> `prepare_upload_package`.
-2.  **[seo_optimizer.py](file:///Users/rus/ai-tools/youtube-faceless-pipeline/seo_optimizer.py)**:
-    *   Генерирует высококликабельные заголовки (длина `<60` символов), структурированные описания с таймкодами и оптимизированные хэштеги/теги.
-    *   Вычисляет сходство по коэффициенту Жаккара (Jaccard similarity index) с ранее сгенерированными видео, чтобы предотвратить нарушения правил YouTube по "reused/duplicate content".
-3.  **[upload_cli.py](file:///Users/rus/ai-tools/youtube-faceless-pipeline/upload_cli.py)**:
-    *   Генерирует готовый `upload_package.json`, содержащий метаданные, пути к видеофайлу и обложке.
-    *   Предоставляет чеклист монетизации AdSense (отсутствие копирайта, оригинальный видеоряд, оригинальный голос).
-    *   Предоставляет эмулируемые данные аналитики (просмотры, CTR, удержание).
-4.  **[ui/index.html](file:///Users/rus/ai-tools/youtube-faceless-pipeline/ui/index.html)**:
-    *   Студия c глассморфизмом, поддерживающая вкладки: "Студия" (генерация, превью видео и обложки), "Монетизация" (чеклист AdSense), "Аналитика" (графики просмотров и удержания аудитории).
-5.  **[tests/test_pipeline.py](file:///Users/rus/ai-tools/youtube-faceless-pipeline/tests/test_pipeline.py)**:
-    *   Три юнит-теста:
-        *   `test_pipeline_positive_cycle` — проверка успешного сквозного рендеринга видео, создания обложки и пакета метаданных.
-        *   `test_pipeline_negative_invalid_niche` — защита от некорректных ниш (policy check).
-        *   `test_pipeline_duplicate_content_check` — проверка срабатывания ошибки при попытке генерации дублирующего сценария.
+## Success Criteria (DoD)
+* **Длительность видео**: $T_{video} > 90\text{ с}$.
+* **Уникальность сценария**: $U_{jaccard} > 60\%$ (сходство $S_{jaccard} < 40\%$).
+* **Экономия времени**: $T_{saved} \ge 6\text{ ч/видео}$.
+* **SEO-пакет**: Генерация A/B вариантов заголовков, описания с таймкодами, тегов и обложки.
+* **Быстродействие UI**: $t_{ui} < 2\text{ с}$.
+* **Тесты**: $100\%$ успешное прохождение.
 
 ---
 
-## 3. Монетизация и Аналитика (AdSense Checklist)
-
-Для прохождения ручной модерации AdSense в 2026 году пайплайн соблюдает следующие правила:
-*   **Изображения**: Генерируются уникальные картинки по детализированным промптам без вотермарок и чужого авторского права.
-*   **Текст**: Скрипты проходят валидацию на уникальность, спам и опасный контент.
-*   **Аналитика (Mocked)**: В UI выводится аналитическая панель с ключевыми метриками (CTR, среднее удержание аудитории на уровне ~72% для Shorts, доход) с SVG-визуализацией.
+## Technical Plan (Phase 2: Plan)
+1. **Расширение `content_gen.py` для длинных видео**:
+   - Переписать генератор сценариев, чтобы для целевой ниши генерировалось 6 длинных сцен.
+   - Метод `generate_speech` нарезать на предложения, синтезировать через `say` по частям во избежание переполнения буфера CLI, склеивать через FFmpeg в один `.wav`.
+   - Внедрить жесткое ограничение сходства по Жаккару $S_{jaccard} < 40\%$ (уникальность сценария $> 60\%$).
+2. **Интеграция A/B вариантов заголовков в `seo_optimizer.py`**:
+   - Метод `optimize_metadata` должен возвращать `title_a` и `title_b`.
+   - Вариант A строится на основе прямого вхождения темы, вариант B — вовлекающий/кликбейтный стиль.
+3. **Обновление структуры `upload_package.json` в `upload_cli.py`**:
+   - Сохранять оба варианта `title_a` и `title_b`.
+4. **Обновление веб-интерфейса**:
+   - Добавить A/B варианты заголовков в превью-панель.
+   - Убедиться, что CSS содержит все неоновые акценты.
+5. **Обновление тестов**:
+   - Добавить тесты на проверку длительности сгенерированного видео $> 90\text{ с}$ и проверку лимита уникальности Жаккара.
 
 ---
 
-## 4. Концепт интерфейса v2.0
-Мы обновили интерфейс, чтобы он в точности соответствовал нашему премиальному темному дизайну с неоновыми фиолетовыми и бирюзовыми акцентами, глассморфизмом и плавными анимациями при переключении шагов.
-
-![UI Design](file:///Users/rus/.gemini/antigravity-cli/brain/072f44ab-fc3a-49d7-ba61-a522fa821321/faceless_pipeline_concept_1782064295806.jpg)
+## Tasks (Phase 3: Tasks)
+- [ ] **Task 1: Обновление лимита уникальности и сценария в `content_gen.py`**
+  - *Acceptance*: Сходство $S_{jaccard} > 40\%$ вызывает `ContentPolicyError`, а сценарий для ИИ-агентов содержит 6 сцен с общим количеством слов $> 130$.
+  - *Verify*: `pytest -k test_pipeline`
+  - *Files*: `youtube-faceless-pipeline/tools/content_gen.py`
+- [ ] **Task 2: Реализация A/B заголовков в `seo_optimizer.py` и `upload_cli.py`**
+  - *Acceptance*: Метод возвращает `title_a` и `title_b`, пакет метаданных содержит оба поля.
+  - *Verify*: `pytest`
+  - *Files*: `youtube-faceless-pipeline/seo_optimizer.py`, `youtube-faceless-pipeline/upload_cli.py`
+- [ ] **Task 3: Интеграция A/B превью в `ui/index.html`**
+  - *Acceptance*: В интерфейсе выводятся оба варианта заголовка для копирования.
+  - *Verify*: Визуальный осмотр разметки.
+  - *Files*: `youtube-faceless-pipeline/ui/index.html`
+- [ ] **Task 4: Написание тестов на длину видео и A/B логику**
+  - *Acceptance*: Тесты проверяют $T_{video} > 90\text{ с}$ и наличие полей A/B заголовков.
+  - *Verify*: `uv run pytest`
+  - *Files*: `youtube-faceless-pipeline/tests/test_pipeline.py`

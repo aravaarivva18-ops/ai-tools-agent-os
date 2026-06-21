@@ -110,24 +110,55 @@ class VideoGenerator:
         trend1 = trends[0] if len(trends) > 0 else "AI Automation"
         trend2 = trends[1] if len(trends) > 1 else "Future Tech"
 
+        niche_lower = niche.lower()
+        if "autonomous" in niche_lower or "agents" in niche_lower:
+            scenes = [
+                {
+                    "text": "Привет! В две тысячи двадцать шестом году автономные ИИ-агенты вышли на совершенно новый уровень и теперь они способны управлять реальными коммерческими проектами и бизнесами полностью самостоятельно без какого-либо вмешательства со стороны человека.",
+                    "visual_prompt": "Futuristic clean laboratory with glowing neon cyan lines, professional dashboard displayed on screen, hyperrealistic, dark mood"
+                },
+                {
+                    "text": "В основе всей этой невероятной системы лежит передовая архитектура Solo Loop. ИИ-агент самостоятельно ставит себе задачи, пишет программный код, разворачивает облачные серверы, настраивает базы данных и проводит полную SEO-оптимизацию.",
+                    "visual_prompt": "Abstract cybernetic brain connection nodes, digital neural network interface, glowing blue particles, cinematic lighting"
+                },
+                {
+                    "text": "Автономные онлайн-магазины, интеллектуальные рекламные кампании в соцсетях и автоматический юридический аудит сложных контрактов — все эти рутинные процессы теперь выполняются роботами со скоростью, превышающей человеческую в десятки раз.",
+                    "visual_prompt": "Digital data stream matrix, golden particle effects flowing through dark virtual corridor, high technology background"
+                },
+                {
+                    "text": "Новейшие технологические решения, такие как революционная платформа ChipStack AI, наглядно продемонстрировали на выставке Computex 2026, что виртуальные инженеры могут проектировать сложнейшие микропроцессоры за считанные минуты.",
+                    "visual_prompt": "Detailed silicon microchip layout glowing green, virtual schematic blueprint overlay, high tech render"
+                },
+                {
+                    "text": "В этой новой реальности человек смещается в роль высокоуровневого рецензента и контролера по знаменитому правилу Dan Martell 10-80-10, экономя колоссальное количество своего драгоценного времени и ментальной энергии.",
+                    "visual_prompt": "Minimalist digital productivity space, smooth neon purple highlights, elegant dashboard showing time saved"
+                },
+                {
+                    "text": "Если вы хотите узнать, как запустить и масштабировать свой собственный полностью автоматизированный ИИ-бизнес, обязательно подписывайтесь на наш канал. Мы покажем вам весь процесс разработки от А до Я!",
+                    "visual_prompt": "Futuristic neon red subscribe button hovering in dynamic abstract cyberspace backdrop, cinematic render"
+                }
+            ]
+        else:
+            scenes = [
+                {
+                    "text": f"Here is the truth about {trend1} in 2026. It is changing faster than ever.",
+                    "visual_prompt": "futuristic laboratory with glowing neon lines, high tech computer screen displaying charts, hyperrealistic, dark mood, purple neon accents",
+                },
+                {
+                    "text": f"This is why {trend2} will change everything in our daily productivity loop.",
+                    "visual_prompt": "abstract cybernetic brain connection nodes, digital neural network interface, glowing blue and cyan particles, cinematic lighting",
+                },
+                {
+                    "text": "The era of manual work is coming to an end. Join the automation era today.",
+                    "visual_prompt": "minimalist neon red subscribe button hovering in a futuristic abstract cyberspace background, cinematic render",
+                },
+            ]
+
         script = {
             "title": f"The Future of {niche.split('/')[-1].capitalize()}: {trend1.title()}",
             "description": f"How {trend1} and {trend2} are reshaping the world. Stay tuned for details! #technology #faceless #ai",
             "tags": [niche.split("/")[-1], "tech", "faceless", "ai", "trends"],
-            "scenes": [
-                {
-                    "text": f"Here is the truth about {trend1} in 2026.",
-                    "visual_prompt": "futuristic laboratory with glowing neon lines, high tech computer screen displaying charts, hyperrealistic, dark mood, purple neon accents",
-                },
-                {
-                    "text": f"This is why {trend2} will change everything.",
-                    "visual_prompt": "abstract cybernetic brain connection nodes, digital neural network interface, glowing blue and cyan particles, cinematic lighting",
-                },
-                {
-                    "text": "The era of manual work is coming to an end.",
-                    "visual_prompt": "minimalist neon red subscribe button hovering in a futuristic abstract cyberspace background, cinematic render",
-                },
-            ],
+            "scenes": scenes,
         }
 
         # Валидация сгенерированного сценария
@@ -431,9 +462,10 @@ class VideoGenerator:
         full_text = " ".join([scene["text"] for scene in script["scenes"]])
         similarity = self.seo.check_similarity(full_text)
 
-        if similarity > 0.75:
+        # Уникальность должна быть > 60%, то есть сходство по Жаккару < 40% (0.40)
+        if similarity > 0.40:
             raise ContentPolicyError(
-                f"Duplicate content warning: script has {similarity * 100:.1f}% similarity with past videos."
+                f"Duplicate content warning: script has {similarity * 100:.1f}% similarity with past videos (max allowed: 40.0%)."
             )
 
         self.seo.save_to_database(full_text)
