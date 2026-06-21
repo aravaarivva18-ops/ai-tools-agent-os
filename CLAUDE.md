@@ -25,6 +25,7 @@
 - **Скрапинг и парсинг HTML (Selectolax / curl_cffi)**: См. [skills/stealth-scraping/SKILL.md](file:///Users/rus/ai-tools/skills/stealth-scraping/SKILL.md)
 - **Генерация PDF-документов (Typst)**: См. [skills/typst-pdf/SKILL.md](file:///Users/rus/ai-tools/skills/typst-pdf/SKILL.md)
 - **Хранение данных и RLS (Supabase / pgvector / Alembic)**: См. [skills/database-persistence/SKILL.md](file:///Users/rus/ai-tools/skills/database-persistence/SKILL.md)
+- **Создание и стандартизация JIT-навыков (Pydantic / Agno-style)**: См. [skills/skill-creator/SKILL.md](file:///Users/rus/ai-tools/skills/skill-creator/SKILL.md)
 
 
 
@@ -40,14 +41,15 @@
 
 
 
-## 📐 Глобальные правила разработки (v3.1)
+## 📐 Глобальные правила разработки (v10)
 Все разработки регулируются конституцией [GEMINI_ANTIGRAVITY.md](file:///Users/rus/GEMINI_ANTIGRAVITY.md).
 Основные принципы:
-- **Solo Loop v3.1**: Субагенты отключены. Работа ведется только нативными инструментами.
+- **Solo Loop v10**: Субагенты отключены. Статус сессии восстанавливается из `implementation_plan.md` через `PlanningWithFiles`. Вывод сжимается через `SoloLoopV10`.
+- **Валидация и Схемы**: Валидировать выходы LLM по Pydantic моделям и генерировать схемы инструментов через `tools/tool_validator.py`.
+- **Навыки**: Использовать `tools/agent_skills.py` для управления JIT-навыками (создание, проверка выходов, инспекция).
 - **Плагины**: Обязательно использование `agent-skills` (слэш-команды), `fablize` (DoD и доказательства) и `ponytail` (YAGNI/контроль абстракций).
-- **YAGNI (Ponytail) & TDD**: Максимум 2-3 уровня абстракции. Любой код сопровождается тестами.
-- **Self-Healing & Self-Improvement**: При ошибках запускается `tools/test_healer.py`. В конце сессии - `tools/self_improve.py`.
-- **Obsidian Sync**: Фиксация изменений в Obsidian Local REST API через `tools/obsidian_cli.py` и `tools/llm_wiki.py`.
+- **YAGNI (Ponytail) & TDD**: Максимум 2 уровня абстракции. Любой код сопровождается тестами.
+- **Self-Healing & Self-Improvement**: При ошибках раннер `tools/test_healer.py` перехватывает сбои (Stealth Stop на 3-й раз). В конце сессии - `tools/self_improve.py`.
 - **Абсолютные пути**: Использовать `file:///Users/rus/` для локального хоста macOS. Пути `/home/workdir/` запрещены.
 - **Безопасность (SAST)**: Для запуска Bandit использовать `python3 -m bandit` из окружения `uv`.
 

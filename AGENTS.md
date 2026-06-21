@@ -30,18 +30,20 @@ Every meaningful change requires a DOX pass before the task is done. Update the 
 - [[tools/AGENTS.md]] — CLI Dashboard, Diff Applier, Test Healer, and utilities.
 - [[geo-seo/AGENTS.md]] — Scraping engines (`selectolax`, `curl_cffi`).
 - [[ai-sales/AGENTS.md]] — Typst-based PDF report generation workflows.
+- [[bitrix-knowledge/AGENTS.md]] — Persistent 1C-Bitrix knowledge base & Obsidian RAG index.
 
 ---
 
-## 📐 Глобальные регламенты (v3.1)
+## 📐 Глобальные регламенты (v10)
 
 Все разработки в монорепозитории регулируются конституцией [GEMINI_ANTIGRAVITY.md](file:///Users/rus/GEMINI_ANTIGRAVITY.md).
 Основные стандарты:
-- **Solo Loop v3.1**: Субагенты запрещены.
+- **Solo Loop v10**: Субагенты запрещены. Статус сессии считывается из `implementation_plan.md` через `PlanningWithFiles`. Выводы сжимаются через `SoloLoopV10`.
+- **Валидация и Схемы**: Строгая валидация по BaseModel и экспорт Agno-style схем через `tools/tool_validator.py`.
+- **Навыки**: Управление JIT-навыками через `tools/agent_skills.py`.
 - **Окружение**: Python 3.12+ (`uv run`), форматирование Ruff (`ruff.toml`).
-- **Плагины**: Обязательно использование `agent-skills` (слэш-команды контроля качества), `fablize` (фиксация DoD и доказательств) и `ponytail` (регулярный аудит на overengineering).
-- **YAGNI**: Ponytail mode `full`, максимум 2-3 уровня абстракции.
-- **Процесс**: Spec -> Research -> Plan -> Implement -> Test (`tools/test_healer.py`) -> Ship (`tools/self_improve.py`).
-- **Синхронизация**: Obsidian Local REST API через `tools/obsidian_cli.py` и `tools/llm_wiki.py`.
+- **Плагины**: Обязательно использование `agent-skills` (слэш-команды), `fablize` (DoD и доказательства) и `ponytail` (YAGNI/контроль абстракций).
+- **YAGNI**: Ponytail mode `full`, максимум 2 уровня абстракции.
+- **Процесс**: Spec -> Research -> Plan -> Implement -> Test (`tools/test_healer.py` со Stealth Stop на 3-й раз) -> Ship (`tools/self_improve.py`).
 
 
