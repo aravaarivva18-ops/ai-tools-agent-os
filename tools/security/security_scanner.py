@@ -5,8 +5,10 @@ the absolute virtual environment path of Python.
 """
 
 import os
+import re
 import subprocess  # nosec B404
 import sys
+from pathlib import Path
 
 
 def get_verified_python_path() -> str:
@@ -23,6 +25,7 @@ def build_bandit_command(
     exclude_dirs: list[str] | None = None,
     skip_tests: list[str] | None = None,
     quiet: bool = False,
+    output_format: str | None = None,
 ) -> list[str]:
     """Builds the shell command list for executing Bandit using the verified python path."""
     python_path = get_verified_python_path()
@@ -40,6 +43,9 @@ def build_bandit_command(
     if quiet:
         cmd.append("-q")
 
+    if output_format:
+        cmd.extend(["-f", output_format])
+
     return cmd
 
 
@@ -48,12 +54,13 @@ def run_security_scan(
     exclude_dirs: list[str] | None = None,
     skip_tests: list[str] | None = None,
     quiet: bool = False,
+    output_format: str | None = None,
 ) -> tuple[int, str, str]:
     """
     Runs the Bandit scan command in a subprocess.
     Returns a tuple of (returncode, stdout, stderr).
     """
-    cmd = build_bandit_command(targets, exclude_dirs, skip_tests, quiet)
+    cmd = build_bandit_command(targets, exclude_dirs, skip_tests, quiet, output_format)
 
     # Verify that the executable file exists before running to avoid "no such file or directory"
     if not os.path.exists(cmd[0]):
@@ -71,10 +78,6 @@ def run_security_scan(
         return 1, "", str(e)
 
 
-import re
-from pathlib import Path
-
-
 def scan_for_secrets(target_path: str = ".") -> list[dict]:
     """
     Scans files in target_path for hardcoded secrets, keys, and tokens.
@@ -88,7 +91,10 @@ def scan_for_secrets(target_path: str = ".") -> list[dict]:
     }
 
     # Generic pattern to catch variables like token = 'xxx' or password = "xxx"
-    generic_pattern = re.compile(r"\b(password|secret|passwd|token|api_key)\s*=\s*['\"]([^'\"]{8,})['\"]", re.IGNORECASE)
+    generic_pattern = re.compile(
+        r"\b(password|secret|passwd|token|api_key)\s*=\s*['\"]([^'\"]{8,})['\"]",
+        re.IGNORECASE,
+    )
 
     findings = []
     exclude_dirs = {".venv", ".git", ".obsidian", "__pycache__", "node_modules"}
@@ -108,7 +114,18 @@ def scan_for_secrets(target_path: str = ".") -> list[dict]:
                 if any(part in exclude_dirs for part in p.parts):
                     continue
                 # Skip binary files by extension
-                if p.suffix.lower() in {".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz", ".db"}:
+                if p.suffix.lower() in {
+                    ".png",
+                    ".jpg",
+                    ".jpeg",
+                    ".gif",
+                    ".ico",
+                    ".pdf",
+                    ".zip",
+                    ".tar",
+                    ".gz",
+                    ".db",
+                }:
                     continue
                 files_to_scan.append(p)
 
@@ -120,26 +137,40 @@ def scan_for_secrets(target_path: str = ".") -> list[dict]:
                 # 1. Check strong patterns
                 for name, regex in patterns.items():
                     if regex.search(line):
-                        findings.append({
-                            "type": name,
-                            "file": str(f),
-                            "line": idx,
-                            "context": line.strip()
-                        })
+                        findings.append(
+                            {
+                                "type": name,
+                                "file": str(f),
+                                "line": idx,
+                                "context": line.strip(),
+                            }
+                        )
                 # 2. Check generic pattern
                 match = generic_pattern.search(line)
                 if match:
                     # Skip common test mock data and env lookups
                     val = match.group(2)
-                    if not any(x in val.lower() for x in ("mock", "test", "env", "dummy", "placeholder", "os.get")):
-                        findings.append({
-                            "type": "Generic Secret",
-                            "file": str(f),
-                            "line": idx,
-                            "context": line.strip()
-                        })
-        except Exception:
-            continue
+                    if not any(
+                        x in val.lower()
+                        for x in (
+                            "mock",
+                            "test",
+                            "env",
+                            "dummy",
+                            "placeholder",
+                            "os.get",
+                        )
+                    ):
+                        findings.append(
+                            {
+                                "type": "Generic Secret",
+                                "file": str(f),
+                                "line": idx,
+                                "context": line.strip(),
+                            }
+                        )
+        except Exception:  # noqa: S110
+            pass
 
     return findings
 

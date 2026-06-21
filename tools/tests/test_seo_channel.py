@@ -34,8 +34,12 @@ def test_create_seo_skill_includes_optimizations():
     content = skill_path.read_text(encoding="utf-8")
 
     # Verify SEO & GEO best practices are generated
-    assert "programmatic seo" in content.lower(), "Programmatic SEO should be recommended in SEO skill templates"
-    assert "eeat" in content.lower(), "EEAT credentials should be recommended in SEO skill templates"
+    assert "programmatic seo" in content.lower(), (
+        "Programmatic SEO should be recommended in SEO skill templates"
+    )
+    assert "eeat" in content.lower(), (
+        "EEAT credentials should be recommended in SEO skill templates"
+    )
     assert "ai search engine" in content.lower() or "geo" in content.lower(), (
         "AI Search / GEO optimization should be recommended in SEO skill templates"
     )
@@ -52,5 +56,7 @@ def test_create_non_seo_skill_clean():
     assert skill_path.exists()
     content = skill_path.read_text(encoding="utf-8")
 
-    assert "programmatic seo" not in content.lower(), "SEO bloat should not exist in db-connector"
+    assert "programmatic seo" not in content.lower(), (
+        "SEO bloat should not exist in db-connector"
+    )
     assert "eeat" not in content.lower(), "EEAT bloat should not exist in db-connector"

@@ -213,6 +213,10 @@
                 </a>
                 
                 <div class="flex items-center gap-4">
+                    <a href="#/security" class="flex items-center gap-2 py-1.5 px-3 rounded-lg bg-slate-900/60 border border-slate-800 hover:border-slate-600 text-slate-300 hover:text-white font-medium text-xs transition btn-spring" title="Сканирование безопасности SAST">
+                        <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                        <span>Безопасность</span>
+                    </a>
                     <a href="http://localhost:8501" target="_blank" class="hidden md:flex items-center gap-2 py-1.5 px-3 rounded-lg bg-sky-950/40 border border-sky-800/40 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-medium text-xs transition btn-spring" title="Открыть DataLens-стиль MVP в Streamlit">
                         <i class="fa-solid fa-chart-line"></i>
                         <span>Streamlit-версия</span>
@@ -417,6 +421,82 @@
                         <div id="change-logs-list" class="flex-1 overflow-y-auto space-y-4 pr-1">
                             <!-- Сюда вставляются логи через JS -->
                             <div class="text-center py-8 text-slate-500">Логов изменений нет</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Экран безопасности (Security Analysis View) -->
+            <div id="security-view" class="hidden space-y-6 screen-transition screen-hidden">
+                <!-- Заголовок и кнопка Назад -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <a href="#/" class="w-10 h-10 rounded-lg border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition btn-spring">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
+                        <div>
+                            <h2 class="text-3xl font-bold font-outfit text-white flex items-center gap-2">
+                                <i class="fa-solid fa-shield-halved text-emerald-400"></i> Анализ безопасности
+                            </h2>
+                            <p class="text-slate-400 text-sm mt-1">Сканирование кода (Bandit SAST) и поиск hardcoded секретов/токенов</p>
+                        </div>
+                    </div>
+                    
+                    <button id="run-scan-btn" class="py-2.5 px-5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition btn-spring flex items-center gap-2 shadow-lg shadow-emerald-600/10">
+                        <i class="fa-solid fa-play"></i> Запустить сканирование
+                    </button>
+                </div>
+
+                <!-- Карточки итогов сканирования -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bi-panel p-6 rounded-lg flex items-center gap-4 border border-slate-800 bg-[#0d1527]/50">
+                        <div class="w-12 h-12 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-xs uppercase font-semibold tracking-wider">Статус системы</div>
+                            <div id="scan-status-text" class="text-xl font-bold text-white mt-1">Ожидает запуска</div>
+                        </div>
+                    </div>
+                    <div class="bi-panel p-6 rounded-lg flex items-center gap-4 border border-slate-800 bg-[#35101a]/30">
+                        <div class="w-12 h-12 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-xs uppercase font-semibold tracking-wider font-medium">Найденные секреты</div>
+                            <div id="scan-total-secrets" class="text-2xl font-bold text-white mt-1">—</div>
+                        </div>
+                    </div>
+                    <div class="bi-panel p-6 rounded-lg flex items-center gap-4 border border-slate-800 bg-[#281c10]/30">
+                        <div class="w-12 h-12 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-bug"></i>
+                        </div>
+                        <div>
+                            <div class="text-slate-400 text-xs uppercase font-semibold tracking-wider font-medium">Уязвимости Bandit</div>
+                            <div id="scan-total-sast" class="text-2xl font-bold text-white mt-1">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Результаты сканирования -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Левая колонка: Секреты -->
+                    <div class="bi-panel p-6 rounded-lg flex flex-col border border-slate-800">
+                        <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-key text-red-400"></i> Утечки секретов и токенов
+                        </h3>
+                        <div id="secrets-scan-results" class="flex-1 overflow-y-auto space-y-4 max-h-[500px] pr-1">
+                            <div class="text-center py-12 text-slate-500">Запустите сканирование для проверки файлов</div>
+                        </div>
+                    </div>
+
+                    <!-- Правая колонка: Bandit SAST -->
+                    <div class="bi-panel p-6 rounded-lg flex flex-col border border-slate-800">
+                        <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-bug text-amber-400"></i> Уязвимости Bandit SAST
+                        </h3>
+                        <div id="sast-scan-results" class="flex-1 overflow-y-auto space-y-4 max-h-[500px] pr-1">
+                            <div class="text-center py-12 text-slate-500">Запустите сканирование для проверки файлов</div>
                         </div>
                     </div>
                 </div>

@@ -24,7 +24,3 @@ def test_no_ccr_dependencies():
     assert "claude-code-router" not in content.lower(), (
         "claude-code-router should not be added to dependencies"
     )
-
-
-
-

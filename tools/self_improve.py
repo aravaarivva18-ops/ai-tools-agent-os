@@ -306,7 +306,15 @@ def _classify_jit_skills(skills_dir_path: Path | None) -> dict[str, int]:
                     content = skill_md.read_text(encoding="utf-8").lower()
                     if any(
                         kw in content
-                        for kw in ["scale", "productivity", "business", "automation", "sop", "delegate", "time"]
+                        for kw in [
+                            "scale",
+                            "productivity",
+                            "business",
+                            "automation",
+                            "sop",
+                            "delegate",
+                            "time",
+                        ]
                     ):
                         result["scale"] += 1
                     elif any(
@@ -316,7 +324,16 @@ def _classify_jit_skills(skills_dir_path: Path | None) -> dict[str, int]:
                         result["seo"] += 1
                     elif any(
                         kw in content
-                        for kw in ["ui", "landing", "animation", "hover", "scroll", "frontend", "css", "web"]
+                        for kw in [
+                            "ui",
+                            "landing",
+                            "animation",
+                            "hover",
+                            "scroll",
+                            "frontend",
+                            "css",
+                            "web",
+                        ]
                     ):
                         result["ui"] += 1
                     else:
@@ -326,7 +343,9 @@ def _classify_jit_skills(skills_dir_path: Path | None) -> dict[str, int]:
     return result
 
 
-def generate_improvement_report(friction_logs_path: Path, output_path: Path, skills_dir_path: Path | None = None) -> dict:
+def generate_improvement_report(
+    friction_logs_path: Path, output_path: Path, skills_dir_path: Path | None = None
+) -> dict:
     """Reads friction logs, aggregates issues, and writes a self-improvement report with advanced metrics."""
     if not friction_logs_path.exists():
         if collect:

@@ -21,5 +21,9 @@ def test_no_speckit_dependencies():
     pyproject_path = Path("/Users/rus/ai-tools/pyproject.toml")
     assert pyproject_path.exists()
     content = pyproject_path.read_text(encoding="utf-8")
-    assert "specify-cli" not in content.lower(), "spec-kit should not be added to dependencies"
-    assert "spec-kit" not in content.lower(), "spec-kit should not be added to dependencies"
+    assert "specify-cli" not in content.lower(), (
+        "spec-kit should not be added to dependencies"
+    )
+    assert "spec-kit" not in content.lower(), (
+        "spec-kit should not be added to dependencies"
+    )

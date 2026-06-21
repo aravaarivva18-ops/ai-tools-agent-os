@@ -20,3 +20,6 @@ pgdata/
 .idea/
 .vscode/
 .DS_Store
+
+# Temporary outputs / spikes
+ai-ads/

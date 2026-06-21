@@ -63,7 +63,15 @@ class AgentSkillsManager:
         # Check if the skill is Business Scaling/Productivity-themed (Dan Martell insights)
         is_scale = any(
             keyword in normalized_name or keyword in description.lower()
-            for keyword in ["scale", "productivity", "business", "automation", "sop", "delegate", "time"]
+            for keyword in [
+                "scale",
+                "productivity",
+                "business",
+                "automation",
+                "sop",
+                "delegate",
+                "time",
+            ]
         )
 
         # Check if the skill is SEO/GEO-themed
@@ -81,13 +89,28 @@ class AgentSkillsManager:
         # Check if the skill is UI-themed (for animations, hover, scroll, frontend)
         is_ui = any(
             keyword in normalized_name or keyword in description.lower()
-            for keyword in ["ui", "landing", "animation", "hover", "scroll", "frontend", "css", "web"]
+            for keyword in [
+                "ui",
+                "landing",
+                "animation",
+                "hover",
+                "scroll",
+                "frontend",
+                "css",
+                "web",
+            ]
         )
 
         # Check if the skill is Prototype-themed (throwaway spike)
         is_prototype = any(
             keyword in normalized_name or keyword in description.lower()
-            for keyword in ["prototype", "spike", "draft", "throwaway", "proof-of-concept"]
+            for keyword in [
+                "prototype",
+                "spike",
+                "draft",
+                "throwaway",
+                "proof-of-concept",
+            ]
         )
 
         # Check if the skill is Grill/Docs-alignment themed

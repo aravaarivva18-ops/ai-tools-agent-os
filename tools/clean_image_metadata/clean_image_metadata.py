@@ -14,7 +14,7 @@ from PIL import Image
 
 try:
     import tkinter as tk
-    from tkinter import filedialog, messagebox, ttk
+    from tkinter import filedialog, messagebox
 
     HAS_TKINTER = True
     ParentCanvas = tk.Canvas
@@ -65,9 +65,7 @@ def clean_jpeg_metadata(input_path: str, output_path: str) -> bool:
 
 
 def clean_png_metadata(input_path: str, output_path: str) -> bool:
-    """
-    Удаляет текстовые метаданные (tEXt, zTXt, iTXt чанки) из PNG-изображения.
-    """
+    """Удаляет текстовые метаданные (tEXt, zTXt, iTXt чанки) из PNG-изображения."""
     try:
         if not os.path.exists(input_path):
             return False
@@ -84,9 +82,7 @@ def clean_png_metadata(input_path: str, output_path: str) -> bool:
 
 
 def clean_image(input_path: str, output_path: str) -> bool:
-    """
-    Определяет формат изображения по расширению и вызывает соответствующую очистку.
-    """
+    """Определяет формат изображения по расширению и вызывает соответствующую очистку."""
     try:
         if not os.path.exists(input_path):
             return False
@@ -245,16 +241,16 @@ class MetadataCleanerApp:
             justify="center",
         )
 
-        self.drop_canvas.bind("<Button-1>", lambda e: self.browse_files())
+        self.drop_canvas.bind("<Button-1>", lambda _: self.browse_files())
         self.drop_canvas.bind(
             "<Enter>",
-            lambda e: self.drop_canvas.configure(
+            lambda _: self.drop_canvas.configure(
                 highlightbackground=self.accent_purple
             ),
         )
         self.drop_canvas.bind(
             "<Leave>",
-            lambda e: self.drop_canvas.configure(highlightbackground="#475569"),
+            lambda _: self.drop_canvas.configure(highlightbackground="#475569"),
         )
 
         # --- Кнопки управления ---
@@ -574,7 +570,7 @@ def main():
                 root = TkinterDnD.Tk()
             else:
                 root = tk.Tk()
-            app = MetadataCleanerApp(root)
+            MetadataCleanerApp(root)
             root.mainloop()
         else:
             # Стандартный запуск GUI
@@ -582,7 +578,7 @@ def main():
                 root = TkinterDnD.Tk()
             else:
                 root = tk.Tk()
-            app = MetadataCleanerApp(root)
+            MetadataCleanerApp(root)
             root.mainloop()
 
 

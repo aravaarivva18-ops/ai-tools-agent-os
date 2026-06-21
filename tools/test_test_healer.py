@@ -59,11 +59,11 @@ class TestTestHealer(unittest.TestCase):
         """Positive test: Verifies that library-specific noise is removed from tracebacks."""
         raw_tb = (
             "Traceback (most recent call last):\n"
-            "  File \"/opt/homebrew/lib/python3.14/unittest/case.py\", line 500, in run\n"
+            '  File "/opt/homebrew/lib/python3.14/unittest/case.py", line 500, in run\n'
             "    self._callTestMethod(testMethod)\n"
-            "  File \"tools/tests/test_demo.py\", line 12, in test_fail\n"
+            '  File "tools/tests/test_demo.py", line 12, in test_fail\n'
             "    assert 1 == 2\n"
-            "  File \"/Users/rus/ai-tools/.venv/lib/python3.14/site-packages/pytest/__init__.py\", line 42, in check\n"
+            '  File "/Users/rus/ai-tools/.venv/lib/python3.14/site-packages/pytest/__init__.py", line 42, in check\n'
             "    raise AssertionError()\n"
         )
         compressed = compress_traceback(raw_tb)
@@ -75,7 +75,7 @@ class TestTestHealer(unittest.TestCase):
     def test_compress_traceback_negative(self):
         """Negative test: Verifies that a clean traceback without library noise is returned unchanged."""
         raw_tb = (
-            "  File \"tools/tests/test_demo.py\", line 12, in test_fail\n"
+            '  File "tools/tests/test_demo.py", line 12, in test_fail\n'
             "    assert 1 == 2\n"
         )
         compressed = compress_traceback(raw_tb)

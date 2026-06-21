@@ -8,7 +8,9 @@ import pytest
 
 from tools.agent_skills import AgentSkillsManager
 
-TEST_RESOURCES_WORKSPACE = Path(__file__).resolve().parents[2] / "vault" / "tmp_resources_test"
+TEST_RESOURCES_WORKSPACE = (
+    Path(__file__).resolve().parents[2] / "vault" / "tmp_resources_test"
+)
 
 
 @pytest.fixture(autouse=True)
@@ -34,9 +36,15 @@ def test_create_mcp_skill_includes_protocol_rules():
     content = skill_path.read_text(encoding="utf-8")
 
     # Verify MCP best practices are generated
-    assert "model context protocol" in content.lower() or "mcp" in content.lower(), "MCP / Model Context Protocol should be in MCP skill templates"
-    assert "json-rpc" in content.lower() or "sdk" in content.lower(), "JSON-RPC / SDK should be recommended in MCP templates"
-    assert "karpathy" in content.lower() or "levelsio" in content.lower(), "Karpathy / levelsio principles should be in MCP templates"
+    assert "model context protocol" in content.lower() or "mcp" in content.lower(), (
+        "MCP / Model Context Protocol should be in MCP skill templates"
+    )
+    assert "json-rpc" in content.lower() or "sdk" in content.lower(), (
+        "JSON-RPC / SDK should be recommended in MCP templates"
+    )
+    assert "karpathy" in content.lower() or "levelsio" in content.lower(), (
+        "Karpathy / levelsio principles should be in MCP templates"
+    )
 
 
 def test_create_non_mcp_skill_clean():
@@ -50,6 +58,12 @@ def test_create_non_mcp_skill_clean():
     assert skill_path.exists()
     content = skill_path.read_text(encoding="utf-8")
 
-    assert "model context protocol" not in content.lower(), "MCP bloat should not exist in generic exporter"
-    assert "json-rpc" not in content.lower(), "MCP bloat should not exist in generic exporter"
-    assert "karpathy" in content.lower() or "levelsio" in content.lower(), "Karpathy / levelsio principles should be in default templates"
+    assert "model context protocol" not in content.lower(), (
+        "MCP bloat should not exist in generic exporter"
+    )
+    assert "json-rpc" not in content.lower(), (
+        "MCP bloat should not exist in generic exporter"
+    )
+    assert "karpathy" in content.lower() or "levelsio" in content.lower(), (
+        "Karpathy / levelsio principles should be in default templates"
+    )

@@ -44,17 +44,23 @@ def test_generate_improvement_report(tmp_path):
     # Scale skill
     scale_skill = skills_dir / "automation-task"
     scale_skill.mkdir()
-    (scale_skill / "SKILL.md").write_text("---\nname: automation-task\n---\nScale and productivity", encoding="utf-8")
+    (scale_skill / "SKILL.md").write_text(
+        "---\nname: automation-task\n---\nScale and productivity", encoding="utf-8"
+    )
 
     # SEO skill
     seo_skill = skills_dir / "seo-campaign"
     seo_skill.mkdir()
-    (seo_skill / "SKILL.md").write_text("---\nname: seo-campaign\n---\nSEO crawler strategy", encoding="utf-8")
+    (seo_skill / "SKILL.md").write_text(
+        "---\nname: seo-campaign\n---\nSEO crawler strategy", encoding="utf-8"
+    )
 
     with open(friction_logs_path, "w", encoding="utf-8") as f:
         json.dump(dummy_logs, f)
 
-    metrics = generate_improvement_report(friction_logs_path, output_report_path, skills_dir_path=skills_dir)
+    metrics = generate_improvement_report(
+        friction_logs_path, output_report_path, skills_dir_path=skills_dir
+    )
 
     assert metrics["total_sessions"] == 2
     assert metrics["total_friction_points"] == 3

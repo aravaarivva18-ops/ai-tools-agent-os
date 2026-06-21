@@ -26,6 +26,17 @@ def test_constitutions_contain_latest_integrations():
         # Verify that either levelsio, karpathy vibe coding, or buyback metrics are mentioned
         has_new_philosophies = any(
             kw in content
-            for kw in ["levelsio", "karpathy", "buyback", "pre-delegation", "is_ui", "is_seo", "is_scale", "is_mcp"]
+            for kw in [
+                "levelsio",
+                "karpathy",
+                "buyback",
+                "pre-delegation",
+                "is_ui",
+                "is_seo",
+                "is_scale",
+                "is_mcp",
+            ]
         )
-        assert has_new_philosophies, f"New integrations (vibe coding, buyback, JIT templates) missing in {f_path.name}"
+        assert has_new_philosophies, (
+            f"New integrations (vibe coding, buyback, JIT templates) missing in {f_path.name}"
+        )

@@ -213,3 +213,18 @@ def test_cron_sync_all():
     data = response.json()
     assert data["status"] == "completed"
     assert "Парковка Уфа" in data["results"]
+
+
+def test_security_scan_endpoint():
+    """Тест эндпоинта сканирования безопасности."""
+    response = client.post("/api/security/scan")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert "timestamp" in data
+    assert "bandit" in data
+    assert "secrets" in data
+    assert "summary" in data["bandit"]
+    assert "issues" in data["bandit"]
+    assert "summary" in data["secrets"]
+    assert "findings" in data["secrets"]

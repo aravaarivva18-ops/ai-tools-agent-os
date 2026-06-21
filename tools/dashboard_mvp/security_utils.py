@@ -23,7 +23,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return False
 
 
-def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     """Создает JWT токен доступа."""
     to_encode = data.copy()
     if expires_delta:

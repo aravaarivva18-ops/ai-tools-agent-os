@@ -73,7 +73,9 @@ def test_run_security_scan_with_invalid_python(monkeypatch):
 def test_scan_for_secrets_positive(tmp_path):
     """Positive test: Verifies that common API secrets are successfully detected."""
     bad_file = tmp_path / "secrets.py"
-    bad_file.write_text("openai_api_key = 'sk-proj-A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4'\n")
+    bad_file.write_text(
+        "openai_api_key = 'sk-proj-A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4'\n"
+    )
 
     findings = scan_for_secrets(str(tmp_path))
     assert len(findings) == 1
@@ -89,4 +91,3 @@ def test_scan_for_secrets_negative(tmp_path):
 
     findings = scan_for_secrets(str(tmp_path))
     assert len(findings) == 0
-

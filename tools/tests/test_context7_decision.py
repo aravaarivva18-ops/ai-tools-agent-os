@@ -27,4 +27,3 @@ def test_context7_skill_file_exists():
     assert skill_path.exists(), "context7-mcp SKILL.md does not exist"
     content = skill_path.read_text(encoding="utf-8")
     assert "context7-mcp" in content, "Invalid skill name in file"
-

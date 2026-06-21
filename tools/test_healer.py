@@ -73,19 +73,24 @@ def compress_traceback(tb_text):
 
     library_noise = re.compile(
         r"(/unittest/|/pytest/|site-packages|/importlib/|python3\.\d+|/opt/homebrew/)",
-        re.IGNORECASE
+        re.IGNORECASE,
     )
 
     # We filter out lines indicating files inside library directories
     skip_next = False
     for line in lines:
-        if "File \"" in line:
+        if 'File "' in line:
             if library_noise.search(line):
                 skip_next = True
                 continue
             else:
                 skip_next = False
-        elif line.strip() and not line.startswith(" ") and not line.startswith("E ") and not line.startswith(">"):
+        elif (
+            line.strip()
+            and not line.startswith(" ")
+            and not line.startswith("E ")
+            and not line.startswith(">")
+        ):
             # Not a code indent, likely part of python traceback framework
             pass
 

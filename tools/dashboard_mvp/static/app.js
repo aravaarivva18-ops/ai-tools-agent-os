@@ -105,8 +105,9 @@ function logout() {
 function showView(viewId) {
     const summaryView = document.getElementById("summary-view");
     const detailView = document.getElementById("project-detail-view");
+    const securityView = document.getElementById("security-view");
     
-    const views = [summaryView, detailView];
+    const views = [summaryView, detailView, securityView];
     views.forEach(v => {
         if (v.id === viewId) {
             v.classList.remove("hidden");
@@ -149,6 +150,9 @@ async function handleRoute() {
             showView("project-detail-view");
             await loadProjectDetail(projectId);
         }
+    } else if (hash === "#/security") {
+        showView("security-view");
+        initSecurityView();
     }
 }
 
@@ -681,3 +685,125 @@ document.addEventListener("DOMContentLoaded", () => {
     // Запускаем роутинг при старте
     handleRoute();
 });
+
+// --- РАЗДЕЛ БЕЗОПАСНОСТИ ---
+
+function initSecurityView() {
+    const scanBtn = document.getElementById("run-scan-btn");
+    if (scanBtn) {
+        scanBtn.onclick = runSecurityScan;
+    }
+}
+
+async function runSecurityScan() {
+    const scanBtn = document.getElementById("run-scan-btn");
+    const statusText = document.getElementById("scan-status-text");
+    const totalSecrets = document.getElementById("scan-total-secrets");
+    const totalSast = document.getElementById("scan-total-sast");
+    const secretsContainer = document.getElementById("secrets-scan-results");
+    const sastContainer = document.getElementById("sast-scan-results");
+    
+    if (!scanBtn) return;
+    
+    // Блокируем кнопку
+    scanBtn.disabled = true;
+    scanBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Сканирование...`;
+    statusText.textContent = "Выполняется сканирование...";
+    
+    secretsContainer.innerHTML = `<div class="text-center py-12"><i class="fa-solid fa-spinner fa-spin text-xl text-sky-400"></i><p class="text-xs text-slate-400 mt-2">Поиск секретов...</p></div>`;
+    sastContainer.innerHTML = `<div class="text-center py-12"><i class="fa-solid fa-spinner fa-spin text-xl text-sky-400"></i><p class="text-xs text-slate-400 mt-2">Анализ кода Bandit...</p></div>`;
+    
+    try {
+        const data = await request(`${API_BASE}/api/security/scan`, { method: "POST" });
+        
+        statusText.textContent = "Сканирование завершено";
+        totalSecrets.textContent = data.secrets.summary.total;
+        totalSast.textContent = data.bandit.summary.total;
+        
+        // 1. Отображаем секреты
+        if (data.secrets.findings.length === 0) {
+            secretsContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 text-emerald-400">
+                    <i class="fa-regular fa-circle-check text-4xl mb-3"></i>
+                    <p class="font-semibold text-sm">Секреты не найдены</p>
+                    <p class="text-xs text-slate-500 mt-1">Все файлы чисты от токенов и паролей</p>
+                </div>`;
+        } else {
+            secretsContainer.innerHTML = data.secrets.findings.map(f => {
+                if (f.error) {
+                    return `
+                        <div class="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+                            Ошибка: ${f.error}
+                        </div>`;
+                }
+                const shortFile = f.file.replace("/Users/rus/ai-tools/", "");
+                return `
+                    <div class="p-4 rounded-lg bg-red-500/5 border border-red-500/20 text-xs hover:border-red-500/40 transition">
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <span class="font-bold text-red-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-triangle-exclamation"></i> ${f.type}
+                            </span>
+                            <span class="text-[10px] text-slate-500 font-mono">${shortFile}:${f.line}</span>
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded font-mono text-[11px] text-slate-300 overflow-x-auto whitespace-pre"><code>${escapeHtml(f.context)}</code></div>
+                    </div>`;
+            }).join("");
+        }
+        
+        // 2. Отображаем уязвимости Bandit SAST
+        if (data.bandit.issues.length === 0) {
+            sastContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 text-emerald-400">
+                    <i class="fa-regular fa-circle-check text-4xl mb-3"></i>
+                    <p class="font-semibold text-sm">Уязвимости не найдены</p>
+                    <p class="text-xs text-slate-500 mt-1">Bandit SAST не обнаружил проблем безопасности</p>
+                </div>`;
+        } else {
+            sastContainer.innerHTML = data.bandit.issues.map(issue => {
+                const shortFile = issue.filename.replace("/Users/rus/ai-tools/", "");
+                const severity = issue.issue_severity || "LOW";
+                
+                let severityBadge = "";
+                if (severity === "HIGH") {
+                    severityBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30">HIGH</span>`;
+                } else if (severity === "MEDIUM") {
+                    severityBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">MEDIUM</span>`;
+                } else {
+                    severityBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">LOW</span>`;
+                }
+                
+                return `
+                    <div class="p-4 rounded-lg bg-slate-900/40 border border-slate-800 text-xs hover:border-slate-700 transition">
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <span class="font-semibold text-white flex items-center gap-1.5">
+                                ${severityBadge} <span class="text-slate-200">${issue.test_name}</span>
+                            </span>
+                            <span class="text-[10px] text-slate-500 font-mono">${shortFile}:${issue.line_number}</span>
+                        </div>
+                        <p class="text-slate-400 mb-2 font-medium">${escapeHtml(issue.issue_text)}</p>
+                        <div class="bg-slate-950 p-2.5 rounded font-mono text-[11px] text-slate-300 overflow-x-auto whitespace-pre"><code>${escapeHtml(issue.code)}</code></div>
+                    </div>`;
+            }).join("");
+        }
+        
+    } catch (err) {
+        statusText.textContent = "Ошибка при сканировании";
+        secretsContainer.innerHTML = `<div class="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-xs">Не удалось выполнить сканирование: ${err.message}</div>`;
+        sastContainer.innerHTML = `<div class="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-xs">Не удалось выполнить сканирование: ${err.message}</div>`;
+    } finally {
+        scanBtn.disabled = false;
+        scanBtn.innerHTML = `<i class="fa-solid fa-play"></i> Запустить сканирование`;
+    }
+}
+
+function escapeHtml(text) {
+    if (!text) return "";
+    return text
+        .toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+

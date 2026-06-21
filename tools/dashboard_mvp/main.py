@@ -3,6 +3,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import json
 from datetime import date, datetime, timedelta
 
 from dashboard_mvp.config import GOOGLE_CREDENTIALS_PATH, GOOGLE_SPREADSHEET_ID
@@ -25,6 +26,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from security.security_scanner import run_security_scan, scan_for_secrets
 from sqlalchemy.orm import Session
 
 app = FastAPI(title="Аналитический дашборд «Рука на пульсе» API")
@@ -623,6 +625,90 @@ def setup_test_project(db: Session = Depends(get_db)):
         "client_id": client.id,
         "project_id": project.id,
         "message": "Тестовая структура создана (Парковка Уфа) и планы KPI импортированы из Excel",
+    }
+
+
+# --- РАЗДЕЛ БЕЗОПАСНОСТИ И SAST СКАНИРОВАНИЯ ---
+
+
+@app.post("/api/security/scan")
+def run_security_dashboard_scan():
+    """Запускает сканирование безопасности монорепозитория (Bandit SAST + Поиск секретов)."""
+    # Корневой путь монорепозитория
+    root_dir = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
+
+    # 1. Запуск Bandit
+    exclude_dirs = [
+        ".venv",
+        ".git",
+        ".obsidian",
+        "__pycache__",
+        "node_modules",
+        "ai-ads",
+    ]
+    skip_tests = ["B101", "B110", "B112", "B310", "B311", "B404", "B603", "B607"]
+
+    exit_code, stdout, stderr = run_security_scan(
+        targets=[root_dir],
+        exclude_dirs=exclude_dirs,
+        skip_tests=skip_tests,
+        output_format="json",
+    )
+
+    bandit_data = {"results": [], "metrics": {}}
+    if exit_code in (
+        0,
+        1,
+    ):  # Bandit возвращает 1, если найдены проблемы, и 0, если всё чисто
+        try:
+            bandit_data = json.loads(stdout)
+        except Exception as e:
+            bandit_data = {
+                "error": f"Ошибка парсинга JSON Bandit: {e}",
+                "raw_stdout": stdout[:1000],
+            }
+    else:
+        bandit_data = {"error": f"Ошибка запуска Bandit (код {exit_code}): {stderr}"}
+
+    # 2. Запуск сканера секретов
+    try:
+        secrets_results = scan_for_secrets(root_dir)
+    except Exception as e:
+        secrets_results = [{"error": str(e)}]
+
+    # Подсчитаем метрики для фронтенда
+    total_bandit_issues = 0
+    bandit_summary = {"high": 0, "medium": 0, "low": 0}
+
+    if "results" in bandit_data:
+        total_bandit_issues = len(bandit_data["results"])
+        for issue in bandit_data["results"]:
+            sev = issue.get("issue_severity", "LOW").upper()
+            if sev == "HIGH":
+                bandit_summary["high"] += 1
+            elif sev == "MEDIUM":
+                bandit_summary["medium"] += 1
+            else:
+                bandit_summary["low"] += 1
+
+    return {
+        "status": "success",
+        "timestamp": datetime.now().isoformat(),
+        "bandit": {
+            "summary": {
+                "total": total_bandit_issues,
+                "high": bandit_summary["high"],
+                "medium": bandit_summary["medium"],
+                "low": bandit_summary["low"],
+            },
+            "issues": bandit_data.get("results", []),
+        },
+        "secrets": {
+            "summary": {"total": len(secrets_results)},
+            "findings": secrets_results,
+        },
     }
 
 
