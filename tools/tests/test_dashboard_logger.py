@@ -230,3 +230,44 @@ def test_log_change_retry_on_lock(temp_db):
     conn2.close()
 
     assert count == 1
+
+
+def test_log_session_start_greeting(temp_db):
+    """Positive test: Verifies that log_change correctly logs session start greeting."""
+    log_change(
+        project_name="System",
+        description="Session start: ну как ты",
+        reason="Antigravity v10 self-check",
+        expected_effect="Verify logging structure and start state",
+        change_date="2026-06-21",
+    )
+
+    conn = sqlite3.connect(temp_db)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM projects WHERE name = ?", ("System",))
+    project = cursor.fetchone()
+    assert project is not None
+    assert project["name"] == "System"
+
+    cursor.execute("SELECT * FROM changelog WHERE project_id = ?", (project["id"],))
+    change = cursor.fetchone()
+    assert change is not None
+    assert change["description"] == "Session start: ну как ты"
+    assert change["reason"] == "Antigravity v10 self-check"
+    assert change["expected_effect"] == "Verify logging structure and start state"
+    assert change["date"] == "2026-06-21"
+
+    conn.close()
+
+
+def test_log_session_start_invalid_project(temp_db):
+    """Negative test: Verifies that log_change handles empty project name appropriately."""
+    with pytest.raises(sqlite3.IntegrityError):
+        # Empty project name should fail or trigger database constraints
+        log_change(
+            project_name=None,
+            description="Session start: ну как ты",
+        )
+
