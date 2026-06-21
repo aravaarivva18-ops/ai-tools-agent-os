@@ -12,6 +12,21 @@ except ImportError:
     except ImportError:
         collect = None
 
+try:
+    from tools.prompt_validator import (
+        normalize_gemini_constitution_headings,
+        ensure_core_imperatives_block,
+    )
+except ImportError:
+    try:
+        from prompt_validator import (
+            normalize_gemini_constitution_headings,
+            ensure_core_imperatives_block,
+        )
+    except ImportError:
+        normalize_gemini_constitution_headings = None
+        ensure_core_imperatives_block = None
+
 
 def generate_research_queries(category: str, issue_content: str) -> list:
     """Генерирует целевые поисковые запросы для GitHub/arXiv/Web на основе описания проблемы."""
@@ -576,7 +591,54 @@ def main() -> None:
     else:
         print("Warning: dashboard_logger.log_change not found. Skipping DB log.")
 
+    maintain_constitution()
+
     print("🚀 Self-Improvement Loop iteration completed successfully.")
+
+
+def maintain_constitution(constitution_path: Path = None) -> None:
+    """Нормализует заголовки и ядро в конституции, если требуется."""
+    if not normalize_gemini_constitution_headings or not ensure_core_imperatives_block:
+        print("Warning: normalization functions are not available. Skipping maintenance.")
+        return
+
+    if constitution_path is None:
+        constitution_path = Path("/Users/rus/GEMINI_ANTIGRAVITY.md")
+
+    if not constitution_path.exists():
+        print(f"Warning: Constitution file not found at {constitution_path}. Skipping maintenance.")
+        return
+
+    original = constitution_path.read_text(encoding="utf-8")
+    fixed = normalize_gemini_constitution_headings(original)
+    fixed = ensure_core_imperatives_block(fixed)
+
+    if fixed != original:
+        backup = constitution_path.with_suffix(".md.bak." + datetime.now().strftime("%Y%m%d_%H%M%S"))
+        backup.write_text(original, encoding="utf-8")
+        constitution_path.write_text(fixed, encoding="utf-8")
+        print(f"✅ Constitution normalized. Backup: {backup}")
+
+        # Log change in dashboard.db
+        log_change = None
+        try:
+            from tools.dashboard_logger import log_change
+        except ImportError:
+            try:
+                from dashboard_logger import log_change
+            except ImportError:
+                pass
+
+        if log_change:
+            try:
+                log_change(
+                    project_name="Парковка Уфа",
+                    description="Automated normalization of GEMINI_ANTIGRAVITY.md structure (v10)",
+                    reason="Ensure sequential headings and core imperatives block alignment",
+                    expected_effect="Sequential rules consistency",
+                )
+            except Exception as e:
+                print(f"Warning: Could not log constitution change to dashboard.db: {e}")
 
 
 if __name__ == "__main__":

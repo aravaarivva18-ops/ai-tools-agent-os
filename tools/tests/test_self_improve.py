@@ -1,7 +1,11 @@
 import json
 from pathlib import Path
 
-from tools.self_improve import apply_improvement_record, generate_improvement_report
+from tools.self_improve import (
+    apply_improvement_record,
+    generate_improvement_report,
+    maintain_constitution,
+)
 
 
 def test_generate_improvement_report(tmp_path):
@@ -228,3 +232,33 @@ def test_auto_heal_queue_generation(tmp_path):
     assert "tools/tests/test_rules_audit.py" in queue_data["heal_candidates"]
     assert "tools/test_healer.py" in queue_data["heal_candidates"]
     assert len(queue_data["priority_registry"]) == 1
+
+
+def test_maintain_constitution_flow(tmp_path):
+    """Проверяет сквозной процесс нормализации и создания бэкапа в maintain_constitution."""
+    constitution_file = tmp_path / "GEMINI_ANTIGRAVITY.md"
+    content = (
+        "# GEMINI_ANTIGRAVITY\n"
+        "\n"
+        "## 🏛️ 5. Раздел один\n"
+        "Текст один\n"
+        "\n"
+        "## 🧠 9. Раздел два\n"
+        "Текст два\n"
+    )
+    constitution_file.write_text(content, encoding="utf-8")
+
+    # Выполняем нормализацию
+    maintain_constitution(constitution_file)
+
+    # Проверяем, что заголовки перенумерованы
+    fixed_content = constitution_file.read_text(encoding="utf-8")
+    assert "## 🏛️ 1. Раздел один" in fixed_content
+    assert "## 🧠 2. Раздел два" in fixed_content
+    assert "## 🏛️ Ядро (Core Imperatives)" in fixed_content
+
+    # Проверяем, что создался бэкап
+    backups = list(tmp_path.glob("GEMINI_ANTIGRAVITY.md.bak.*"))
+    assert len(backups) == 1
+    assert "## 🏛️ 5. Раздел один" in backups[0].read_text(encoding="utf-8")
+

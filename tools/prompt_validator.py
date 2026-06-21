@@ -121,6 +121,48 @@ def validate_constitution_system() -> bool:
     return success
 
 
+CORE_BLOCK = """## 🏛️ Ядро (Core Imperatives) — обязательно к исполнению
+
+- Solo Loop v10 + Stealth Stop на 3-й ошибке
+- YAGNI (максимум 2–3 уровня абстракции)
+- TDD (минимум 1 positive + 1 negative тест)
+- Zero-Fluff + абсолютные file:// пути
+- WAL + retry при записи в dashboard.db
+- Human-in-the-Loop для опасных операций
+"""
+
+def normalize_gemini_constitution_headings(text: str) -> str:
+    """Перенумеровывает заголовки ## ... N. Title последовательно."""
+    lines = text.splitlines(keepends=True)
+    result = []
+    counter = 1
+    pattern = re.compile(r'^(##\s+[^0-9\r\n]*?)\s*(\d+)\.\s+(.*)$')
+
+    for line in lines:
+        m = pattern.match(line.rstrip('\r\n'))
+        if m:
+            prefix = m.group(1).rstrip()
+            title = m.group(3)
+            # Сохраняем исходное окончание строки
+            ending = line[len(line.rstrip('\r\n')):]
+            result.append(f"{prefix} {counter}. {title}{ending}")
+            counter += 1
+        else:
+            result.append(line)
+    return "".join(result)
+
+def ensure_core_imperatives_block(text: str) -> str:
+    if "## 🏛️ Ядро (Core Imperatives)" in text or "## 🏛️ Core Rules Summary" in text:
+        return text
+    # Вставляем после первого заголовка документа
+    lines = text.splitlines(keepends=True)
+    for i, line in enumerate(lines):
+        if line.strip().startswith("#") and "GEMINI_ANTIGRAVITY" in line:
+            lines.insert(i + 2, CORE_BLOCK + "\n")
+            break
+    return "".join(lines)
+
+
 def main():
     if not validate_constitution_system():
         sys.exit(1)
