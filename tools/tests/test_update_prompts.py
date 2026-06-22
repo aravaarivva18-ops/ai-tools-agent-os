@@ -64,6 +64,32 @@ def test_update_gem_bot_prompts(temp_prompts_db):
     assert const_row is not None
     assert "🧬 GEMINI_ANTIGRAVITY" in const_row["prompt"]
 
+    # Check for Student Guide
+    cursor.execute("SELECT * FROM prompts WHERE act = ?", ("Student Guide",))
+    guide_row = cursor.fetchone()
+    assert guide_row is not None
+    assert "Руководство" in guide_row["prompt"]
+
+    # Check for Claude Workspace Rules
+    cursor.execute("SELECT * FROM prompts WHERE act = ?", ("Claude Workspace Rules",))
+    claude_row = cursor.fetchone()
+    assert claude_row is not None
+    assert "AI Tools Workspace" in claude_row["prompt"]
+
+    # Check for DOX Agent Contracts
+    cursor.execute("SELECT * FROM prompts WHERE act = ?", ("DOX Agent Contracts",))
+    dox_row = cursor.fetchone()
+    assert dox_row is not None
+    assert "DOX" in dox_row["prompt"]
+
+    # Check for Gemini Bot Knowledge Base
+    cursor.execute(
+        "SELECT * FROM prompts WHERE act = ?", ("Gemini Bot Knowledge Base",)
+    )
+    kb_row = cursor.fetchone()
+    assert kb_row is not None
+    assert "База знаний" in kb_row["prompt"]
+
     # Check for ADRs
     cursor.execute("SELECT * FROM prompts WHERE act LIKE 'ADR:%'")
     adr_rows = cursor.fetchall()
@@ -74,3 +100,36 @@ def test_update_gem_bot_prompts(temp_prompts_db):
     assert has_n8n_adr, "Should import n8n evaluation ADR"
 
     conn.close()
+
+
+def test_update_prompts_missing_db(capsys):
+    """Test that main() handles a missing database gracefully."""
+    orig_db_path = ugbp.DB_PATH
+    ugbp.DB_PATH = Path("/nonexistent/path/to/prompts.db")
+
+    try:
+        ugbp.main()
+        captured = capsys.readouterr()
+        assert "Error: Database" in captured.out
+    finally:
+        ugbp.DB_PATH = orig_db_path
+
+
+def test_update_prompts_missing_files(temp_prompts_db, capsys):
+    """Test that missing source files are skipped and don't raise errors."""
+    orig_desktop = ugbp.DESKTOP_DIR
+    orig_attachments = ugbp.ATTACHMENTS_DIR
+
+    # Point directories to an empty temporary path
+    empty_dir = Path("/nonexistent/empty/dir")
+    ugbp.DESKTOP_DIR = empty_dir
+    ugbp.ATTACHMENTS_DIR = empty_dir
+
+    try:
+        ugbp.main()
+        captured = capsys.readouterr()
+        # Verify that warning messages are printed for skipped files
+        assert "Warning: File" in captured.out
+    finally:
+        ugbp.DESKTOP_DIR = orig_desktop
+        ugbp.ATTACHMENTS_DIR = orig_attachments
