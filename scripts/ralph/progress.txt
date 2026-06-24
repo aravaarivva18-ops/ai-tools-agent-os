@@ -32,3 +32,18 @@ Started: Wed Jun 24 13:24:35 +04 2026
   - Useful context:
     - Running the statistics utility outputs formatted JSON to stdout.
 ---
+
+## 2026-06-24 13:51 +0400 - US-003
+- Created unit tests for python code statistics utility under tools/tests/test_code_stats.py
+- Verified code statistics logic for files (simple, empty, comment-only), paths (files, directories), and error handling (nonexistent paths)
+- Files changed:
+  - tools/tests/test_code_stats.py
+- **Learnings for future iterations:**
+  - Patterns discovered:
+    - Pytest's `tmp_path` fixture is highly effective for testing file-system interactions and reading/writing temporary files.
+  - Gotchas encountered:
+    - Ensure all imported modules in test files are actually used, and imports are sorted, to comply with ruff check and avoid lint errors.
+  - Useful context:
+    - The tools tests are run using `uv run pytest tools/tests/ -v`.
+---
+
