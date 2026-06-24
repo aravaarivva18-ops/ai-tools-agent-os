@@ -10,15 +10,13 @@ format:
 	uv run ruff format .
 
 check-rules:
-	python3 tools/check_rules.py
+	python3 tools/rules_validator.py
 
 normalize-constitution:
 	uv run python tools/self_improve.py
-	uv run python tools/update_gem_bot_prompts.py
 
 auto-improve:
 	uv run python tools/self_improve.py
-	uv run python tools/update_gem_bot_prompts.py
 
 check: check-rules
 	uv run ruff check .

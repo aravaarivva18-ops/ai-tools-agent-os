@@ -6,7 +6,7 @@ from pathlib import Path
 
 def test_context7_integrated_in_knowledge_base():
     """Positive test: Verifies that context7.com is documented in the Gemini bot knowledge base."""
-    kb_path = Path("/Users/rus/Desktop/gemini_bot_knowledge_base.md")
+    kb_path = Path("/Users/rus/ai-tools/attachments/gemini_bot_knowledge_base.md")
     assert kb_path.exists(), "gemini_bot_knowledge_base.md does not exist"
 
     content = kb_path.read_text(encoding="utf-8")

@@ -94,7 +94,7 @@ class UserRepositoryLoggingWrapper:
 
 def test_solo_loop_enforced_positive():
     """Позитивный тест: Проверяет наличие требований строгого Solo Loop и блокировки субагентов в базах знаний."""
-    kb_path = Path("/Users/rus/Desktop/gemini_bot_knowledge_base.md")
+    kb_path = Path("/Users/rus/ai-tools/attachments/gemini_bot_knowledge_base.md")
     antigravity_path = Path("/Users/rus/GEMINI_ANTIGRAVITY.md")
 
     assert kb_path.exists(), "gemini_bot_knowledge_base.md не найден"
