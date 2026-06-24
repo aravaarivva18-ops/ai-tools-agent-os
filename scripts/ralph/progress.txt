@@ -1,3 +1,21 @@
 # Ralph Progress Log
 Started: Wed Jun 24 13:24:35 +04 2026
+
+## Codebase Patterns
+- Ruff: Do not provide unnecessary `"r"` mode argument to `open()`, it is the default and triggers `UP015` warning.
+- Ruff: Unused imports (like `os`) must be removed, otherwise lint checks will fail.
+
+---
+
+## 2026-06-24 13:48 +0400 - US-001
+- Implemented `analyze_file(filepath: str) -> dict[str, int]` in `tools/code_stats.py` to calculate Python file statistics: total, code, comment, and blank lines.
+- Files changed:
+  - `tools/code_stats.py`
+- **Learnings for future iterations:**
+  - Patterns discovered:
+    - Standard library `open()` can be used without the `"r"` mode argument.
+  - Gotchas encountered:
+    - Unused imports must be deleted, otherwise lint check fails.
+  - Useful context:
+    - The code statistics utility resides in `tools/code_stats.py`.
 ---

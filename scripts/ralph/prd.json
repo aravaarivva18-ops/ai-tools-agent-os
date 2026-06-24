@@ -1,0 +1,48 @@
+{
+  "project": "ai-tools",
+  "branchName": "ralph/code-stats",
+  "description": "Python Code Statistics Utility - CLI tool to calculate line statistics for Python files.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Implement Core Logic for File Statistics Analysis",
+      "description": "As a developer, I want to parse a single Python file to count total lines, blank lines, comment lines, and actual code lines.",
+      "acceptanceCriteria": [
+        "Implement analyze_file(filepath: str) -> dict in tools/code_stats.py",
+        "Count total, blank, comment and code lines correctly",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Add Directory Scanning and CLI Interface",
+      "description": "As a user, I want a CLI interface to run the analysis on a file or a folder and print the results as JSON.",
+      "acceptanceCriteria": [
+        "CLI accepts positional argument path",
+        "Recursively scans directories for .py files",
+        "Outputs consolidated JSON to stdout",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Write Unit Tests for Code Statistics Utility",
+      "description": "As a QA engineer, I want unit tests for the statistics utility to verify correct counts for various file cases.",
+      "acceptanceCriteria": [
+        "Create tests in tools/tests/test_code_stats.py",
+        "Running pytest tools/tests/test_code_stats.py passes",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
