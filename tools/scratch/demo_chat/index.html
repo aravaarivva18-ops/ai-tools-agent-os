@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кирпич Центр — ИИ-Менеджер чатов (Демо)</title>
+    <!-- Подключаем современные шрифты -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Боковая панель управления (Контроллер симуляции) -->
+        <aside class="control-panel">
+            <div class="panel-header">
+                <div class="logo-circle">🤖</div>
+                <div class="title-group">
+                    <h2>Harness-Solo</h2>
+                    <span class="badge">AI Chat Manager v1.0</span>
+                </div>
+            </div>
+            
+            <div class="panel-section">
+                <h3>1. Выберите сценарий лида</h3>
+                <div class="scenario-buttons">
+                    <button class="btn-scenario active" data-scenario="calc">
+                        <span class="icon">📐</span>
+                        <div class="text-group">
+                            <span class="btn-title">Расчет блоков</span>
+                            <span class="btn-sub">Запрос объема на дом 10х12м</span>
+                        </div>
+                    </button>
+                    <button class="btn-scenario" data-scenario="compare">
+                        <span class="icon">⚖️</span>
+                        <div class="text-group">
+                            <span class="btn-title">Сравнение брендов</span>
+                            <span class="btn-sub">Сомнения ЗЯБ vs Bikton</span>
+                        </div>
+                    </button>
+                    <button class="btn-scenario" data-scenario="discount">
+                        <span class="icon">💰</span>
+                        <div class="text-group">
+                            <span class="btn-title">Запрос скидки</span>
+                            <span class="btn-sub">Попытка сбить дилерскую цену</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>2. Интерактивный калькулятор</h3>
+                <div class="calculator-inputs">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="width">Ширина (м)</label>
+                            <input type="number" id="width" value="10">
+                        </div>
+                        <div class="input-group">
+                            <label for="length">Длина (м)</label>
+                            <input type="number" id="length" value="12">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="height">Высота (м)</label>
+                            <input type="number" id="height" value="3">
+                        </div>
+                        <div class="input-group">
+                            <label for="thickness">Толщина (мм)</label>
+                            <select id="thickness">
+                                <option value="400" selected>400 мм</option>
+                                <option value="300">300 мм</option>
+                                <option value="250">250 мм</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="btn-calculate">Рассчитать и отправить в ИИ</button>
+                </div>
+            </div>
+
+            <div class="panel-section metrics-section">
+                <h3>Бизнес-метрики (Live)</h3>
+                <div class="metric-card">
+                    <div class="metric-row">
+                        <span>Затраты на чат:</span>
+                        <strong class="highlight">ИИ в 4 раза выгоднее</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>Скорость ответа:</span>
+                        <strong class="success">&lt; 30 секунд (24/7)</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>Точность расчетов:</span>
+                        <strong class="success">100% (Math-verified)</strong>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Главная зона чата (Авито / WhatsApp Симулятор) -->
+        <main class="chat-area">
+            <header class="chat-header">
+                <div class="avatar-group">
+                    <div class="avatar">🧱</div>
+                    <div class="status-group">
+                        <h3>Кирпич Центр Ижевск (Авито-чат)</h3>
+                        <span class="status-online">Авто-ответчик ИИ активен</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <span class="crm-badge"> amoCRM синхронизирована</span>
+                </div>
+            </header>
+
+            <div class="messages-container" id="messages-container">
+                <!-- Сообщения будут рендериться динамически -->
+            </div>
+
+            <footer class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Введите сообщение от лица клиента..." autocomplete="off">
+                <button id="btn-send">Отправить ➔</button>
+            </footer>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
