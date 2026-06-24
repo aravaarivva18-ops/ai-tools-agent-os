@@ -1,0 +1,217 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Update Product Section crm.productsection.update"
+original_path: "api-reference/crm/outdated/product-section/crm-product-section-update.md"
+---
+
+# Update Product Section crm.productsection.update
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`crm`](../../../scopes/permissions.md)
+>
+> Who can execute the method: any user
+
+{% note warning "DEPRECATED" %}
+
+Development of this method has been halted. Please use [catalog.section.update](../../../catalog/section/catalog-section-update.md).
+
+{% endnote %}
+
+The method `crm.productsection.update` updates an existing product section.
+
+## Method Parameters
+
+{% include [Note on Required Parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id***
+[`integer`](../../data-types.md) | Identifier of the product section ||
+|| **fields**
+[`array`](../../data-types.md) | [Set of fields](./crm-product-section-add.md) — an array in the form `array("field_to_update"=>"value"[, ...])`, where "field_to_update" can take values returned by the method [crm.productsection.fields](./crm-product-section-fields.md). 
+
+{% note info %}
+
+To find out the required format of the fields, execute the method [crm.productsection.fields](./crm-product-section-fields.md) and check the format of the returned values for those fields. 
+
+{% endnote %}
+||
+|#
+
+## Code Examples
+
+{% include [Note on Examples](../../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```curl
+    id=$(prompt "Enter ID")
+    sectionName=$(prompt "Enter section name")
+
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{
+        "id": '"$id"',
+        "fields": {
+            "NAME": "'"$sectionName"'"
+        }
+    }' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/crm.productsection.update
+    ```
+
+- cURL (OAuth)
+
+    ```curl
+    id=$(prompt "Enter ID")
+    sectionName=$(prompt "Enter section name")
+
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{
+        "id": '"$id"',
+        "fields": {
+            "NAME": "'"$sectionName"'"
+        },
+        "auth": "**put_access_token_here**"
+    }' \
+    https://**put_your_bitrix24_address**/rest/crm.productsection.update
+    ```
+
+- JS
+
+    ```js
+    try
+    {
+        const id = prompt("Enter ID");
+        const sectionName = prompt("Enter section name");
+    
+        const response = await $b24.callMethod(
+            "crm.productsection.update",
+            {
+                id: id,
+                fields:
+                {
+                    "NAME": sectionName
+                }
+            }
+        );
+    
+        const result = response.getData().result;
+        if(result.error())
+        {
+            console.error(result.error());
+        }
+        else
+        {
+            console.info(result);
+        }
+    }
+    catch(error)
+    {
+        console.error('Error:', error);
+    }
+    ```
+
+- PHP
+
+    ```php
+    $id = readline("Enter ID: ");
+    $sectionName = readline("Enter section name: ");
+    
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'crm.productsection.update',
+                [
+                    'id' => $id,
+                    'fields' => [
+                        'NAME' => $sectionName
+                    ]
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        if ($result->error()) {
+            error_log($result->error());
+        } else {
+            echo 'Success: ' . print_r($result->data(), true);
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error updating product section: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    var id = prompt("Enter ID");
+    var sectionName = prompt("Enter section name");
+    BX24.callMethod(
+        "crm.productsection.update",
+        {
+            id: id,
+            fields:
+            {
+                "NAME": sectionName
+            }
+        },
+        function(result)
+        {
+            if(result.error())
+                console.error(result.error());
+            else
+            {
+                console.info(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $id = readline("Enter ID: ");
+    $sectionName = readline("Enter section name: ");
+
+    $result = CRest::call(
+        'crm.productsection.update',
+        [
+            'id' => $id,
+            'fields' => [
+                'NAME' => $sectionName
+            ]
+        ]
+    );
+
+    if (isset($result['error'])) {
+        echo "Error: " . $result['error_description'] . "\n";
+    } else {
+        echo "Updated section with ID " . $id . "\n";
+        echo '<PRE>';
+        print_r($result['result']);
+        echo '</PRE>';
+    }
+    ```
+
+{% endlist %}

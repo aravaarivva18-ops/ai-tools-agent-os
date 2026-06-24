@@ -1,0 +1,675 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Get a List of Leads crm.lead.list"
+original_path: "api-reference/crm/leads/crm-lead-list.md"
+---
+
+# Get a List of Leads crm.lead.list
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`crm`](../../scopes/permissions.md)
+>
+> Who can execute the method: a user with read access to leads
+
+{% note warning "DEPRECATED" %}
+
+The development of this method has been halted. Use [crm.item.list](../universal/crm-item-list.md).
+
+{% endnote %}
+
+The method `crm.lead.list` returns a list of leads based on a filter. It is an implementation of the list method for leads.
+
+## Method Parameters
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+#|  
+|| **Name**  
+`type` | **Description** ||  
+|| **select**  
+[`array`](../../data-types.md) | An array containing the list of fields to select (see lead fields [crm-lead-fields](./crm-lead-fields.md)).  
+
+When selecting, use masks:  
+- "*" - to select all fields (excluding custom and multiple fields)  
+- "UF_*" - to select all custom fields (excluding multiple fields)  
+
+There are no masks for selecting multiple fields. To select multiple fields, specify the required ones in the selection list ("PHONE", "EMAIL", etc.).  
+There is no option to add a logical OR condition to the filter if you need to select by several different fields. ||  
+|| **filter**  
+[`object`](../../data-types.md) | An object for filtering selected leads in the format `{"field_1": "value_1", ... "field_N": "value_N"}`.  
+
+Possible values for `field` correspond to lead fields [crm-lead-fields](./crm-lead-fields.md).  
+
+An additional prefix can be assigned to the key to specify the filter behavior. Possible prefix values:  
+- `>=` — greater than or equal to  
+- `>` — greater than  
+- `<=` — less than or equal to  
+- `<` — less than  
+- `@` — IN (an array is passed as the value)  
+- `!@` — NOT IN (an array is passed as the value)  
+- `%` — LIKE, substring search. The `%` symbol in the filter value should not be passed. The search looks for a substring in any position of the string  
+- `=%` — LIKE, substring search. The `%` symbol should be passed in the value. Examples:  
+  - "mol%" — searching for values starting with "mol"  
+  - "%mol" — searching for values ending with "mol"  
+  - "%mol%" — searching for values where "mol" can be in any position  
+
+- `%=` — LIKE (see description above)  
+
+- `!%` — NOT LIKE, substring search. The `%` symbol in the filter value should not be passed. The search goes from both sides.  
+
+- `=%` — NOT LIKE, substring search. The `%` symbol should be passed in the value. Examples:  
+  - "mol%" — searching for values not starting with "mol"  
+  - "%mol" — searching for values not ending with "mol"  
+  - "%mol%" — searching for values where the substring "mol" is not present in any position  
+
+- `!%=` — NOT LIKE (see description above)  
+
+- `=` — equal, exact match (used by default)  
+- `!=` - not equal  
+- `!` — not equal  
+  ||  
+|| **order**  
+Possible values for `order`:  
+- `asc` — in ascending order  
+- `desc` — in descending order ||  
+|| **start**  
+[`integer`](../data-types.md) | This parameter is used to control pagination.  
+
+The page size of results is always static: 50 records.  
+
+To select the second page of results, you need to pass the value `50`. To select the third page of results — the value `100`, and so on.  
+
+The formula for calculating the value of the `start` parameter:  
+
+`start = (N-1) * 50`, where `N` — the number of the desired page ||  
+|#
+
+Also, see the description of [list methods](../../../settings/how-to-call-rest-api/list-methods-pecularities.md).
+
+## Code Examples
+
+{% include [Note on Examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+  ```bash
+  curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{"select":["*","UF_*"],"start":50,"filter":{"=OPPORTUNITY":15000},"order":{"STATUS_ID":"ASC"}}' \
+  https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/crm.lead.list
+  ```
+
+- cURL (OAuth)
+
+  ```bash
+  curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{"select":["*","UF_*"],"start":50,"filter":{"=OPPORTUNITY":15000},"order":{"STATUS_ID":"ASC"},"auth":"**put_access_token_here**"}' \
+  https://**put_your_bitrix24_address**/rest/crm.lead.list
+  ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame, ISODate } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of each lead object returned in result[]
+    type CrmLeadListItem = {
+      ID: string
+      TITLE: string
+      NAME: string | null
+      LAST_NAME: string | null
+      STATUS_ID: string
+      SOURCE_ID: string
+      CURRENCY_ID: string
+      OPPORTUNITY: string
+      ASSIGNED_BY_ID: string
+      OPENED: string
+      DATE_CREATE: ISODate | null
+      DATE_MODIFY: ISODate | null
+    }
+
+    try {
+      // crm.lead.list returns a single page (max 50 records). For the whole result set
+      // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+      // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+      // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+      // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+      const response = await $b24.actions.v2.call.make<CrmLeadListItem[]>({
+        method: 'crm.lead.list',
+        params: {
+          select: ['*', 'UF_*'],
+          filter: {
+            '=OPPORTUNITY': 15000,
+          },
+          order: {
+            STATUS_ID: 'ASC',
+          },
+          start: 50,
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Leads on this page:', result.length, result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function listLeads() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          // crm.lead.list returns a single page (max 50 records). For the whole result set
+          // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+          // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+          // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+          // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+          const response = await $b24.actions.v2.call.make({
+            method: 'crm.lead.list',
+            params: {
+              select: ['*', 'UF_*'],
+              filter: {
+                '=OPPORTUNITY': 15000,
+              },
+              order: {
+                STATUS_ID: 'ASC',
+              },
+              start: 50,
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Leads on this page:', result.length, result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', listLeads)
+    </script>
+    ```
+
+- PHP
+
+  ```php      
+  try {
+      $order = [];
+      $filter = []; // Define your filter criteria here
+      $select = [
+          'ID', 'TITLE', 'HONORIFIC', 'NAME', 'SECOND_NAME', 'LAST_NAME', 
+          'BIRTHDATE', 'COMPANY_TITLE', 'SOURCE_ID', 'SOURCE_DESCRIPTION', 
+          'STATUS_ID', 'STATUS_DESCRIPTION', 'STATUS_SEMANTIC_ID', 'POST', 
+          'ADDRESS', 'ADDRESS_2', 'ADDRESS_CITY', 'ADDRESS_POSTAL_CODE', 
+          'ADDRESS_REGION', 'ADDRESS_PROVINCE', 'ADDRESS_COUNTRY', 
+          'ADDRESS_COUNTRY_CODE', 'ADDRESS_LOC_ADDR_ID', 'CURRENCY_ID', 
+          'OPPORTUNITY', 'IS_MANUAL_OPPORTUNITY', 'OPENED', 'COMMENTS', 
+          'HAS_PHONE', 'HAS_EMAIL', 'HAS_IMOL', 'ASSIGNED_BY_ID', 
+          'CREATED_BY_ID', 'MODIFY_BY_ID', 'MOVED_BY_ID', 'DATE_CREATE', 
+          'DATE_MODIFY', 'MOVED_TIME', 'COMPANY_ID', 'CONTACT_ID', 
+          'CONTACT_IDS', 'IS_RETURN_CUSTOMER', 'DATE_CLOSED', 
+          'ORIGINATOR_ID', 'ORIGIN_ID', 'UTM_SOURCE', 'UTM_MEDIUM', 
+          'UTM_CAMPAIGN', 'UTM_CONTENT', 'UTM_TERM', 'PHONE', 'EMAIL', 
+          'WEB', 'IM', 'LINK'
+      ];
+      $startItem = 0;
+      $leadsResult = $serviceBuilder->getCRMScope()->lead()->list($order, $filter, $select, $startItem);
+      
+      foreach ($leadsResult->getLeads() as $lead) {
+          print("ID: {$lead->ID}, TITLE: {$lead->TITLE}, NAME: {$lead->NAME}, BIRTHDATE: " . 
+                ($lead->BIRTHDATE ? $lead->BIRTHDATE->format(DATE_ATOM) : 'N/A') . "\n");
+      }
+  } catch (Throwable $e) {
+      print("Error: " . $e->getMessage());
+  }
+  ```
+
+- BX24.js
+
+    ```javascript 
+    BX24.callMethod(
+      'crm.lead.list',
+      {
+        select: ['*', 'UF_*'],
+        filter: {
+            '=OPPORTUNITY': 15000,
+        },
+        order: {
+            STATUS_ID: 'ASC',
+        }, 
+      },
+      (result) => {
+        if(result.error())
+        {
+          console.error(result.error());
+  
+          return;
+        }
+        
+        console.info(result.data());
+
+        if (result.more())
+        {
+          result.next();
+        }
+      }
+    );
+    ```
+
+- PHP CRest
+
+  ```php
+  require_once('crest.php');
+
+  $result = CRest::call(
+      'crm.lead.list',
+      [
+          'select' => ['*', 'UF_*'],
+          'start' => 50,
+          'filter' => [
+              '=OPPORTUNITY' => 15000,
+          ],
+          'order' => [
+              'STATUS_ID' => 'ASC',
+          ],
+      ]
+  );
+
+  echo '<PRE>';
+  print_r($result);
+  echo '</PRE>';
+  ```
+
+- Python
+
+    Example
+
+    ```python
+    from b24pysdk.client import BaseClient
+    from b24pysdk.errors import BitrixAPIError, BitrixSDKException
+
+    client: BaseClient
+
+    try:
+        bitrix_response = client.crm.lead.list(
+            select=["ID", "TITLE", "STATUS_ID", "OPPORTUNITY", "CURRENCY_ID", "ASSIGNED_BY_ID", "DATE_CREATE"],
+            filter={">OPPORTUNITY": 0, "!STATUS_ID": "CONVERTED", "=OPENED": "Y"},
+            order={"DATE_CREATE": "DESC", "ID": "DESC"},
+            start=0,
+        ).response
+        result = bitrix_response.result
+        print(result)
+    except BitrixAPIError as error:
+        print(
+            "Bitrix API error",
+            f"error: {error.error}",
+            f"error_description: {error.error_description}",
+            sep="\n",
+        )
+    except BitrixSDKException as error:
+        print(f"Bitrix SDK error: {error.message}")
+    except Exception as error:
+        print(f"Unexpected error: {error}")
+    ```
+
+    Example `as_list`
+
+    ```python
+    from b24pysdk.client import BaseClient
+    from b24pysdk.errors import BitrixAPIError, BitrixSDKException
+
+    client: BaseClient
+
+    try:
+        bitrix_response = client.crm.lead.list(
+            select=["ID", "TITLE", "STATUS_ID"],
+            filter={"!STATUS_ID": "JUNK"},
+            order={"ID": "ASC"},
+        ).as_list().response
+        result = bitrix_response.result
+        for item in result:
+            print(item)
+    except BitrixAPIError as error:
+        print(
+            "Bitrix API error",
+            f"error: {error.error}",
+            f"error_description: {error.error_description}",
+            sep="\n",
+        )
+    except BitrixSDKException as error:
+        print(f"Bitrix SDK error: {error.message}")
+    except Exception as error:
+        print(f"Unexpected error: {error}")
+    ```
+
+    Example `as_list_fast`
+
+    ```python
+    from b24pysdk.client import BaseClient
+    from b24pysdk.errors import BitrixAPIError, BitrixSDKException
+
+    client: BaseClient
+
+    try:
+        bitrix_response = client.crm.lead.list(
+            select=["ID", "TITLE", "STATUS_ID"],
+            filter={"!STATUS_ID": "JUNK"},
+            order={"ID": "DESC"},
+        ).as_list_fast(descending=True).response
+        result = bitrix_response.result
+        for item in result:
+            print(item)
+    except BitrixAPIError as error:
+        print(
+            "Bitrix API error",
+            f"error: {error.error}",
+            f"error_description: {error.error_description}",
+            sep="\n",
+        )
+    except BitrixSDKException as error:
+        print(f"Bitrix SDK error: {error.message}")
+    except Exception as error:
+        print(f"Unexpected error: {error}")
+    ```
+{% endlist %}
+
+## Some Practical Examples
+
+{% list tabs %}
+
+- Searching for Unconverted Leads with Amount Greater than Zero
+
+  ```js
+  BX24.callMethod(
+      "crm.lead.list",
+      {
+          order: { "STATUS_ID": "ASC" },
+          filter: { ">OPPORTUNITY": 0, "!STATUS_ID": "CONVERTED" },
+          select: [ "ID", "TITLE", "STATUS_ID", "OPPORTUNITY", "CURRENCY_ID" ],
+      },
+      (result) => {
+          if(result.error())
+          {
+              console.error(result.error());
+          }
+          else
+          {
+              console.dir(result.data());
+              if (result.more())
+              {
+                  result.next();
+              }
+          }
+      }
+  );
+  ```
+
+- Searching for a Lead by Phone
+
+  ```js
+  BX24.callMethod(
+      "crm.lead.list",
+      {
+          filter: { "PHONE": "555888" },
+          select: [ "ID", "TITLE" ]
+      },
+      (result) => {
+        if(result.error())
+        {
+          console.error(result.error());
+        }
+        else
+        {
+          console.dir(result.data());
+          if (result.more())
+          {
+            result.next();
+          }
+        }
+      }
+  );
+  ```
+
+- Selecting Leads for the Month
+
+  ```php
+  $result = CRest::call(
+      'crm.lead.list',
+      [
+          'filter' => [
+              '>DATE_CREATE' => '2023-10-01T00:00:00',
+              '<DATE_CREATE' => '2023-10-31T23:59:59',
+          ],
+          'select' => [
+              'ID',
+              'DATE_CREATE',
+          ],
+      ]
+  );
+  ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+  "result": [
+    {
+      "ID": "5",
+      "TITLE": "Lead 1",
+      "HONORIFIC": null,
+      "NAME": "Erasmus",
+      "SECOND_NAME": null,
+      "LAST_NAME": "Golden of Ireland",
+      "COMPANY_TITLE": null,
+      "COMPANY_ID": "0",
+      "CONTACT_ID": "2069",
+      "IS_RETURN_CUSTOMER": "N",
+      "BIRTHDATE": "",
+      "SOURCE_ID": "CALL",
+      "SOURCE_DESCRIPTION": null,
+      "STATUS_ID": "CONVERTED",
+      "STATUS_DESCRIPTION": null,
+      "POST": null,
+      "COMMENTS": null,
+      "CURRENCY_ID": "USD",
+      "OPPORTUNITY": "15000.00",
+      "IS_MANUAL_OPPORTUNITY": "Y",
+      "HAS_PHONE": "Y",
+      "HAS_EMAIL": "Y",
+      "HAS_IMOL": "N",
+      "ASSIGNED_BY_ID": "1",
+      "CREATED_BY_ID": "1",
+      "MODIFY_BY_ID": "1",
+      "DATE_CREATE": "2021-05-31T15:10:16+02:00",
+      "DATE_MODIFY": "2021-11-26T18:56:13+02:00",
+      "DATE_CLOSED": "2021-07-16T16:43:44+02:00",
+      "STATUS_SEMANTIC_ID": "S",
+      "OPENED": "Y",
+      "ORIGINATOR_ID": null,
+      "ORIGIN_ID": null,
+      "MOVED_BY_ID": "1",
+      "MOVED_TIME": "2021-07-16T16:43:44+02:00",
+      "ADDRESS": "7677 Hollow Ridge Alley",
+      "ADDRESS_2": null,
+      "ADDRESS_CITY": null,
+      "ADDRESS_POSTAL_CODE": null,
+      "ADDRESS_REGION": null,
+      "ADDRESS_PROVINCE": null,
+      "ADDRESS_COUNTRY": "Indonesia",
+      "ADDRESS_COUNTRY_CODE": null,
+      "ADDRESS_LOC_ADDR_ID": "1",
+      "UTM_SOURCE": null,
+      "UTM_MEDIUM": null,
+      "UTM_CAMPAIGN": null,
+      "UTM_CONTENT": null,
+      "UTM_TERM": null,
+      "LAST_ACTIVITY_BY": "1",
+      "LAST_ACTIVITY_TIME": "2021-05-31T15:10:16+02:00",
+      "UF_CRM_1704817278": null,
+      "UF_CRM_1706782596092": null,
+      "UF_CRM_1708952993785": false
+    },
+    {
+      "ID": "6",
+      "TITLE": "Lead 2",
+      "HONORIFIC": null,
+      "NAME": "Ignacius",
+      "SECOND_NAME": null,
+      "LAST_NAME": "Slayny",
+      "COMPANY_TITLE": null,
+      "COMPANY_ID": "0",
+      "CONTACT_ID": "2070",
+      "IS_RETURN_CUSTOMER": "N",
+      "BIRTHDATE": "",
+      "SOURCE_ID": "CALL",
+      "SOURCE_DESCRIPTION": null,
+      "STATUS_ID": "CONVERTED",
+      "STATUS_DESCRIPTION": null,
+      "POST": null,
+      "COMMENTS": null,
+      "CURRENCY_ID": "USD",
+      "OPPORTUNITY": "15000.00",
+      "IS_MANUAL_OPPORTUNITY": "Y",
+      "HAS_PHONE": "Y",
+      "HAS_EMAIL": "Y",
+      "HAS_IMOL": "N",
+      "ASSIGNED_BY_ID": "1",
+      "CREATED_BY_ID": "1",
+      "MODIFY_BY_ID": "1",
+      "DATE_CREATE": "2021-05-31T15:10:16+02:00",
+      "DATE_MODIFY": "2021-11-26T18:56:13+02:00",
+      "DATE_CLOSED": "2021-07-16T16:43:47+02:00",
+      "STATUS_SEMANTIC_ID": "S",
+      "OPENED": "Y",
+      "ORIGINATOR_ID": null,
+      "ORIGIN_ID": null,
+      "MOVED_BY_ID": "1",
+      "MOVED_TIME": "2021-07-16T16:43:47+02:00",
+      "ADDRESS": "35 Mosinee Street",
+      "ADDRESS_2": null,
+      "ADDRESS_CITY": null,
+      "ADDRESS_POSTAL_CODE": null,
+      "ADDRESS_REGION": null,
+      "ADDRESS_PROVINCE": null,
+      "ADDRESS_COUNTRY": "Japan",
+      "ADDRESS_COUNTRY_CODE": null,
+      "ADDRESS_LOC_ADDR_ID": "2",
+      "UTM_SOURCE": null,
+      "UTM_MEDIUM": null,
+      "UTM_CAMPAIGN": null,
+      "UTM_CONTENT": null,
+      "UTM_TERM": null,
+      "LAST_ACTIVITY_BY": "1",
+      "LAST_ACTIVITY_TIME": "2021-05-31T15:10:16+02:00",
+      "UF_CRM_1704817278": null,
+      "UF_CRM_1706782596092": null,
+      "UF_CRM_1708952993785": true
+    },
+    
+      48 more leads with similar structure
+    
+  ],
+  "next": 50,
+  "total": 654,
+  "time": {
+    "start": 1718292234.554781,
+    "finish": 1718292234.657739,
+    "duration": 0.10295796394348145,
+    "processing": 0.05574321746826172,
+    "date_start": "2024-06-13T18:23:54+02:00",
+    "date_finish": "2024-06-13T18:23:54+02:00",
+    "operating": 0
+  }
+}
+```
+
+### Returned Data
+
+#|  
+|| **Name**  
+`type`  | **Description** ||  
+|| **result**  
+[`array`](../../data-types.md) | The root element of the response. Contains an array of objects with information about the fields of deals.  
+
+Note that the structure of the fields may change due to the `select` parameter.  
+
+For information about the structure of a lead, see the method [`crm.lead.get`](./crm-lead-get.md) ||  
+|| **total**  
+[`integer`](../../data-types.md) | The total number of found items ||  
+|| **next**  
+[`integer`](../../data-types.md) | Contains the value to be passed in the next request in the `start` parameter to get the next batch of data.  
+
+The `next` parameter appears in the response if the number of items matching your request exceeds `50` ||  
+|| **time**  
+[`time`](../../data-types.md#time) | Information about the execution time of the request ||  
+|#
+
+## Error Handling
+
+> HTTP Status: 40x, 50x Error
+
+```json
+{
+    "error": "",
+    "error_description": "Access denied."
+}
+```
+
+{% include notitle [error handling](../../../_includes/error-info.md) %}
+
+### Possible Errors
+
+#|  
+|| **Error Text** | **Description** ||  
+|| `Access denied` | The user does not have permission to read leads ||  
+|#
+
+{% include [system errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning 
+
+- [{#T}](../../../tutorials/crm/how-to-add-crm-objects/how-to-add-repeat-lead.md)
+- [{#T}](../../../tutorials/crm/how-to-get-lists/search-by-phone-and-email.md)

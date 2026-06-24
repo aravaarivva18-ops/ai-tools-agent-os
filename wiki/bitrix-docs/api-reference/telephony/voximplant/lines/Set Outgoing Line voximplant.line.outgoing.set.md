@@ -1,0 +1,264 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Set Outgoing Line voximplant.line.outgoing.set"
+original_path: "api-reference/telephony/voximplant/lines/voximplant-line-outgoing-set.md"
+---
+
+# Set Outgoing Line voximplant.line.outgoing.set
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`telephony`](../../../scopes/permissions.md)
+>
+> Who can execute the method: user with the Manage Numbers — modify access permission
+
+The method `voximplant.line.outgoing.set` sets the default outgoing line.
+
+## Method Parameters
+
+{% include [Note on required parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **LINE_ID***
+[`string`](../../../data-types.md) | Line identifier.
+
+Available identifiers can be retrieved using the [voximplant.line.get](./voximplant-line-get.md) method ||
+|#
+
+{% note info "" %}
+
+The method changes the outgoing line only if the provided `LINE_ID` exists among the available lines. If `LINE_ID` is not specified or not found, the method will return `1`, but the outgoing line setting will not change.
+
+{% endnote %}
+
+## Code Examples
+
+{% include [Note on examples](../../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"LINE_ID":"reg150907"}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/voximplant.line.outgoing.set
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"LINE_ID":"reg150907","auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/voximplant.line.outgoing.set
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    try {
+      const response = await $b24.actions.v2.call.make<number>({
+        method: 'voximplant.line.outgoing.set',
+        params: {
+          LINE_ID: 'reg150907',
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Set outgoing line result:', result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function setOutgoingLine() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'voximplant.line.outgoing.set',
+            params: {
+              LINE_ID: 'reg150907',
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Set outgoing line result:', result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', setOutgoingLine)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'voximplant.line.outgoing.set',
+                [
+                    'LINE_ID' => 'reg150907',
+                ]
+            );
+
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+
+        echo 'Success: ' . print_r($result, true);
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'voximplant.line.outgoing.set',
+        {
+            LINE_ID: 'reg150907'
+        },
+        function(result)
+        {
+            if (result.error())
+            {
+                console.error(result.error(), result.error_description());
+            }
+            else
+            {
+                console.log(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'voximplant.line.outgoing.set',
+        [
+            'LINE_ID' => 'reg150907',
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+    "result": 1,
+    "time": {
+        "start": 1773664560,
+        "finish": 1773664560.138283,
+        "duration": 0.13828301429748535,
+        "processing": 0,
+        "date_start": "2026-03-16T15:36:00+02:00",
+        "date_finish": "2026-03-16T15:36:00+02:00",
+        "operating_reset_at": 1773665160,
+        "operating": 0
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`integer`](../../../data-types.md) | Result of the method execution.
+
+`1` — request processed.
+Check the actual line using [voximplant.line.outgoing.get](./voximplant-line-outgoing-get.md), as an invalid `LINE_ID` will also return `1` ||
+|| **time**
+[`time`](../../../data-types.md#time) | Information about the request execution time ||
+|#
+
+## Error Handling
+
+HTTP Status: **403**
+
+```json
+{
+    "error": "ACCESS_DENIED",
+    "error_description": "Access denied!"
+}
+```
+
+{% include notitle [error handling](../../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** | **Value** ||
+|| `ACCESS_DENIED` | `Access denied!` | Insufficient permissions to modify the default outgoing line ||
+|#
+
+{% include [system errors](../../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./voximplant-line-get.md)
+- [{#T}](./voximplant-line-outgoing-get.md)
+- [{#T}](./voximplant-line-outgoing-set.md)
+- [{#T}](./voximplant-line-outgoing-sip-set.md)

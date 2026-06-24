@@ -1,0 +1,305 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Update User Field Values for Inventory Accounting Documents catalog.userfield.document.update"
+original_path: "api-reference/catalog/userfield-document/catalog-userfield-document-update.md"
+---
+
+# Update User Field Values for Inventory Accounting Documents catalog.userfield.document.update
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`catalog`](../../scopes/permissions.md)
+>
+> Who can execute the method: a user with "Create and Edit" access permission for the required document type
+
+The method `catalog.userfield.document.update` updates the values of user fields in inventory accounting documents.
+
+## Method Parameters
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+#| 
+|| **Name**
+`type` | **Description** ||
+|| **documentId*** 
+[`catalog_document.id`](../data-types.md#catalog_document) | Identifier of the inventory accounting document. The identifier can be obtained using the [catalog.document.list](../document/catalog-document-list.md) method ||
+|| **fields*** 
+[`object`](#fields) | Fields to be updated ([detailed description](#fields)) ||
+|#
+
+### Parameter fields {#fields}
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+#| 
+|| **Name**
+`type` | **Description** ||
+|| **documentType*** 
+[`string`](../../data-types.md) | Type of the inventory accounting document.
+
+Allowed values: [types of inventory accounting documents](../enum/catalog-enum-get-store-document-types.md) ||
+|| **fieldN** 
+[`mixed`](../../data-types.md) | Value of the user field, where `N` is the identifier of the user field, for example `field287`.
+
+Identifiers and settings for user fields can be obtained using the [userfieldconfig.list](../../crm/universal/userfieldconfig/userfieldconfig-list.md) method ||
+|#
+
+## Code Examples
+
+{% include [Note on Examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"documentId":81,"fields":{"documentType":"A","field7097":"Test Field"}}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/catalog.userfield.document.update
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"documentId":81,"fields":{"documentType":"A","field7097":"Test Field"},"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/catalog.userfield.document.update
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of the payload returned in result (match the "response handling" section of the page)
+    type UpdateUserfieldDocumentResult = {
+      document: {
+        documentId: number
+        documentType: string
+        [field: string]: unknown
+      }
+    }
+
+    try {
+      const response = await $b24.actions.v2.call.make<UpdateUserfieldDocumentResult>({
+        method: 'catalog.userfield.document.update',
+        params: {
+          documentId: 81,
+          fields: {
+            documentType: 'A',
+            field7097: 'Test field value',
+          },
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info(result.document)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function updateUserfieldDocument() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'catalog.userfield.document.update',
+            params: {
+              documentId: 81,
+              fields: {
+                documentType: 'A',
+                field7097: 'Test field value',
+              },
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info(result.document)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', updateUserfieldDocument)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'catalog.userfield.document.update',
+                [
+                    'documentId' => 81,
+                    'fields' => [
+                        'documentType' => 'A',
+                        'field7097' => 'Test Field',
+                    ],
+                ]
+            );
+
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+
+        print_r($result['document']);
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error updating document user fields: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'catalog.userfield.document.update',
+        {
+            documentId: 81,
+            fields: {
+                documentType: 'A',
+                field7097: 'Test Field'
+            }
+        },
+        function(result) {
+            if (result.error()) {
+                console.error(result.error());
+            } else {
+                console.log(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'catalog.userfield.document.update',
+        [
+            'documentId' => 81,
+            'fields' => [
+                'documentType' => 'A',
+                'field7097' => 'Test Field',
+            ],
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result['result']['document']);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Code: **200**
+
+```json
+{
+    "result": {
+        "document": {
+            "documentId": 81,
+            "documentType": "A",
+            "field7097": "Test Field"
+        }
+    },
+    "time": {
+        "start": 1774341924,
+        "finish": 1774341924.459929,
+        "duration": 0.4599289894104004,
+        "processing": 0,
+        "date_start": "2026-03-24T11:45:24+01:00",
+        "date_finish": "2026-03-24T11:45:24+01:00",
+        "operating_reset_at": 1774342524,
+        "operating": 0
+    }
+}
+```
+
+### Returned Data
+
+#| 
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`object`](../../data-types.md) | Root element of the response ||
+|| **document**
+[`catalog_userfield_document`](../data-types.md#catalog_userfield_document) | Object with updated values of the document's user fields ||
+|| **time**
+[`time`](../../data-types.md#time) | Information about the request execution time ||
+|#
+
+## Error Handling
+
+{% include notitle [Error Handling](../../../_includes/error-info.md) %}
+
+HTTP Code: **400**
+
+```json
+{
+    "error": "0",
+    "error_description": "The specified document does not exist"
+}
+```
+
+### Possible Error Codes
+
+#| 
+|| **Code** | **Description** | **Value** ||
+|| `0` | The specified document does not exist | Document with the specified `documentId` not found ||
+|| `0` | Access Denied | Insufficient rights to modify the document of the selected type ||
+|#
+
+{% include [System Errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./catalog-userfield-document-list.md)
+- [{#T}](../enum/catalog-enum-get-store-document-types.md)
+- [{#T}](../../crm/universal/userfieldconfig/userfieldconfig-list.md)

@@ -1,0 +1,345 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Get a List of REST Handlers for the Payment System sale.paysystem.handler.list"
+original_path: "api-reference/pay-system/sale-pay-system-handler-list.md"
+---
+
+# Get a List of REST Handlers for the Payment System sale.paysystem.handler.list
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`pay_system`](../scopes/permissions.md)
+>
+> Who can execute the method: CRM administrator (permission "Allow to modify settings")
+
+This method returns a list of REST handlers for the payment system.
+
+No parameters required.
+
+## Code Examples
+
+{% include [Examples Note](../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/sale.paysystem.handler.list
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{}' \
+    https://**put_your_bitrix24_address**/rest/sale.paysystem.handler.list?auth=**put_access_token_here**
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of each HandlerItem returned in result[]
+    type HandlerItem = {
+      ID: string
+      NAME: string
+      CODE: string
+      SORT: string
+      SETTINGS: Record<string, unknown>
+    }
+
+    try {
+      // sale.paysystem.handler.list returns a single page (max 50 records). For the whole result set
+      // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+      // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+      // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+      // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+      const response = await $b24.actions.v2.call.make<HandlerItem[]>({
+        method: 'sale.paysystem.handler.list',
+        params: {
+          start: 0,
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Handlers count:', result.length, 'First handler:', result[0])
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function listPaySystemHandlers() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          // sale.paysystem.handler.list returns a single page (max 50 records). For the whole result set
+          // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+          // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+          // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+          // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+          const response = await $b24.actions.v2.call.make({
+            method: 'sale.paysystem.handler.list',
+            params: {
+              start: 0,
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Handlers count:', result.length, 'First handler:', result[0])
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', listPaySystemHandlers)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'sale.paysystem.handler.list',
+                []
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        if ($result->error()) {
+            error_log($result->error());
+        } else {
+            echo 'Success: ' . print_r($result->data(), true);
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error fetching payment system handlers: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        "sale.paysystem.handler.list",
+        {},
+        function(result)
+        {
+            if(result.error())
+                console.error(result.error());
+            else
+                console.dir(result.data());
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'sale.paysystem.handler.list',
+        []
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+    "result": [
+        {
+            "ID": "1",
+            "NAME": "REST Handler",
+            "CODE": "resthandlercodedoc",
+            "SORT": "100",
+            "SETTINGS": {
+                "CURRENCY": [
+                    "EUR"
+                ],
+                "FORM_DATA": {
+                    "ACTION_URI": "http://example.com/payment_form.php",
+                    "METHOD": "POST",
+                    "FIELDS": {
+                        "phone": {
+                            "VISIBLE": "Y",
+                            "CODE": {
+                                "NAME": "Phone Number",
+                                "TYPE": "STRING"
+                            }
+                        },
+                        "paymentId": {
+                            "CODE": "PAYMENT_ID",
+                            "VISIBLE": "Y"
+                        },
+                        "serviceid": {
+                            "CODE": "REST_SERVICE_ID"
+                        }
+                    }
+                },
+                "CODES": {
+                    "REST_SERVICE_ID": {
+                        "NAME": "Store Number",
+                        "DESCRIPTION": "Store Number",
+                        "SORT": "100"
+                    },
+                    "REST_SERVICE_KEY": {
+                        "NAME": "Secret Key",
+                        "DESCRIPTION": "Secret Key",
+                        "SORT": "300"
+                    },
+                    "PAYMENT_ID": {
+                        "NAME": "Payment Number",
+                        "SORT": "400",
+                        "GROUP": "PAYMENT",
+                        "DEFAULT": {
+                            "PROVIDER_KEY": "PAYMENT",
+                            "PROVIDER_VALUE": "ACCOUNT_NUMBER"
+                        }
+                    },
+                    "PS_CHANGE_STATUS_PAY": {
+                        "NAME": "Automatic Payment Status Change",
+                        "SORT": "700",
+                        "INPUT": {
+                            "TYPE": "Y/N"
+                        }
+                    },
+                    "PAYMENT_BUYER_ID": {
+                        "NAME": "Buyer Code",
+                        "SORT": "1000",
+                        "GROUP": "PAYMENT",
+                        "DEFAULT": {
+                            "PROVIDER_KEY": "ORDER",
+                            "PROVIDER_VALUE": "USER_ID"
+                        }
+                    },
+                    "PS_WORK_MODE": {
+                        "NAME": "Payment System Operating Mode",
+                        "SORT": "1100",
+                        "INPUT": {
+                            "TYPE": "ENUM",
+                            "OPTIONS": {
+                                "TEST": "Test",
+                                "REGULAR": "Live"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "time": {
+        "start": 1712135335.026931,
+        "finish": 1712135335.407762,
+        "duration": 0.3808310031890869,
+        "processing": 0.0336611270904541,
+        "date_start": "2024-04-03T11:08:55+02:00",
+        "date_finish": "2024-04-03T11:08:55+02:00",
+        "operating_reset_at": 1705765533,
+        "operating": 3.3076241016387939
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`sale_paysystem_handler[]`](../sale/data-types.md) | List of registered REST handlers for payment systems ||
+|| **time**
+[`time`](../data-types.md) | Information about the request execution time ||
+|#
+
+## Error Handling
+
+HTTP Status: **403**
+
+```json
+{
+    "error": "ACCESS_DENIED",
+    "error_description": "Access denied!"
+}
+```
+
+{% include notitle [error handling](../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** | **Status** ||
+|| `ACCESS_DENIED` | Access denied. The application is trying to modify a handler added by another application, or lacks sufficient rights to update the handler | 403 ||
+|#
+
+{% include [system errors](../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./sale-pay-system-handler-add.md)
+- [{#T}](./sale-pay-system-handler-update.md)
+- [{#T}](./sale-pay-system-handler-delete.md)
+- [{#T}](./sale-pay-system-add.md)
+- [{#T}](./sale-pay-system-update.md)
+- [{#T}](./sale-pay-system-list.md)
+- [{#T}](./sale-pay-system-settings-get.md)
+- [{#T}](./sale-pay-system-settings-update.md)
+- [{#T}](./sale-pay-system-delete.md)
+- [{#T}](./sale-pay-system-pay-payment.md)
+- [{#T}](./sale-pay-system-settings-payment-get.md)

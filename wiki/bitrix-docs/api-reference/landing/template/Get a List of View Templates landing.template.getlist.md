@@ -1,0 +1,497 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Get a List of View Templates landing.template.getlist"
+original_path: "api-reference/landing/template/landing-template-get-list.md"
+---
+
+# Get a List of View Templates landing.template.getlist
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`landing`](../../scopes/permissions.md)
+>
+> Who can execute the method: a user with access permission to the "Sites and Stores" section
+
+The method `landing.template.getlist` retrieves a list of view templates for the current account based on the selection parameters.
+
+## Method Parameters
+
+{% include [Note on required parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **params**
+[`object`](../../data-types.md) | An object containing the selection parameters for view templates in the following format:
+
+```json
+{
+    "select": ["field_1", "field_2"],
+    "filter": {
+        "field": "value"
+    },
+    "order": {
+        "field": "ASC"
+    },
+    "group": ["field"],
+    "limit": 50,
+    "offset": 0
+}
+```
+
+The list of available fields is described [below](#params) ||
+|#
+
+### Parameter params {#params}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **select**
+[`string[]`](../../data-types.md) | A list of fields from the [fields of the View Template object](./fields.md).
+
+If the parameter is not provided, the method returns all available fields of the template.
+
+Fields like `CREATED_BY.NAME` are not supported ||
+|| **filter**
+[`object`](../../data-types.md) | A filter for fields from the [fields of the View Template object](./fields.md).
+
+If the parameter is not provided, the method returns all templates of the current account, including inactive ones.
+
+Fields like `CREATED_BY.NAME` are not supported ||
+|| **order**
+[`object`](../../data-types.md) | Sorting in the format `{"FIELD": "ASC"}` or `{"FIELD": "DESC"}`.
+
+Multiple fields can be provided. If the parameter is not provided, the method does not apply any sorting ||
+|| **group**
+[`array`](../../data-types.md) | An array of field names for grouping, such as `["ACTIVE"]` or `["ACTIVE", "SORT"]`.
+
+Calculated fields via `runtime` are not supported ||
+|| **limit**
+[`integer`](../../data-types.md) | The maximum number of items in the response.
+
+If `limit` is not specified, the method returns all found templates without restriction. Use together with `offset` for pagination ||
+|| **offset**
+[`integer`](../../data-types.md) | The offset from the start of the selection. Use together with `limit` for pagination ||
+|#
+
+## Code Examples
+
+{% include [Note on examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+      -H "Content-Type: application/json" \
+      -d '{
+        "params": {
+          "select": [
+            "ID",
+            "TITLE",
+            "XML_ID",
+            "SORT",
+            "ACTIVE",
+            "DATE_MODIFY"
+          ],
+          "filter": {
+            "=ACTIVE": "Y"
+          },
+          "order": {
+            "SORT": "ASC",
+            "ID": "ASC"
+          },
+          "limit": 2,
+          "offset": 0
+        }
+      }' \
+      "https://**put.your-domain-here**/rest/**user_id**/**webhook_code**/landing.template.getlist.json"
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+      -H "Content-Type: application/json" \
+      -d '{
+        "params": {
+          "select": [
+            "ID",
+            "TITLE",
+            "XML_ID",
+            "SORT",
+            "ACTIVE",
+            "DATE_MODIFY"
+          ],
+          "filter": {
+            "=ACTIVE": "Y"
+          },
+          "order": {
+            "SORT": "ASC",
+            "ID": "ASC"
+          },
+          "limit": 2,
+          "offset": 0
+        },
+        "auth": "**put_access_token_here**"
+      }' \
+      "https://**put.your-domain-here**/rest/landing.template.getlist.json"
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of each template item returned in result[]
+    type TemplateItem = {
+      ID: string
+      TITLE: string
+      XML_ID: string
+      SORT: string
+      ACTIVE: string
+      DATE_MODIFY: string
+    }
+
+    try {
+      // landing.template.getlist returns a single page (max 50 records). For the whole result set
+      // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+      // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+      // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+      // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+      const response = await $b24.actions.v2.call.make<TemplateItem[]>({
+        method: 'landing.template.getlist',
+        params: {
+          params: {
+            select: [
+              'ID',
+              'TITLE',
+              'XML_ID',
+              'SORT',
+              'ACTIVE',
+              'DATE_MODIFY',
+            ],
+            filter: {
+              '=ACTIVE': 'Y',
+            },
+            order: {
+              SORT: 'ASC',
+              ID: 'ASC',
+            },
+            limit: 2,
+            offset: 0,
+          },
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Templates count:', result.length, result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function getTemplateList() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          // landing.template.getlist returns a single page (max 50 records). For the whole result set
+          // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+          // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+          // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+          // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+          const response = await $b24.actions.v2.call.make({
+            method: 'landing.template.getlist',
+            params: {
+              params: {
+                select: [
+                  'ID',
+                  'TITLE',
+                  'XML_ID',
+                  'SORT',
+                  'ACTIVE',
+                  'DATE_MODIFY',
+                ],
+                filter: {
+                  '=ACTIVE': 'Y',
+                },
+                order: {
+                  SORT: 'ASC',
+                  ID: 'ASC',
+                },
+                limit: 2,
+                offset: 0,
+              },
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Templates count:', result.length, result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', getTemplateList)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'landing.template.getlist',
+                [
+                    'params' => [
+                        'select' => [
+                            'ID',
+                            'TITLE',
+                            'XML_ID',
+                            'SORT',
+                            'ACTIVE',
+                            'DATE_MODIFY',
+                        ],
+                        'filter' => [
+                            '=ACTIVE' => 'Y',
+                        ],
+                        'order' => [
+                            'SORT' => 'ASC',
+                            'ID' => 'ASC',
+                        ],
+                        'limit' => 2,
+                        'offset' => 0,
+                    ],
+                ]
+            );
+
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+
+        echo 'Success: ' . print_r($result, true);
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error getting template list: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'landing.template.getlist',
+        {
+            params: {
+                select: [
+                    'ID',
+                    'TITLE',
+                    'XML_ID',
+                    'SORT',
+                    'ACTIVE',
+                    'DATE_MODIFY'
+                ],
+                filter: {
+                    '=ACTIVE': 'Y'
+                },
+                order: {
+                    SORT: 'ASC',
+                    ID: 'ASC'
+                },
+                limit: 2,
+                offset: 0
+            }
+        },
+        function(result)
+        {
+            if (result.error())
+            {
+                console.error(result.error());
+            }
+            else
+            {
+                console.info(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'landing.template.getlist',
+        [
+            'params' => [
+                'select' => [
+                    'ID',
+                    'TITLE',
+                    'XML_ID',
+                    'SORT',
+                    'ACTIVE',
+                    'DATE_MODIFY',
+                ],
+                'filter' => [
+                    '=ACTIVE' => 'Y',
+                ],
+                'order' => [
+                    'SORT' => 'ASC',
+                    'ID' => 'ASC',
+                ],
+                'limit' => 2,
+                'offset' => 0,
+            ],
+        ]
+    );
+
+    if (isset($result['error']))
+    {
+        echo 'Error: ' . $result['error_description'];
+    }
+    else
+    {
+        echo '<pre>';
+        print_r($result['result']);
+        echo '</pre>';
+    }
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+    "result": [
+        {
+            "ID": "1",
+            "TITLE": "With Header and Footer",
+            "XML_ID": "header_footer",
+            "SORT": "100",
+            "ACTIVE": "Y",
+            "DATE_MODIFY": "10/10/2022 03:25:30 pm"
+        },
+        {
+            "ID": "2",
+            "TITLE": "With Left Sidebar",
+            "XML_ID": "sidebar_left",
+            "SORT": "200",
+            "ACTIVE": "Y",
+            "DATE_MODIFY": "10/10/2022 03:25:30 pm"
+        }
+    ],
+    "time": {
+        "start": 1774765200,
+        "finish": 1774765200.411258,
+        "duration": 0.4112579822540283,
+        "processing": 0,
+        "date_start": "2026-03-29T10:00:00+02:00",
+        "date_finish": "2026-03-29T10:00:00+02:00",
+        "operating_reset_at": 1774765800,
+        "operating": 0
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`object[]`](../../data-types.md) | A list of view templates [(detailed description)](#template).
+
+If nothing is found by the filter, the method returns `result: []` ||
+|| **time**
+[`time`](../../data-types.md#time) | Information about the execution time of the request ||
+|#
+
+#### Object template {#template}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **FIELD**
+[`string`](../../data-types.md) \| [`integer`](../../data-types.md) \| `null` | A field of the view template from the [fields of the View Template object](./fields.md), if it was included in the selection.
+
+For the fields `DATE_CREATE` and `DATE_MODIFY`, the method always returns a string, for example `04/20/2020 12:48:10 pm` ||
+|#
+
+Response Features:
+
+- The `TITLE` field is usually returned as the name in the current language of the account
+- If a translation for a system template is not found, the `TITLE` may return a language key like `#...#`, for example `#HEADER_ONLY#`
+
+## Error Handling
+
+HTTP Status: **400**
+
+```json
+{
+    "error": "ACCESS_DENIED",
+    "error_description": "Insufficient permissions."
+}
+```
+
+{% include notitle [error handling](../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** ||
+|| `ACCESS_DENIED` | Insufficient permissions to work with the "Sites and Stores" section ||
+|| `TYPE_ERROR` | Data type error while processing the call parameters ||
+|| `SYSTEM_ERROR` | Internal error during method execution ||
+|#
+
+{% include [system errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./landing-template-get-landing-ref.md)
+- [{#T}](./landing-template-get-site-ref.md)
+- [{#T}](./landing-template-set-landing-ref.md)
+- [{#T}](./landing-template-set-site-ref.md)
+- [Fields of the View Template object](./fields.md)

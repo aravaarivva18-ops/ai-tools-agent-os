@@ -1,0 +1,453 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Get Deal Products crm.deal.productrows.get"
+original_path: "api-reference/crm/deals/crm-deal-productrows-get.md"
+---
+
+# Get Deal Products crm.deal.productrows.get
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`crm`](../../scopes/permissions.md)
+>
+> Who can execute the method: a user with "read" access permission for the deal
+
+{% note warning "DEPRECATED" %}
+
+Development of this method has been halted. Please use [crm.item.productrow.*](../universal/product-rows/index.md).
+
+{% endnote %}
+
+The method `crm.deal.productrows.get` returns the product rows of a deal.
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id^*^**
+[`integer`](../../data-types.md) | The identifier of the deal. It can be obtained using the method for retrieving the list of deals: [`crm.deal.list`](./crm-deal-list.md) or when creating a deal: [`crm.deal.add`](./crm-deal-add.md) ||
+|#
+
+{% include [Footnote on parameters](../../../_includes/required.md) %}
+
+
+## Code Examples
+
+Retrieve the product rows of the deal with `id = 5`
+
+{% include [Footnote on examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+	-H "Content-Type: application/json" \
+	-H "Accept: application/json" \
+	-d '{"id":5}' \
+	https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/crm.deal.productrows.get
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+	-H "Content-Type: application/json" \
+	-H "Accept: application/json" \
+	-d '{"id":5,"auth":"**put_access_token_here**"}' \
+	https://**put_your_bitrix24_address**/rest/crm.deal.productrows.get
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of each product row returned in result[]
+    type CrmDealProductRow = {
+      ID: string
+      OWNER_ID: string
+      OWNER_TYPE: string
+      PRODUCT_ID: number
+      PRODUCT_NAME: string
+      PRICE: number
+      QUANTITY: number
+      DISCOUNT_TYPE_ID: number
+      DISCOUNT_RATE: number
+      DISCOUNT_SUM: number
+      TAX_RATE: number | null
+      TAX_INCLUDED: string
+      MEASURE_CODE: number
+      MEASURE_NAME: string
+      SORT: number
+    }
+
+    try {
+      const response = await $b24.actions.v2.call.make<CrmDealProductRow[]>({
+        method: 'crm.deal.productrows.get',
+        params: {
+          id: 5,
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Product rows:', result.length, result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function getDealProductRows() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'crm.deal.productrows.get',
+            params: {
+              id: 5,
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Product rows:', result.length, result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', getDealProductRows)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'crm.deal.productrows.get',
+                [
+                    'id' => 5,
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        if ($result->error()) {
+            echo 'Error: ' . $result->error();
+        } else {
+            echo 'Data: ' . print_r($result->data(), true);
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error getting deal product rows: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'crm.deal.productrows.get',
+        {
+            id: 5,
+        },
+        (result) => {
+            result.error()
+                ? console.error(result.error())
+                : console.info(result.data())
+            ;
+        },
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+	$result = CRest::call(
+		'crm.deal.productrows.get',
+		[
+			'id' => 5
+		]
+	);
+
+	echo '<PRE>';
+	print_r($result);
+	echo '</PRE>';
+    ```
+
+- Python
+
+    Example
+
+    ```python
+    from b24pysdk.client import BaseClient
+    from b24pysdk.errors import BitrixAPIError, BitrixSDKException
+
+    client: BaseClient
+
+    try:
+        bitrix_response = client.crm.deal.productrows.get(bitrix_id=123).response
+        result = bitrix_response.result
+        print(result)
+    except BitrixAPIError as error:
+        print(
+            "Bitrix API error",
+            f"error: {error.error}",
+            f"error_description: {error.error_description}",
+            sep="\n",
+        )
+    except BitrixSDKException as error:
+        print(f"Bitrix SDK error: {error.message}")
+    except Exception as error:
+        print(f"Unexpected error: {error}")
+    ```
+{% endlist %}
+
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+	"result": [
+		{
+			"ID": "5",
+			"OWNER_ID": "5",
+			"OWNER_TYPE": "D",
+			"PRODUCT_ID": 450,
+			"PRODUCT_NAME": "Product #2",
+			"ORIGINAL_PRODUCT_NAME": "Product #2",
+			"PRODUCT_DESCRIPTION": null,
+			"PRICE": 899.1,
+			"PRICE_EXCLUSIVE": 899.1,
+			"PRICE_NETTO": 999,
+			"PRICE_BRUTTO": 999,
+			"PRICE_ACCOUNT": "899.10",
+			"QUANTITY": 1,
+			"DISCOUNT_TYPE_ID": 2,
+			"DISCOUNT_RATE": 10,
+			"DISCOUNT_SUM": 99.9,
+			"TAX_RATE": null,
+			"TAX_INCLUDED": "Y",
+			"CUSTOMIZED": "Y",
+			"MEASURE_CODE": 796,
+			"MEASURE_NAME": "pcs",
+			"SORT": 10,
+			"XML_ID": "sale_basket_651",
+			"TYPE": 1,
+			"STORE_ID": 0,
+			"RESERVE_ID": 31,
+			"DATE_RESERVE_END": "2024-12-26",
+			"RESERVE_QUANTITY": 1
+		},
+		{
+			"ID": "4",
+			"OWNER_ID": "5",
+			"OWNER_TYPE": "D",
+			"PRODUCT_ID": 449,
+			"PRODUCT_NAME": "Product #1",
+			"ORIGINAL_PRODUCT_NAME": "Product #1",
+			"PRODUCT_DESCRIPTION": "Detailed description",
+			"PRICE": 100,
+			"PRICE_EXCLUSIVE": 100,
+			"PRICE_NETTO": 100,
+			"PRICE_BRUTTO": 100,
+			"PRICE_ACCOUNT": "100.00",
+			"QUANTITY": 1,
+			"DISCOUNT_TYPE_ID": 2,
+			"DISCOUNT_RATE": 0,
+			"DISCOUNT_SUM": 0,
+			"TAX_RATE": null,
+			"TAX_INCLUDED": "Y",
+			"CUSTOMIZED": "Y",
+			"MEASURE_CODE": 796,
+			"MEASURE_NAME": "pcs",
+			"SORT": 20,
+			"XML_ID": "sale_basket_650",
+			"TYPE": 1,
+			"STORE_ID": 1,
+			"RESERVE_ID": 30,
+			"DATE_RESERVE_END": "2024-12-26",
+			"RESERVE_QUANTITY": 1
+		}
+	],
+	"time": {
+		"start": 1734969122.936213,
+		"finish": 1734969123.586089,
+		"duration": 0.6498758792877197,
+		"processing": 0.14046597480773926,
+		"date_start": "2024-12-23T17:52:02+02:00",
+		"date_finish": "2024-12-23T17:52:03+02:00",
+		"operating": 0
+	}
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`productrow[]`](#productrow) | The root element of the response containing an array of product rows for the deal ||
+|| **time**
+[`time`](../../data-types.md#time) | Information about the execution time of the request ||
+|#
+
+#### Product Row Type {#productrow}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **ID**
+[`integer`](../../data-types.md) | The identifier of the product row ||
+|| **OWNER_ID**
+[`integer`](../../data-types.md) | The identifier of the entity to which the product is linked. For this method, it will always equal the `id` of the deal ||
+|| **OWNER_TYPE**
+[`string`](../../data-types.md) | String identifier of the type of object to which the product is linked. For this method, it will always equal `D` ||
+|| **PRODUCT_ID**
+[`integer`](../../data-types.md) | The identifier of the product in the catalog. `0` if not from the catalog
+
+For more detailed information about the product, use [`catalog.product.get`](../../catalog/product/catalog-product-get.md)
+||
+|| **PRODUCT_NAME**
+[`string`](../../data-types.md) | The name of the product row ||
+|| **ORIGINAL_PRODUCT_NAME**
+[`string`](../../data-types.md) | The name of the product row in the catalog ||
+|| **PRODUCT_DESCRIPTION**
+[`string`](../../data-types.md) | The description of the product row ||
+|| **PRICE**
+[`double`](../../data-types.md) | The total cost of the product per unit ||
+|| **PRICE_EXCLUSIVE**
+[`double`](../../data-types.md) | The cost per unit considering discounts, excluding taxes ||
+|| **PRICE_NETTO**
+[`double`](../../data-types.md) | The cost per unit excluding discounts and taxes ||
+|| **PRICE_BRUTTO**
+[`double`](../../data-types.md) | The cost per unit excluding discounts but including taxes ||
+|| **PRICE_ACCOUNT**
+[`string`](../../data-types.md) | The cost of the product in "report currency" ||
+|| **QUANTITY**
+[`integer`](../../data-types.md) | The quantity of the product units ||
+|| **DISCOUNT_TYPE_ID**
+[`integer`](../../data-types.md) | The type of discount
+Possible types:
+ - `1` - Absolute
+ - `2` - Percentage
+
+||
+|| **DISCOUNT_RATE**
+[`double`](../../data-types.md) | The discount value in percentage (if using the percentage discount type) ||
+|| **DISCOUNT_SUM**
+[`double`](../../data-types.md) | The absolute value of the discount (if using the absolute discount type) ||
+|| **TAX_RATE**
+[`double`](../../data-types.md) | The tax rate in percentage ||
+|| **TAX_INCLUDED**
+[`char`](../../data-types.md) | Indicator of whether tax is included in the price
+Possible values:
+- `Y` – tax included
+- `N` – tax not included
+
+||
+|| **CUSTOMIZED**
+[`char`](../../data-types.md) | Customized (Deprecated)
+Possible values:
+ - `Y` - Yes
+ - `N` - No
+
+||
+|| **MEASURE_CODE**
+[`catalog_measure.code`](../../catalog/data-types.md#catalog_measure) | The code of the unit of measure ||
+|| **MEASURE_NAME**
+[`string`](../../data-types.md) | The textual representation of the unit of measure (e.g., pcs, kg, m, l, etc.) ||
+|| **SORT**
+[`integer`](../../data-types.md) | Sorting ||
+|| **XML_ID**
+[`string`](../../data-types.md) | The external code of the product ||
+|| **TYPE**
+[`integer`](../../data-types.md) | The type of product
+Possible values: 
+ - `1` - Simple product
+ - `4` - Trade offer/variation
+ - `7` - Service
+
+||
+|| **STORE_ID**
+[`integer`](../../data-types.md) | The identifier of the warehouse. For more detailed information about the warehouse, use [`catalog.store.get`](../../catalog/store/catalog-store-get.md) ||
+|| **RESERVE_ID**
+[`integer`](../../data-types.md) | The identifier of the reserve ||
+|| **DATE_RESERVE_END**
+[`date`](../../data-types.md) | The date of the end of the reservation ||
+|| **RESERVE_QUANTITY**
+[`integer`](../../data-types.md) | The quantity of reserved product units ||
+|#
+
+
+## Error Handling
+
+HTTP Status: **400**
+
+```json
+{
+  "error": "",
+  "error_description": "The parameter id is invalid or not defined."
+}
+```
+
+{% include notitle [error handling](../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Description** | **Value** ||
+|| The parameter id is invalid or not defined | An incorrect value was passed in the `id` parameter ||
+|| Access denied | The user does not have "read" access permission for the deal  ||
+|| Not found | The deal with the provided `id` was not found ||
+|#
+
+{% include [system errors](./../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./crm-deal-productrows-set.md)

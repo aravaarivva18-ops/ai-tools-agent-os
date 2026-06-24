@@ -1,0 +1,189 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Update Custom Field crm.invoice.userfield.update"
+original_path: "api-reference/crm/outdated/invoice/crm-invoice-user-field-update.md"
+---
+
+# Update Custom Field crm.invoice.userfield.update
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`crm`](../../../scopes/permissions.md)
+>
+> Who can execute the method: any user
+
+{% note warning "DEPRECATED" %}
+
+The development of this method has been halted. Please use [Universal Methods for Invoices](../../universal/invoice.md).
+
+{% endnote %}
+
+This method updates an existing custom field for invoices.
+
+## Method Parameters
+
+{% include [Note on Required Parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id** | Identifier of the custom field ||
+|| **fields** | Set of fields - an array in the form `array("updatable field"=>"value"[, ...])`, where "updatable field" can take values returned by the method [crm.userfield.fields](../../universal/user-defined-fields/crm-userfield-fields.md) ||
+|| **LIST** | Contains a set of list values for custom fields of type List. This is specified when creating/updating the field. Each value is an array with the following fields: 
+- **VALUE** - value of the list item. This field is required when creating a new item  
+- **SORT** - sorting 
+- **DEF** - if set to Y, the list item is the default value. For multiple fields, multiple DEF=Y are allowed. For non-multiple fields, the first one will be considered default  
+- **XML_ID** - external code of the value. This parameter is only considered when updating already existing list item values
+- **ID** - identifier of the value. If specified, it is considered an update of an existing list item value, not the creation of a new one. This is only relevant when calling the `*.userfield.update` methods
+- **DEL** - if set to Y, the existing list item will be deleted. This is applied if the ID parameter is filled  ||
+|#
+
+## Code Examples
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```http
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id": "**put_id_here**", "fields": {"EDIT_FORM_LABEL": "**put_label_here**", "LIST_COLUMN_LABEL": "**put_label_here**"}}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/crm.invoice.userfield.update
+    ```
+
+- cURL (OAuth)
+
+    ```http
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id": "**put_id_here**", "fields": {"EDIT_FORM_LABEL": "**put_label_here**", "LIST_COLUMN_LABEL": "**put_label_here**"}, "auth": "**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/crm.invoice.userfield.update
+    ```
+
+- JS
+
+    ```js
+    try
+    {
+    	const id = prompt("Enter ID");
+    	const label = prompt("Enter new name");
+    
+    	const response = await $b24.callMethod(
+    		"crm.invoice.userfield.update",
+    		{
+    			id: id,
+    			fields: {
+    				"EDIT_FORM_LABEL": label,
+    				"LIST_COLUMN_LABEL": label
+    			}
+    		}
+    	);
+    
+    	const result = response.getData().result;
+    	console.dir(result);
+    	if (response.more())
+    		response.next();
+    }
+    catch( error )
+    {
+    	console.error(error);
+    }
+    ```
+
+- PHP
+
+    ```php
+    $id = $_POST['id'];
+    $label = $_POST['label'];
+    
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'crm.invoice.userfield.update',
+                [
+                    'id' => $id,
+                    'fields' => [
+                        'EDIT_FORM_LABEL'   => $label,
+                        'LIST_COLUMN_LABEL' => $label
+                    ]
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        echo 'Success: ' . print_r($result, true);
+        if ($response->more()) {
+            $response->next();
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error updating user field: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    var id = prompt("Enter ID");
+    var label = prompt("Enter new name");
+    BX24.callMethod(
+        "crm.invoice.userfield.update",
+        {
+            id: id,
+            fields: {
+                "EDIT_FORM_LABEL": label,
+                "LIST_COLUMN_LABEL": label
+            }
+        },
+        function (result)
+        {
+            if (result.error())
+                console.error(result.error());
+            else
+            {
+                console.dir(result.data());
+                if (result.more())
+                    result.next();
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $id = $_REQUEST['id']; // Assuming ID is passed as a request parameter
+    $label = $_REQUEST['label']; // Assuming label is passed as a request parameter
+
+    $result = CRest::call(
+        'crm.invoice.userfield.update',
+        [
+            'id' => $id,
+            'fields' => [
+                'EDIT_FORM_LABEL' => $label,
+                'LIST_COLUMN_LABEL' => $label
+            ]
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}

@@ -1,0 +1,13 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "log-recepients"
+original_path: "api-reference/log/_includes/log-recepients.md"
+---
+
+- `SG<X>` — [workgroups and projects](../../sonet-group/sonet-group-create.md) with the identifier `X`. The identifier can be obtained using the [sonet_group.get](../../sonet-group/sonet-group-get.md) method.
+- `U<X>` — [users](../../user/index.md) with the identifier `X`. The identifier can be obtained using the [user.get](../../user/user-get.md) method.
+- `UA` — all authorized users
+- `DR<X>` — company departments with the identifier `X`. The identifier can be obtained using the [department.get](../../departments/department-get.md) method.

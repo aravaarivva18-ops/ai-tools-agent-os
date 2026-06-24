@@ -1,0 +1,917 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "What's New?"
+original_path: "whats-new.md"
+---
+
+# What's New?
+
+## 2026
+
+### June 18, 2026
+
+- Added new method [tasks.task.list](./api-reference/rest-v3/tasks/tasks-task-list.md)
+- Updated the main page of the [Embedding Applications into CRM Activities](./api-reference/crm/timeline/activities/app-embedding/index.md) section
+
+### June 10, 2026
+
+- Added methods to the [Department and Team Communications](./api-reference/rest-v3/humanresources/node-communication/index.md) section
+- Added methods to the [Employees](./api-reference/rest-v3/humanresources/employee/index.md) section
+- Updated the main page of the [Embedding Applications in CRM Activities](./api-reference/crm/timeline/activities/app-embedding/index.md) section
+
+### June 5, 2026
+
+- Added methods to the section [Time Tracking Records](./api-reference/rest-v3/timeman/index.md)
+- Added methods to the section [Departments and Teams](./api-reference/rest-v3/humanresources/node/index.md)
+- Added methods to the section [Department and Team Participants](./api-reference/rest-v3/humanresources/node-member/index.md)
+- Updated the page [Method Permissions and Scopes](./api-reference/scopes/index.md)
+- Updated the page [Data Import into CRM: Overview of Methods](./api-reference/crm/universal/import/index.md)
+- Updated the page [Product Items in CRM Entities: Overview of Methods](./api-reference/crm/universal/product-rows/index.md)
+- Updated the page [Overview of Events When Working with Smart Process Entities](./api-reference/crm/universal/events/index.md)
+- Added the article [Passing Context to the Bot When Opening a Chat](./api-reference/chat-bots/chat-bots-v2/imbot.v2/bot-context.md)
+
+### May 29, 2026
+
+- Added a section for working with [mail methods in REST 3.0](./api-reference/rest-v3/mail/index.md)
+- Updated the main page [REST API Reference: Bitrix24 tools and methods](./api-reference/index.md)
+- Updated the tutorial [Workflows and Automation rules: typical scenarios](./tutorials/bizproc/index.md)
+- Updated the tutorial [How to embed widgets in CRM](./tutorials/crm/crm-widgets/index.md)
+- Updated the tutorial [Online sales: typical scenarios](./tutorials/sale/index.md)
+- Updated the tutorial [Tasks: typical scenarios](./tutorials/tasks/index.md)
+- Added the subsection [Autofilling details in the CRM card](./api-reference/widgets/crm/requisites-autocomplete/index.md) in Widgets. Described embedding points for autofilling client details and bank details
+
+### May 22, 2026
+
+- Added descriptions of the [tasks.task.pin](./api-reference/tasks/tasks-task-pin.md) and [tasks.task.unpin](./api-reference/tasks/tasks-task-unpin.md) methods
+- Updated the tutorials [How to Use End-to-End Analytics Data](./tutorials/crm/how-to-use-analitycs/index.md) and [How to Send Data to CRM End-to-End Analytics](./tutorials/crm/how-to-use-analitycs/info-to-analitics.md)
+
+### May 15, 2026
+
+- Added a description of the methods for working with [Task Results](./api-reference/rest-v3/tasks/result/index.md) REST 3.0
+
+### May 08, 2026
+
+- Updated the page [How to Integrate External Telephony with Bitrix24](./tutorials/telephony/index.md)
+
+### April 29, 2026
+
+- Updated the pages [How to Add Data to CRM: Overview of Use-Cases and Scenarios](./tutorials/crm/how-to-add-crm-objects/index.md) and [Typical Use-Cases and Scenarios in Open Channels](./tutorials/openlines/index.md)
+- Updated the use-cases in the section [Typical Use-Cases and Scenarios of the Document Generator](./api-reference/document-generator/examples/index.md). Added explanations on data preparation for document generation
+
+### April 23, 2026
+
+- Updated the page [Security Recommendations for REST API Applications](./settings/cloud-and-on-premise/security-recommendations.md)
+- Updated the main page of the section [Websites and Stores](./api-reference/landing/index.md). Added explanations for choosing methods for working with blocks
+- Updated the page [Working with Page Blocks](./api-reference/landing/page/block-methods/index.md). Added a method selection table based on tasks
+- Updated the page [How to Work with Files](./api-reference/files/index.md). Added introductory information, types of file fields, relationships with other objects, and method selection
+- Updated the page [Editing Data in CRM](./tutorials/crm/how-to-edit-crm-objects/index.md). Added introductory information, relationships with CRM objects, and an overview of scenarios
+- Updated the page [Getting Lists in CRM](./tutorials/crm/how-to-get-lists/index.md). Added introductory information, relationships with CRM objects, and an overview of scenarios
+- Updated the main page of the section [System Activity](./api-reference/crm/timeline/activities/activity-base/index.md) in CRM. Added introductory information, a getting started scenario, relationships with other objects, and an overview of methods
+- Updated the main page of the section [Activity Relationships with CRM Entities](./api-reference/crm/timeline/activities/binding/index.md). Added introductory information, a getting started scenario, operational features, and relationships with other objects
+- Updated the main page of the section [Timeline Record Bindings with CRM Entities](./api-reference/crm/timeline/bindings/index.md). Added introductory information, a getting started scenario, relationships with other objects, and an overview of methods
+- Updated the main page of the section [Notes on Timeline Records](./api-reference/crm/timeline/note/index.md). Added introductory information, a getting started scenario, relationships with other objects, and an overview of methods
+- Added new methods [sign.b2e.document.send](./api-reference/sign/sign-b2e-document-send.md), [sign.b2e.document.get](./api-reference/sign/sign-b2e-document-get.md), [sign.b2e.company.provider.list](./api-reference/sign/sign-b2e-company-provider-list.md) and events [OnSignB2eDocumentStatusChanged](./api-reference/sign/events/on-sign-b2e-document-status-changed.md), [OnSignB2eMemberStatusChanged](./api-reference/sign/events/on-sign-b2e-member-status-changed.md) in the section [Signature](./api-reference/sign/index.md)
+- Updated the main page of the section [Additional Timeline Content Blocks](./api-reference/crm/timeline/layout-blocks/index.md)
+- Updated the main page of the section [Application Automation Rules](./api-reference/bizproc/bizproc-robot/index.md)
+- Updated the main page of the section [CRM](./api-reference/crm/index.md). Added introductory information, relationships with other objects, and an overview of sections and methods
+- Updated the main page of the section [Log Message Journal](./api-reference/crm/timeline/logmessage/index.md)
+- Updated the main page of the section [Log Message Icons](./api-reference/crm/timeline/logmessage/icons/index.md)
+- Updated the main page of the section [Log Message Logos](./api-reference/crm/timeline/logmessage/logo/index.md)
+- Updated the main page of the section [Methods for Working with Blocks](./api-reference/landing/block/methods/index.md) in Websites and Stores. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Managing Entity Detail Forms](./api-reference/crm/universal/item-details-configuration/index.md) in CRM. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Comments](./api-reference/crm/timeline/comments/index.md) in CRM. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Events](./api-reference/crm/timeline/comments/events/index.md) in CRM Comments
+- Updated the main page of the section [Events When Working with CRM Activities](./api-reference/crm/timeline/activities/events/index.md). Added introductory information and an overview of events
+- Updated the main page of the section [Events When Working with Requisites](./api-reference/crm/requisites/events/index.md). Added introductory information and an overview of events
+- Updated the page [CRM Automation: Overview of Methods](./api-reference/crm/automation/index.md). Added introductory information, getting started scenarios, and relationships with other objects
+- Updated the main page of the section [CRM Automation Triggers](./api-reference/crm/automation/triggers/index.md). Added introductory information and a getting started scenario
+- Updated the page [Document Generator: Overview of Methods and Events](./api-reference/crm/document-generator/index.md). Added introductory information, a getting started scenario, relationships with other objects, and an overview of methods and events
+- Updated the main page of the section [Documents](./api-reference/crm/document-generator/documents/index.md) in the Document Generator. Added introductory information and a getting started scenario
+- Updated the main page of the section [Document Templates](./api-reference/crm/document-generator/templates/index.md) in the Document Generator. Added introductory information, a getting started scenario, and relationships with other objects
+- Updated the main page of the section [Numbering Systems](./api-reference/crm/document-generator/numerator/index.md) in the Document Generator. Added introductory information, a getting started scenario, and important limitations
+- Updated the main page of the section [CRM Sales Funnels](./api-reference/crm/universal/category/index.md). Added introductory information, a getting started scenario, and relationships with other objects
+- Updated the main page of the section [BIconnector](./api-reference/biconnector/index.md)
+- Updated the main page of the section [Custom Field Settings](./api-reference/crm/universal/userfieldconfig/index.md) in CRM
+- Updated the main page of the section [Payment Systems](./api-reference/pay-system/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [CRM Connection with Online Store Orders](./api-reference/crm/universal/order-entity/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Universal CRM Methods](./api-reference/crm/universal/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Custom CRM Type Events](./api-reference/crm/universal/events/type/index.md)
+- Updated the main page of the section [System Dialogs](./sdk/bx24-js-sdk/system-dialogues/index.md)
+
+### April 17, 2026
+
+- Updated the page [Common methods and events: overview](./api-reference/common/index.md). Added introductory information, connections to other entities, and an overview of methods and events with tabs.
+- Updated the main page of the [Messages](./api-reference/chats/messages/index.md) section in Chats. Added a getting started scenario, connections to other entities, and updated the overview of methods.
+- Updated the main page of the [Block Object](./api-reference/landing/block/index.md) section in Sites and Stores. Added introductory information, connections to the page and repository, as well as an overview of methods.
+- Updated the page [Interactivity in applications: overview of scenarios and methods](./settings/interactivity/index.md).
+- Updated the page [Embedding locations in the Sites section: overview of methods](./api-reference/landing/embedding/index.md).
+- Updated the page [Embedding locations for the Knowledge Base: overview of methods](./api-reference/landing/embedding/knowledge-base/index.md).
+- Updated the page [Outdated methods for chat applications](./api-reference/chats/outdated/index.md).
+- Updated the page [Application actions: overview of methods](./api-reference/bizproc/bizproc-activity/index.md) in the Business Processes and Automation rules section.
+- Updated the page [How to call REST API methods](./settings/how-to-call-rest-api/index.md).
+- Updated the main page of the [Chats](./api-reference/chats/index.md) section. Added introductory information, as well as an overview of methods and connections.
+- Updated the main page of the [Universal widgets](./api-reference/widgets/universal/index.md) section in Widgets.
+- Updated the main page of the [Widgets in user profile](./api-reference/widgets/user-profile/index.md) section in Widgets.
+- Updated the page [Online store: overview of sections](./api-reference/sale/index.md).
+- Updated the main page of the [Events in the Online store](./api-reference/sale/events/index.md) section.
+- Updated the main page of the [Order property binding in the Online store](./api-reference/sale/property-relation/index.md) section.
+- Updated the main page of the [Order property values in the Online store](./api-reference/sale/property-value/index.md) section.
+- Updated the main page of the [Typical use-cases and scenarios](./api-reference/document-generator/examples/index.md) section in the Document Generator.
+- Updated the main pages of the [Initialization and authorization](./sdk/bx24-js-sdk/system-functions/index.md) and [Interface, navigation, and context](./sdk/bx24-js-sdk/additional-functions/index.md) sections in BX24 JS SDK. Corrected introductory information, connections to other entities, and links to methods.
+- Updated the main page of the [Events](./api-reference/common/events/index.md) section in Common methods and events.
+- Updated the main page of the [Deliveries](./api-reference/crm/universal/delivery/index.md) section in CRM. Added introductory information, as well as an overview of methods and connections.
+- Updated the main page of the [Payments and deliveries](./api-reference/crm/universal/payment/index.md) section in CRM. Added introductory information, as well as an overview of methods and connections.
+- Updated the main page of the [Product items in payments](./api-reference/crm/universal/payment/products-in-payment/index.md) section in CRM. Added introductory information, as well as an overview of methods and connections.
+- Updated the main page of the [Deliveries in payments](./api-reference/crm/universal/payment/delivery-in-payment/index.md) section in CRM. Added introductory information, as well as an overview of methods and connections.
+- Updated the page [Trade catalog: overview of sections](./api-reference/catalog/index.md).
+- Updated the main page of the [Markups in Trade catalog](./api-reference/catalog/extra/index.md) section.
+- Updated the main page of the [Measurement unit ratios in Trade catalog](./api-reference/catalog/ratio/index.md) section.
+- Updated the main page of the [List property values of products](./api-reference/catalog/product-property-enum/index.md) section.
+- Updated the main page of the [Product and variation property parameters](./api-reference/catalog/product-property-feature/index.md) section.
+- Updated the main page of the [Translations of price type names](./api-reference/catalog/price-type/price-type-lang/index.md) section.
+- Updated the main page of the [Template checklists](./api-reference/tasks/template/checklist/index.md) section in Tasks. Added introductory information, as well as an overview of methods and connections.
+- Updated the main pages of the [Additional services](./api-reference/sale/delivery/extra-service/index.md) and [Transport requests](./api-reference/sale/delivery/delivery-request/index.md) sections in the Online store. Added introductory information, as well as an overview of methods and connections.
+
+### April 10, 2026
+
+- Updated the main page of the section [User Information](./api-reference/common/users/index.md). Corrected the introductory information, page structure, and links to methods
+- Updated the main page of the section [System Methods](./api-reference/common/system/index.md). Corrected the introductory information, relationships with other objects, and links to methods
+- Updated the main page of the section [Application Settings](./api-reference/common/settings/index.md). Corrected the introductory information, the context limitation note, and links to methods
+- Updated the main page of the section [CRM Automation Triggers](./api-reference/crm/automation/triggers/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Catalog Enumerations](./api-reference/catalog/enum/index.md)
+- Updated the main page of the section [Binding Price Types to Customer Groups](./api-reference/catalog/price-type/price-type-group/index.md)
+- Updated the main page of the section [Section Settings for Catalog Product Properties](./api-reference/catalog/product-property-section/index.md)
+- Updated the main page of the section [Custom Fields for Inventory Management Documents](./api-reference/catalog/userfield-document/index.md)
+- Updated the main page of the section [Template Object](./api-reference/landing/template/index.md)
+- Updated the main pages of the sections [Permissions](./api-reference/landing/rights/index.md), [Extended Model](./api-reference/landing/rights/extended-model/index.md), and [Role Model](./api-reference/landing/rights/role-model/index.md) in Sites and Stores
+- Updated the main page of the section [Special Site Pages](./api-reference/landing/page/special-pages/index.md)
+- Updated the main pages of the sections [Page Object](./api-reference/landing/page/index.md) and [Working with Pages](./api-reference/landing/page/methods/index.md)
+- Updated the page [Unbind Widget from Block](./api-reference/landing/embedding/landing-repo-unbind.md)
+- Updated the main page of the section [Push&Pull](./settings/interactivity/push-and-pull/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Custom Blocks](./api-reference/landing/user-blocks/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Custom Templates](./api-reference/landing/demos/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the page [How to Prepare a Custom Template](./api-reference/landing/demos/introduction.md)
+- Updated the page [Template Localization](./api-reference/landing/demos/localization.md)
+- Updated the main page of the section [Data Stores](./api-reference/entity/entities/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Data Store Sections](./api-reference/entity/sections/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Data Store Items](./api-reference/entity/items/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Properties of Data Store Items](./api-reference/entity/items/properties/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Templates](./api-reference/document-generator/templates/index.md) in Document Generator. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Document Generator](./api-reference/document-generator/index.md). Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Multifields](./api-reference/crm/auxiliary/multifield/index.md) in CRM. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Custom Fields](./api-reference/crm/universal/user-defined-fields/index.md) in CRM. Added introductory information, as well as an overview of methods and relationships
+- Updated the page [Overview of Events for Working with the WebRTC Client Call Card](./api-reference/widgets/ui-interaction/page-background-worker/events/index.md)
+- Added the page [Managing the WebRTC Client Call Card: Methods Overview](./api-reference/widgets/ui-interaction/page-background-worker/index.md)
+- Updated the main page of the section [Templates](./api-reference/tasks/template/index.md) in Tasks. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Duplicate Search Settings by Any Fields](./api-reference/crm/duplicates/volatile-type/index.md) in CRM. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Interactive Blocks](./api-reference/landing/block/interactive/index.md)
+- Updated the main page of the section [Open Channels](./api-reference/imopenlines/index.md)
+- Updated the main pages in the [Open Channels](./api-reference/imopenlines/openlines/index.md), [Operators](./api-reference/imopenlines/openlines/operators/index.md), and [Dialogs](./api-reference/imopenlines/openlines/sessions/index.md) subsections of Open Channels
+- Updated the main page of the section [BitrixGPT](./api-reference/ai/index.md)
+- Updated the main page of the section [Special Blocks](./api-reference/landing/block/special/index.md)
+- Added a page with a list of current changes in the Chat Bot API 2.0 [imbot.v2 API Changes](./api-reference/chat-bots/chat-bots-v2/change-log.md)
+- Added the method [imbot.v2.Revision.get](./api-reference/chat-bots/chat-bots-v2/imbot.v2/revision-get.md)
+- Updated the main page of the section [Widgets in Messenger](./api-reference/widgets/im/index.md) in Widgets. Added introductory information, as well as an overview of methods and relationships
+- Updated the page [Working with Site Types and Scopes](./api-reference/landing/types.md)
+- Updated the page [Template Fields](./api-reference/landing/template/fields.md)
+- Updated the page [Site Fields](./api-reference/landing/site/base-fields.md)
+- Updated the page [Additional Site Fields](./api-reference/landing/site/additional-fields.md)
+- Updated the main page of the section [Numerators](./api-reference/document-generator/numerators/index.md) in Document Generator. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Regions](./api-reference/document-generator/region/index.md) in Document Generator. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Roles](./api-reference/document-generator/role/index.md) in Document Generator. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Telephony](./api-reference/telephony/index.md)
+- Updated the main page of the section [SIP and Built-in Telephony](./api-reference/telephony/voximplant/index.md)
+- Updated the main page of the section [Line Management](./api-reference/telephony/voximplant/lines/index.md)
+- Updated the main page of the section [SIP Connection Management](./api-reference/telephony/voximplant/sip/index.md)
+- Updated the main page of the section [User Management](./api-reference/telephony/voximplant/users/index.md)
+- Updated documentation for methods [ai.engine.*](./api-reference/ai/index.md) in the BitrixGPT section
+- Updated the page [Additional Fields](./api-reference/landing/page/additional-fields.md)
+- Updated the page [Color Themes](./api-reference/landing/page/color-themes.md)
+- Updated the page [Menu Blocks](./api-reference/landing/block/special/menu.md)
+- Updated the page [Forms in Blocks](./api-reference/landing/block/special/crm-forms.md)
+- Updated the page [Maps in Blocks](./api-reference/landing/block/special/maps.md)
+- Updated the page [Navigation and Header](./api-reference/landing/block/special/navigation.md)
+- Updated the page [Search Forms](./api-reference/landing/block/special/search-forms.md)
+- Updated the page [Search Results](./api-reference/landing/block/special/search.md)
+- Updated the page [Manifest File](./api-reference/landing/block/manifest.md)
+- Updated the page [Attributes](./api-reference/landing/block/attributes.md)
+- Updated the page [Node Types](./api-reference/landing/block/node-types.md)
+- Updated the page [Extended Card Description](./api-reference/landing/block/extended-description.md)
+- Updated the page [Block Localization](./api-reference/landing/block/localization.md)
+- Added documentation for methods [crm.tracking.trace.*](./api-reference/crm/tracking/index.md) in the CRM End-to-End Analytics section
+- Updated the page [REST API Data Types and Parameter Formats](./api-reference/data-types.md)
+- Updated the page [Galleries](./api-reference/landing/block/interactive/gallery.md)
+- Updated the page [Countdown Timers](./api-reference/landing/block/interactive/timer.md)
+- Updated the page [Sliders](./api-reference/landing/block/interactive/sliders.md)
+- Updated documentation for methods in the [BX24 JS SDK](./sdk/bx24-js-sdk/additional-functions/index.md) section
+- Updated documentation for methods [landing.demos.*](./api-reference/landing/demos/index.md) in the Custom Templates section
+- Updated documentation for methods [landing.site.*](./api-reference/landing/embedding/knowledge-base/index.md) in the Knowledge Base Embedding Locations section
+- Updated documentation for methods [landing.repo.*](./api-reference/landing/user-blocks/index.md) in the Custom Blocks section
+- Updated documentation for methods [placement.*](./api-reference/widgets/placements.md) in the Widget Embedding Locations section
+- Updated documentation for methods [pull.application.*](./settings/interactivity/push-and-pull/index.md) in the Push&Pull section
+- Updated documentation for placements [LANDING_BLOCK_*](./api-reference/landing/embedding/block.md) and [LANDING_SETTINGS](./api-reference/landing/embedding/settings.md)
+- Updated documentation for the [CONTACT_CENTER](./api-reference/widgets/contact-center.md) placement
+- Updated the page [BX24 SDK Methods for Widgets](./api-reference/widgets/bx24-widget-methods.md)
+- Updated the page [CALL_CARD Call Card: Overview of Methods and Events](./api-reference/widgets/ui-interaction/call-card/index.md)
+- Updated the page [Interaction with UI: Methods Overview](./api-reference/widgets/ui-interaction/index.md)
+
+### April 02, 2026
+
+- Consolidated updates in WebRTC Call Card docs: events [BackgroundCallCard*](./api-reference/widgets/ui-interaction/page-background-worker/events/index.md), Call Card interaction methods/events, and Page Background Worker call-card methods
+- Updated [BX24 JS SDK additional functions](./sdk/bx24-js-sdk/additional-functions/index.md), including `BX24.isAdmin`, `BX24.fitWindow`, `BX24.getScrollSize`, `BX24.reloadWindow`, `BX24.resizeWindow`, `BX24.getLang`, and `BX24.scrollParentWindow`
+- Consolidated updates in the Landing section: Template Object methods (`landing.template.*`), Block methods (`landing.block.*`), and Special Pages methods (`landing.syspage.*`)
+- Consolidated updates in Data Storage: [entity.*](./api-reference/entity/entities/index.md), [entity.section.*](./api-reference/entity/sections/index.md), [entity.item.*](./api-reference/entity/items/index.md), and [entity.item.property.*](./api-reference/entity/items/properties/index.md)
+- Consolidated updates in the Document Generator: [documentgenerator.region.*](./api-reference/document-generator/region/index.md), [documentgenerator.numerator.*](./api-reference/document-generator/numerators/index.md), [documentgenerator.template.*](./api-reference/document-generator/templates/index.md), and [crm.documentgenerator.document.*](./api-reference/crm/document-generator/documents/index.md)
+- Updated CRM universal custom fields methods [userfieldconfig.*](./api-reference/crm/universal/userfieldconfig/index.md)
+- Consolidated updates in the Trade Catalog: [catalog.enum.*](./api-reference/catalog/enum/index.md), [catalog.priceTypeGroup.*](./api-reference/catalog/price-type/price-type-group/index.md), [catalog.productPropertyEnum.*](./api-reference/catalog/product-property-enum/index.md), [catalog.productPropertyFeature.*](./api-reference/catalog/product-property-feature/index.md), [catalog.productPropertySection.*](./api-reference/catalog/product-property-section/index.md), [catalog.userfield.document.*](./api-reference/catalog/userfield-document/index.md), and [Data Types and Object Structure in the Catalog REST API](./api-reference/catalog/data-types.md)
+- Updated [messageservice.sender.*](./api-reference/messageservice/index.md) and [socialnetwork.api.workgroup.list](./api-reference/sonet-group/socialnetwork-api-workgroup-list.md)
+- Added new methods for [Chatbots 2.0](./api-reference/chat-bots/chat-bots-v2/index.md)
+
+### March 23, 2026
+
+- Updated the documentation for methods [documentgenerator.role.*](./api-reference/document-generator/role/index.md) in the Roles and permissions section of the Document Generator
+- Updated the documentation for methods [sonet_group.user.*](./api-reference/sonet-group/members/index.md) in the Group and project members section
+- Updated the documentation for methods [sonet_group.create](./api-reference/sonet-group/sonet-group-create.md), [sonet_group.delete](./api-reference/sonet-group/sonet-group-delete.md), [sonet_group.feature.access](./api-reference/sonet-group/sonet-group-feature-access.md), [sonet_group.get](./api-reference/sonet-group/sonet-group-get.md), [sonet_group.setowner](./api-reference/sonet-group/sonet-group-setowner.md), [sonet_group.update](./api-reference/sonet-group/sonet-group-update.md), [sonet_group.user.groups](./api-reference/sonet-group/sonet-group-user-groups.md)
+- Updated the documentation for methods [documentgenerator.document.add](./api-reference/document-generator/document-generator-document-add.md), [documentgenerator.document.update](./api-reference/document-generator/document-generator-document-update.md), [documentgenerator.document.get](./api-reference/document-generator/document-generator-document-get.md), [documentgenerator.document.list](./api-reference/document-generator/document-generator-document-list.md), [documentgenerator.document.delete](./api-reference/document-generator/document-generator-document-delete.md), [documentgenerator.document.enablepublicurl](./api-reference/document-generator/document-generator-document-enable-public-url.md), [documentgenerator.document.getfields](./api-reference/document-generator/document-generator-document-get-fields.md) in the Document Generator section
+- Updated the documentation for methods [crm.userfield.*](./api-reference/crm/universal/user-defined-fields/index.md) in the Custom fields section
+- Updated the documentation for methods [landing.landing.addblock](./api-reference/landing/page/block-methods/landing-landing-add-block.md), [landing.landing.copyblock](./api-reference/landing/page/block-methods/landing-landing-copy-block.md), [landing.landing.deleteblock](./api-reference/landing/page/block-methods/landing-landing-delete-block.md), [landing.landing.downblock](./api-reference/landing/page/block-methods/landing-landing-down-block.md), [landing.landing.favoriteBlock](./api-reference/landing/page/block-methods/landing-landing-favorite-block.md), [landing.landing.hideblock](./api-reference/landing/page/block-methods/landing-landing-hide-block.md), [landing.landing.markdeletedblock](./api-reference/landing/page/block-methods/landing-landing-mark-deleted-block.md), [landing.landing.markundeletedblock](./api-reference/landing/page/block-methods/landing-landing-mark-undeleted-block.md), [landing.landing.moveblock](./api-reference/landing/page/block-methods/landing-landing-move-block.md), [landing.landing.showblock](./api-reference/landing/page/block-methods/landing-landing-show-block.md), [landing.landing.unFavoriteBlock](./api-reference/landing/page/block-methods/landing-landing-unfavorite-block.md), [landing.landing.upblock](./api-reference/landing/page/block-methods/landing-landing-up-block.md) in the Blocks section
+- Updated the documentation for methods [catalog.productProperty.*](./api-reference/catalog/product-property/index.md) in the Product and variation properties section
+- Updated the documentation for methods [mailservice.*](./api-reference/mailservice/index.md) in the Mail services section
+- Updated the documentation for methods related to document generator numerators [crm.documentgenerator.numerator.*](./api-reference/crm/document-generator/numerator/index.md)
+- Updated the documentation for methods related to document generator templates [crm.documentgenerator.template.*](./api-reference/crm/document-generator/templates/index.md)
+
+### March 19, 2026
+
+- Updated documentation for methods [log.blogpost.add](./api-reference/log/log-blogpost-add.md), [log.blogpost.delete](./api-reference/log/log-blogpost-delete.md), [log.blogpost.get](./api-reference/log/log-blogpost-get.md), [log.blogpost.getusers.important](./api-reference/log/log-blogpost-getusers-important.md), [log.blogpost.share](./api-reference/log/log-blogpost-share.md), [log.blogpost.update](./api-reference/log/log-blogpost-update.md)
+- Updated documentation for methods [landing.landing.add](./api-reference/landing/page/methods/landing-landing-add.md), [landing.landing.addByTemplate](./api-reference/landing/page/methods/landing-landing-add-by-template.md), [landing.landing.copy](./api-reference/landing/page/methods/landing-landing-copy.md), [landing.landing.delete](./api-reference/landing/page/methods/landing-landing-delete.md), [landing.landing.getAdditionalFields](./api-reference/landing/page/methods/landing-landing-get-additional-fields.md), [landing.landing.getList](./api-reference/landing/page/methods/landing-landing-get-list.md), [landing.landing.getPreview](./api-reference/landing/page/methods/landing-landing-get-preview.md), [landing.landing.getPublicUrl](./api-reference/landing/page/methods/landing-landing-get-public-url.md), [landing.landing.markDelete](./api-reference/landing/page/methods/landing-landing-mark-delete.md), [landing.landing.markUnDelete](./api-reference/landing/page/methods/landing-landing-mark-undelete.md), [landing.landing.move](./api-reference/landing/page/methods/landing-landing-move.md), [landing.landing.publication](./api-reference/landing/page/methods/landing-landing-publication.md), [landing.landing.removeEntities](./api-reference/landing/page/methods/landing-landing-remove-entities.md), [landing.landing.resolveIdByPublicUrl](./api-reference/landing/page/methods/landing-landing-resolve-id-by-public-url.md), [landing.landing.unpublic](./api-reference/landing/page/methods/landing-landing-unpublic.md), [landing.landing.update](./api-reference/landing/page/methods/landing-landing-update.md) in the Pages section.
+- Updated documentation for methods [imopenlines.crm.chat.get](./api-reference/imopenlines/openlines/chats/imopenlines-crm-chat-get.md), [imopenlines.crm.chat.getLastId](./api-reference/imopenlines/openlines/chats/imopenlines-crm-chat-get-last-id.md), [imopenlines.crm.chat.user.add](./api-reference/imopenlines/openlines/chats/imopenlines-crm-chat-user-add.md), [imopenlines.crm.chat.user.delete](./api-reference/imopenlines/openlines/chats/imopenlines-crm-chat-user-delete.md) in the CRM Chats section.
+- Updated documentation for methods [imopenlines.session.*](./api-reference/imopenlines/openlines/sessions/imopenlines-session-open.md) in the Open Channels Dialogs section.
+- Updated documentation for methods [imopenlines.bot.session.*](./api-reference/imopenlines/openlines/chat-bots/index.md) in the Open Channels Chat-bots section.
+- Updated documentation for methods [imopenlines.operator.*](./api-reference/imopenlines/openlines/operators/index.md) in the Open Channels Operators section.
+- Updated documentation for events [OnImConnector*](./api-reference/imopenlines/imconnector/events/index.md) in the Open Channels Connectors section.
+- Updated documentation for methods related to estimates [crm.quote.*](./api-reference/crm/quote/index.md).
+- Updated documentation for methods [voximplant.line.*](./api-reference/telephony/voximplant/lines/index.md) in the Line Management section.
+- Updated documentation for methods [voximplant.sip.*](./api-reference/telephony/voximplant/sip/index.md) in the SIP Connections Management section.
+- Updated documentation for methods [voximplant.user.*](./api-reference/telephony/voximplant/users/index.md) in the User Management section.
+- Updated documentation for methods [voximplant.callback.start](./api-reference/telephony/voximplant/voximplant-callback-start.md), [voximplant.infocall.startwithsound](./api-reference/telephony/voximplant/voximplant-infocall-start-with-sound.md), [voximplant.infocall.startwithtext](./api-reference/telephony/voximplant/voximplant-infocall-start-with-text.md).
+- Updated documentation for methods [imopenlines.config.add](./api-reference/imopenlines/openlines/imopenlines-config-add.md), [imopenlines.config.delete](./api-reference/imopenlines/openlines/imopenlines-config-delete.md), [imopenlines.config.get](./api-reference/imopenlines/openlines/imopenlines-config-get.md), [imopenlines.config.list.get](./api-reference/imopenlines/openlines/imopenlines-config-list-get.md), [imopenlines.config.path.get](./api-reference/imopenlines/openlines/imopenlines-config-path-get.md), [imopenlines.config.update](./api-reference/imopenlines/openlines/imopenlines-config-update.md), [imopenlines.network.join](./api-reference/imopenlines/openlines/imopenlines-network-join.md), [imopenlines.network.message.add](./api-reference/imopenlines/openlines/imopenlines-network-message-add.md), [imopenlines.revision.get](./api-reference/imopenlines/openlines/imopenlines-revision-get.md) in the Open Channels section.
+- Updated documentation for managing lead detail forms [crm.lead.details.configuration.*](./api-reference/crm/leads/custom-form/index.md).
+
+### March 16, 2026
+
+- Added documentation for REST 3.0 methods to retrieve fields from the [event log](./api-reference/rest-v3/main/index.md) and [tasks](./api-reference/rest-v3/tasks/index.md)
+
+### March 13, 2026
+
+- Added the documentation for methods related to [task templates](./api-reference/tasks/template/index.md)
+- Added the documentation for methods related to [checklists for task templates](./api-reference/tasks/template/index.md)
+- Updated the documentation for methods [imconnector.*](./api-reference/imopenlines/imconnector/index.md) in the Open Channels Connectors section
+- Updated the documentation for methods related to [company contacts](./api-reference/crm/companies/contacts/index.md)
+- Updated the documentation for methods [voximplant.sip.connector.status](./api-reference/telephony/voximplant/sip/voximplant-sip-connector-status.md), [voximplant.sip.status](./api-reference/telephony/voximplant/sip/voximplant-sip-status.md), [voximplant.tts.voices.get](./api-reference/telephony/voximplant/voximplant-tts-voices-get.md), [voximplant.url.get](./api-reference/telephony/voximplant/voximplant-url-get.md)
+- Updated the documentation for events [ONEXTERNALCALLBACKSTART](./api-reference/telephony/events/on-external-call-back-start.md), [ONEXTERNALCALLSTART](./api-reference/telephony/events/on-external-call-start.md), [ONVOXIMPLANTCALLEND](./api-reference/telephony/voximplant/events/on-voximplant-call-end.md), [ONVOXIMPLANTCALLINIT](./api-reference/telephony/voximplant/events/on-voximplant-call-init.md), [ONVOXIMPLANTCALLSTART](./api-reference/telephony/voximplant/events/on-voximplant-call-start.md)
+- Updated the documentation for managing deal detail forms [crm.deal.details.configuration.*](./api-reference/crm/deals/custom-form/index.md)
+- Updated the documentation for methods connecting deals with contacts [crm.deal.contact.*](./api-reference/crm/deals/contacts/index.md)
+
+### March 11, 2026
+
+- Updated methods in the [Telephony](./api-reference/telephony/index.md) section
+- Updated the [Attachments in Messages ATTACH](./api-reference/chats/messages/attachments.md) section
+- Updated the [imopenlines.session.history.get](./api-reference/imopenlines/openlines/sessions/imopenlines-session-history-get.md) method in the Open Channels section
+
+### March 10, 2026
+
+- Updated documentation for methods related to Custom Fields for tasks [task.item.userfield.*](./api-reference/tasks/user-field/index.md)
+
+### March 6, 2026
+
+- Updated the page on [Working with Keyboards](./api-reference/chats/messages/keyboards.md)
+- Updated the page on [Working with Context Menu](./api-reference/chats/messages/menu.md)
+- Updated the documentation for chat widgets [IM_CONTEXT_MENU](./api-reference/widgets/im/context-menu.md), [IM_SIDEBAR](./api-reference/widgets/im/sidebar.md), [IM_TEXTAREA](./api-reference/widgets/im/textarea.md)
+- Updated the documentation for chat methods [im.dialog.writing](./api-reference/chats/messages/im-dialog-writing.md), [im.message.add](./api-reference/chats/messages/im-message-add.md), [im.message.command](./api-reference/chats/messages/im-message-command.md), [im.message.delete](./api-reference/chats/messages/im-message-delete.md), [im.message.like](./api-reference/chats/messages/im-message-like.md), [im.message.share](./api-reference/chats/messages/im-message-share.md), [im.message.update](./api-reference/chats/messages/im-message-update.md) in the Messages section
+- Updated the documentation for chat methods [im.search.*](./api-reference/chats/search/index.md) in the Search section
+- Updated the documentation for chat methods [im.notify.*](./api-reference/chats/notifications/index.md) in the Notifications section
+- Updated the documentation for chat methods [im.user.*](./api-reference/chats/users/index.md) in the Users section
+
+### March 04, 2026
+
+- Updated the documentation for the chat methods [im.chat.mute](./api-reference/chats/special-operations/im-chat-mute.md), [im.recent.pin](./api-reference/chats/special-operations/im-recent-pin.md), [im.recent.hide](./api-reference/chats/special-operations/im-recent-hide.md) in the Special Operations section
+- Added the method [imbot.chat.setManager](./api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/index.md) for assigning and revoking chat administrator rights
+- Updated the documentation for the chat methods [im.disk.file.commit](./api-reference/chats/files/im-disk-file-commit.md), [im.disk.file.delete](./api-reference/chats/files/im-disk-file-delete.md), [im.disk.file.save](./api-reference/chats/files/im-disk-file-save.md), [im.disk.folder.get](./api-reference/chats/files/im-disk-folder-get.md) in the Files section
+- Updated the documentation for the chat methods [im.department.get](./api-reference/chats/departments/im-department-get.md), [im.department.managers.get](./api-reference/chats/departments/im-department-managers-get.md), [im.department.employees.get](./api-reference/chats/departments/im-department-employees-get.md), [im.department.colleagues.list](./api-reference/chats/departments/im-department-colleagues-list.md) in the Departments section
+- Updated the documentation for the chat methods [im.chat.setOwner](./api-reference/chats/chat-update/im-chat-set-owner.md), [im.chat.updateAvatar](./api-reference/chats/chat-update/im-chat-update-avatar.md), [im.chat.updateColor](./api-reference/chats/chat-update/im-chat-update-color.md), [im.chat.updateTitle](./api-reference/chats/chat-update/im-chat-update-title.md) in the Chat Update section
+- Updated the documentation for the chat methods [im.chat.leave](./api-reference/chats/chat-users/im-chat-leave.md), [im.chat.user.add](./api-reference/chats/chat-users/im-chat-user-add.md), [im.chat.user.delete](./api-reference/chats/chat-users/im-chat-user-delete.md), [im.chat.user.list](./api-reference/chats/chat-users/im-chat-user-list.md), [im.dialog.users.list](./api-reference/chats/chat-users/im-dialog-users-list.md) in the Chat Participants section
+- Updated the documentation for the chat methods [im.dialog.read.all](./api-reference/chats/special-operations/im-dialog-read-all.md), [im.recent.unread](./api-reference/chats/special-operations/im-recent-unread.md) in the Special Operations section
+- Updated the documentation for the chat methods [im.chat.add](./api-reference/chats/im-chat-add.md), [im.chat.get](./api-reference/chats/im-chat-get.md), [im.counters.get](./api-reference/chats/im-counters-get.md), [im.dialog.get](./api-reference/chats/im-dialog-get.md), [im.recent.get](./api-reference/chats/im-recent-get.md), [im.recent.list](./api-reference/chats/im-recent-list.md)
+- Updated the documentation for the methods [imbot.command.register](./api-reference/chat-bots/chat-bots-v2/imbot.v2/commands/command-register.md), [imbot.command.update](./api-reference/chat-bots/chat-bots-v2/imbot.v2/commands/command-update.md), [imbot.command.answer](./api-reference/chat-bots/chat-bots-v2/imbot.v2/commands/command-answer.md), [imbot.command.unregister](./api-reference/chat-bots/chat-bots-v2/imbot.v2/commands/command-unregister.md)
+- Updated the documentation for the methods [imbot.register](./api-reference/chat-bots/chat-bots-v2/imbot.v2/bots/bot-register.md), [imbot.update](./api-reference/chat-bots/chat-bots-v2/imbot.v2/bots/bot-update.md), [imbot.unregister](./api-reference/chat-bots/chat-bots-v2/imbot.v2/bots/bot-unregister.md), and [imbot.bot.list](./api-reference/chat-bots/chat-bots-v2/imbot.v2/bots/bot-list.md)
+- Updated the documentation for the methods [imbot.chat.sendTyping](./api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/index.md), [imbot.message.update](./api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-update.md), [imbot.message.delete](./api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-delete.md), and [imbot.message.like](./api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-reaction-add.md)
+- Updated the documentation for events [ONIMBOTMESSAGEUPDATE](./api-reference/chat-bots/chat-bots-v2/imbot.v2/events/index.md), [ONIMBOTMESSAGEDELETE](./api-reference/chat-bots/chat-bots-v2/imbot.v2/events/index.md), [ONIMCOMMANDADD](./api-reference/chat-bots/chat-bots-v2/imbot.v2/events/index.md), [ONIMBOTJOINCHAT](./api-reference/chat-bots/chat-bots-v2/imbot.v2/events/index.md), and [ONIMBOTDELETE](./api-reference/chat-bots/chat-bots-v2/imbot.v2/events/index.md)
+- Updated the documentation for the chat-bot chat methods [imbot.chat.*](./api-reference/chat-bots/chat-bots-v2/imbot.v2/chats/index.md)
+- Updated the documentation for the method [imbot.message.add](./api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/chat-message-send.md) and the event [ONIMBOTMESSAGEADD](./api-reference/chat-bots/chat-bots-v2/imbot.v2/events/index.md)
+
+### February 25, 2026
+
+- Updated the article [What the Bitrix24 REST API Allows](./developing-with-rest-api.md)
+- Updated the article [Data Encoding](./settings/how-to-call-rest-api/data-encoding.md)
+- Updated the documentation for custom field methods for leads in CRM [crm.lead.userfield.*](./api-reference/crm/leads/userfield/index.md)
+- Updated the documentation for custom field methods for estimates in CRM [crm.quote.userfield.*](./api-reference/crm/quote/user-field/index.md)
+- Updated the documentation for methods [disk.file.getVersions](./api-reference/disk/file/disk-file-get-versions.md), [disk.file.get](./api-reference/disk/file/disk-file-get.md), [disk.file.markdeleted](./api-reference/disk/file/disk-file-mark-deleted.md), [disk.file.moveto](./api-reference/disk/file/disk-file-move-to.md), [disk.file.rename](./api-reference/disk/file/disk-file-rename.md), [disk.file.restoreFromVersion](./api-reference/disk/file/disk-file-restore-from-version.md), [disk.file.restore](./api-reference/disk/file/disk-file-restore.md), [disk.file.uploadversion](./api-reference/disk/file/disk-file-upload-version.md)
+
+### February 18, 2026
+
+- Updated the documentation for user field methods for companies in CRM [crm.company.userfield.*](./api-reference/crm/companies/userfields/index.md)
+- Added the method [im.dialog.messages.search](./api-reference/chats/messages/im-dialog-messages-search.md) for searching messages in chat
+- Updated the article [Tools for Local Integrations](./local-integrations/index.md)
+
+### February 11, 2026
+
+- Updated the documentation for the methods [disk.file.copyto](./api-reference/disk/file/disk-file-copy-to.md), [disk.file.delete](./api-reference/disk/file/disk-file-delete.md), [disk.file.getExternalLink](./api-reference/disk/file/disk-file-get-external-link.md), [disk.file.getfields](./api-reference/disk/file/disk-file-get-fields.md)
+- Updated the documentation for the methods [disk.storage.getforapp](./api-reference/disk/storage/disk-storage-get-for-app.md), [disk.storage.getlist](./api-reference/disk/storage/disk-storage-get-list.md), [disk.storage.rename](./api-reference/disk/storage/disk-storage-rename.md), [disk.storage.uploadfile](./api-reference/disk/storage/disk-storage-upload-file.md)
+- Updated the main page of the [Storage](./api-reference/disk/storage/index.md) section. Added introductory information and an overview of the methods
+
+### February 4, 2026
+
+- Added methods [main.eventlog.*](./api-reference/rest-v3/main/index.md) for retrieving event log entries
+- Updated the article [Support and Community for Developers](./support.md)
+- Updated the documentation for the methods [disk.folder.uploadfile](./api-reference/disk/folder/disk-folder-upload-file.md), [disk.storage.addfolder](./api-reference/disk/storage/disk-storage-add-folder.md), [disk.storage.getchildren](./api-reference/disk/storage/disk-storage-get-children.md), [disk.storage.getfields](./api-reference/disk/storage/disk-storage-get-fields.md), [disk.storage.gettypes](./api-reference/disk/storage/disk-storage-get-types.md), [disk.storage.get](./api-reference/disk/storage/disk-storage-get.md)
+
+### January 28, 2026
+
+- Updated the documentation for company methods in CRM [crm.company.*](./api-reference/crm/companies/index.md)
+- Updated the documentation for the methods used to manage company cards [crm.company.details.configuration.*](./api-reference/crm/companies/custom-form/index.md)
+- Added a new article [Setup Master for REST-only applications](./settings/app-installation/mass-market-apps/rest-only-installation-master.md)
+- Updated the documentation for the methods [task.checklistitem.isactionallowed](./api-reference/tasks/checklist-item/task-checklist-item-is-action-allowed.md), [task.checklistitem.getmanifest](./api-reference/tasks/checklist-item/task-checklist-item-get-manifest.md) in Task Checklists
+- Updated the documentation for the methods [disk.folder.get](./api-reference/disk/folder/disk-folder-get.md), [disk.folder.markdeleted](./api-reference/disk/folder/disk-folder-mark-deleted.md), [disk.folder.moveto](./api-reference/disk/folder/disk-folder-move-to.md), [disk.folder.rename](./api-reference/disk/folder/disk-folder-rename.md), [disk.folder.restore](./api-reference/disk/folder/disk-folder-restore.md)
+- Added a new method [disk.folder.sharetouser](./api-reference/disk/folder/disk-folder-share-to-user.md)
+- Updated the main page of the [Attached File](./api-reference/disk/attached-object/index.md) section. Added introductory information and an overview of methods
+- Updated the article [How to make your first API request](./first-steps/first-rest-api-call.md)
+- Updated the article [Feedback](./feedback.md)
+
+### January 21, 2026
+
+- Updated the article [How to Access the REST API](./first-steps/access-to-rest-api.md)
+- Updated the documentation for the methods [disk.folder.addsubfolder](./api-reference/disk/folder/disk-folder-add-subfolder.md), [disk.folder.copyto](./api-reference/disk/folder/disk-folder-copy-to.md), [disk.folder.deletetree](./api-reference/disk/folder/disk-folder-delete-tree.md), [disk.folder.getchildren](./api-reference/disk/folder/disk-folder-get-children.md), [disk.folder.getexternallink](./api-reference/disk/folder/disk-folder-get-external-link.md), [disk.folder.getfields](./api-reference/disk/folder/disk-folder-get-fields.md)
+
+### January 14, 2026
+
+- Added a new tutorial [How to create a vendor in CRM](./tutorials/crm/how-to-add-crm-objects/how-to-add-contractor.md)
+- Added a new tutorial [How to get a list of vendors](./tutorials/crm/how-to-get-lists/how-to-get-contractors.md)
+- Updated the article [Getting Started](./first-steps/index.md)
+- Updated the main page of the section [Disk Access Permissions](./api-reference/disk/rights/index.md). Added introductory information and an overview of methods
+- Updated the main page of the section [File Version](./api-reference/disk/version/index.md). Added introductory information and an overview of methods
+
+## 2025
+
+### December 24, 2025
+
+- Updated the main page of the [Events](./api-reference/events/index.md) section
+- Added the article [Tasks in REST 3.0: Overview of Methods](./api-reference/rest-v3/tasks/index.md)
+- Updated the documentation for the methods [catalog.documentcontractor.add](./api-reference/catalog/documentcontractor/catalog-documentcontractor-add.md), [catalog.documentcontractor.delete](./api-reference/catalog/documentcontractor/catalog-documentcontractor-delete.md), [catalog.documentcontractor.getFields](./api-reference/catalog/documentcontractor/catalog-documentcontractor-get-fields.md), [catalog.documentcontractor.list](./api-reference/catalog/documentcontractor/catalog-documentcontractor-list.md)
+- Updated the documentation for the methods [disk.attachedObject.get](./api-reference/disk/attached-object/disk-attached-object-get.md), [disk.rights.getTasks](./api-reference/disk/rights/disk-rights-get-tasks.md), [disk.version.get](./api-reference/disk/version/disk-version-get.md)
+
+### December 17, 2025
+
+- Added the section [REST 3.0](./api-reference/rest-v3/index.md)
+- Added new task methods for REST 3.0 [tasks.task.access.get](./api-reference/rest-v3/tasks/tasks-task-access-get.md), [tasks.task.add](./api-reference/rest-v3/tasks/tasks-task-add.md), [tasks.task.chat.message.send](./api-reference/rest-v3/tasks/tasks-task-chat-message-send.md), [tasks.task.delete](./api-reference/rest-v3/tasks/tasks-task-delete.md), [tasks.task.file.attach](./api-reference/rest-v3/tasks/tasks-task-file-attach.md), [tasks.task.get](./api-reference/rest-v3/tasks/tasks-task-get.md), [tasks.task.update](./api-reference/rest-v3/tasks/tasks-task-update.md)
+- Added the article describing task fields and related objects [Task fields in REST 3.0](./api-reference/rest-v3/tasks/fields.md)
+- Updated the documentation for the methods [lists.field.add](./api-reference/lists/fields/lists-field-add.md), [lists.field.update](./api-reference/lists/fields/lists-field-update.md), [lists.field.get](./api-reference/lists/fields/lists-field-get.md), [lists.field.delete](./api-reference/lists/fields/lists-field-delete.md), [lists.field.type.get](./api-reference/lists/fields/lists-field-type-get.md) in Working with Fields
+
+### December 10, 2025
+
+- Updated the documentation for the methods [task.checklistitem.renew](./api-reference/tasks/checklist-item/task-checklist-item-renew.md), [task.checklistitem.complete](./api-reference/tasks/checklist-item/task-checklist-item-complete.md), [task.checklistitem.delete](./api-reference/tasks/checklist-item/task-checklist-item-delete.md), [task.checklistitem.moveafteritem](./api-reference/tasks/checklist-item/task-checklist-item-move-after-item.md) in Task Checklists
+- Updated the main page of the [Messages](./api-reference/imopenlines/openlines/messages/index.md) section in Open Channels. Added introductory information as well as an overview of methods and connections
+- Updated the documentation for the methods [lists.add](./api-reference/lists/lists/lists-add.md), [lists.update](./api-reference/lists/lists/lists-update.md), [lists.get](./api-reference/lists/lists/lists-get.md), [lists.delete](./api-reference/lists/lists/lists-delete.md), [lists.get.iblock.type.id](./api-reference/lists/lists/lists-get-iblock-type-id.md) in Working with Lists
+- Updated the main page of the [Working with Lists](./api-reference/lists/lists/index.md) section. Added introductory information as well as an overview of methods and connections
+
+### November 28, 2025
+
+- Updated the [OnTaskComment*](./api-reference/tasks/comment-item/events-comment/index.md) events with information on working with the new task card
+
+### November 27, 2025
+
+- Added the article [New task card: comments and events](./api-reference/tasks/tasks-new.md)
+- Added the method [tasks.task.chat.message.send](./api-reference/rest-v3/tasks/tasks-task-chat-message-send.md)
+
+### November 26, 2025
+
+- Updated documentation for the methods [lists.element.add](./api-reference/lists/elements/lists-element-add.md), [lists.element.update](./api-reference/lists/elements/lists-element-update.md), [lists.element.get](./api-reference/lists/elements/lists-element-get.md), [lists.element.delete](./api-reference/lists/elements/lists-element-delete.md), [lists.element.get.file.url](./api-reference/lists/elements/lists-element-get-file-url.md) in Working with Elements
+- Updated the main page of the section [Working with elements](./api-reference/lists/elements/index.md). Added introductory information and an overview of methods and relationships
+
+### November 12, 2025
+
+- Updated documentation for methods [task.checklistitem.get](./api-reference/tasks/checklist-item/task-checklist-item-get.md), [task.checklistitem.getlist](./api-reference/tasks/checklist-item/task-checklist-item-get-list.md) in Task Checklists
+- Updated documentation for methods [imopenlines.crm.message.add](./api-reference/imopenlines/openlines/messages/imopenlines-crm-message-add.md), [imopenlines.message.quick.save](./api-reference/imopenlines/openlines/messages/imopenlines-message-quick-save.md) in Open Lines Messages
+- Updated documentation for methods [task.checklistitem.add](./api-reference/tasks/checklist-item/task-checklist-item-add.md), [task.checklistitem.update](./api-reference/tasks/checklist-item/task-checklist-item-update.md) in Task Checklists
+- Updated documentation for methods [catalog.document.conductList](./api-reference/catalog/document/catalog-document-conduct-list.md), [catalog.document.conduct](./api-reference/catalog/document/catalog-document-conduct.md), [catalog.document.cancel](./api-reference/catalog/document/catalog-document-cancel.md), [catalog.document.cancelList](./api-reference/catalog/document/catalog-document-cancel-list.md) in Inventory Management of the Trade Catalog
+
+### November 5, 2025
+
+- Updated documentation for methods [log.blogcomment.add](./api-reference/log/blogcomment/log-blogcomment-add.md), [log.blogcomment.user.get](./api-reference/log/blogcomment/log-blogcomment-user-get.md), [log.blogcomment.delete](./api-reference/log/blogcomment/log-blogcomment-delete.md) in the Feed.
+- Updated the main page of the [Comments](./api-reference/log/blogcomment/index.md) section in the Feed. Added introductory information, as well as an overview of methods and relationships.
+- Updated the main page of the [Products in Inventory Document](./api-reference/catalog/document/document-element/index.md) section. Added introductory information, as well as an overview of methods and relationships.
+- Updated documentation for methods [catalog.document.add](./api-reference/catalog/document/catalog-document-add.md), [catalog.document.update](./api-reference/catalog/document/catalog-document-update.md), [catalog.document.getFields](./api-reference/catalog/document/catalog-document-get-fields.md), [catalog.document.mode.status](./api-reference/catalog/document/catalog-document-mode-status.md), [catalog.document.list](./api-reference/catalog/document/catalog-document-list.md), [catalog.document.delete](./api-reference/catalog/document/catalog-document-delete.md), [catalog.document.deleteList](./api-reference/catalog/document/catalog-document-delete-list.md) in Inventory Management of the Trade Catalog.
+- Updated the main page of the [Checklists](./api-reference/tasks/checklist-item/index.md) section in Tasks. Added introductory information, as well as an overview of methods and relationships.
+
+### October 29, 2025
+
+- Updated documentation for the methods [lists.section.add](./api-reference/lists/sections/lists-section-add.md), [lists.section.update](./api-reference/lists/sections/lists-section-update.md), [lists.section.get](./api-reference/lists/sections/lists-section-get.md), [lists.section.delete](./api-reference/lists/sections/lists-section-delete.md) in Working with Sections
+- Updated the main page of the section [Working with Sections](./api-reference/lists/sections/index.md). Added introductory information as well as an overview of methods and relationships.
+- Updated the tutorial [Set Up Delivery Service for CRM](./tutorials/sale/delivery-in-crm.md)
+
+### October 22, 2025
+
+- Updated documentation for the methods [catalog.document.element.add](./api-reference/catalog/document/document-element/catalog-document-element-add.md), [catalog.document.element.update](./api-reference/catalog/document/document-element/catalog-document-element-update.md), [catalog.document.element.list](./api-reference/catalog/document/document-element/catalog-document-element-list.md), [catalog.document.element.delete](./api-reference/catalog/document/document-element/catalog-document-element-delete.md), [catalog.document.element.getFields](./api-reference/catalog/document/document-element/catalog-document-element-get-fields.md) in the Trade Catalog
+- Added a new tutorial [How to get a list of stages with semantics for CRM entities](./tutorials/crm/how-to-get-lists/how-to-get-stages-with-semantics.md)
+- Updated the main page of the [User Agreements](./api-reference/user-consent/index.md) section. Added introductory information as well as an overview of methods and relationships.
+- Updated documentation for the methods [userconsent.agreement.list](./api-reference/user-consent/user-consent-agreement-list.md), [userconsent.agreement.text](./api-reference/user-consent/user-consent-agreement-text.md), [userconsent.consent.add](./api-reference/user-consent/user-consent-consent-add.md) in User Agreements
+- Updated documentation for the methods [tasks.task.add](./api-reference/tasks/tasks-task-add.md), [tasks.task.update](./api-reference/tasks/tasks-task-update.md), [tasks.task.get](./api-reference/tasks/tasks-task-get.md), [tasks.task.list](./api-reference/tasks/tasks-task-list.md) in Tasks
+
+### October 15, 2025
+
+- Added an article [SDK for Bitrix24 development](./sdk/index.md)
+- Updated the main page of the section [Linking objects to a request in the waitlist](./api-reference/booking/waitlist/external-data/index.md) in Online Booking. Added introductory information, as well as an overview of methods and relationships.
+
+### October 8, 2025
+
+- Added the article [MCP server for working with Bitrix24 REST API](./ai-tools/mcp.md)
+
+### October 2, 2025
+
+- Updated the main event pages in the [Chats](./api-reference/chat-bots/outdated/chats/events/index.md) and [Messages](./api-reference/chat-bots/outdated/messages/events/index.md) sections of Chatbots. Introductory information and an overview of events have been added.
+- Updated the main page of the [Inventory balances](./api-reference/catalog/store-product/index.md) section in the Trade Catalog. Introductory information and an overview of methods and relationships have been added.
+- Updated the main page of the [Object binding to booking](./api-reference/booking/booking/external-data/index.md) section in Online Booking. Introductory information and an overview of methods and relationships have been added.
+- Updated documentation for the methods [tasks.task.getFields](./api-reference/tasks/tasks-task-get-fields.md), [tasks.task.files.attach](./api-reference/tasks/tasks-task-files-attach.md), [tasks.task.counters.get](./api-reference/tasks/tasks-task-counters-get.md), [tasks.task.history.list](./api-reference/tasks/tasks-task-history-list.md) in Tasks.
+
+### September 19, 2025
+
+- Updated the main page of the [Chats](./api-reference/imopenlines/openlines/chats/index.md) section in Open Lines. Added introductory information as well as an overview of methods and connections.
+- Updated the main page of events in the [Currencies](./api-reference/crm/currency/events/index.md) section. Added introductory information and an overview of events.
+- Added the article [Completing Application Installation](./settings/app-installation/installation-finish.md).
+- Updated the documentation for the methods [tasks.task.favorite.add](./api-reference/tasks/tasks-task-favorite-add.md), [tasks.task.favorite.remove](./api-reference/tasks/tasks-task-favorite-remove.md), [tasks.task.getaccess](./api-reference/tasks/tasks-task-get-access.md), [tasks.task.delete](./api-reference/tasks/tasks-task-delete.md), [tasks.task.delegate](./api-reference/tasks/tasks-task-delegate.md), [tasks.task.approve](./api-reference/tasks/tasks-task-approve.md), [tasks.task.disapprove](./api-reference/tasks/tasks-task-disapprove.md) in Tasks.
+- Updated the documentation for the methods [catalog.storeproduct.*](./api-reference/catalog/store-product/index.md) in the Trade Catalog.
+
+### September 17, 2025
+
+- Updated the documentation for the methods [tasks.task.mute](./api-reference/tasks/tasks-task-mute.md), [tasks.task.unmute](./api-reference/tasks/tasks-task-unmute.md), [tasks.task.startwatch](./api-reference/tasks/tasks-task-start-watch.md), [tasks.task.stopwatch](./api-reference/tasks/tasks-task-stop-watch.md) in Tasks
+- Updated the documentation for the task status change methods [tasks.task.complete](./api-reference/tasks/tasks-task-complete.md), [tasks.task.pause](./api-reference/tasks/tasks-task-pause.md), [tasks.task.start](./api-reference/tasks/tasks-task-start.md), [tasks.task.defer](./api-reference/tasks/tasks-task-defer.md), [tasks.task.renew](./api-reference/tasks/tasks-task-renew.md) in Tasks
+
+### September 11, 2025
+
+- Updated the documentation for pricing methods [catalog.price.*](./api-reference/catalog/price/index.md) in the Trade catalog.
+- Added new features for embedding [CRM_XXX_DETAIL_ACTIVITY](./api-reference/widgets/crm/detail-activity-area.md).
+
+### August 27, 2025
+
+- Updated the main page of the [Client in the Waitlist](./api-reference/booking/waitlist/client/index.md) section in Booking. Added introductory information and an overview of methods and relationships
+- Updated documentation for the methods of working with task results [tasks.task.result.*](./api-reference/tasks/result/index.md) in Tasks
+- Added a new tutorial [How to get a list of activities from deals](./tutorials/crm/how-to-get-lists/get-activity-list-by-deals.md)
+
+### August 20, 2025
+
+- Added methods for working with polls and votes [vote*](./api-reference/vote/index.md)
+- Updated documentation for the method [task.planner.getlist](./api-reference/tasks/planner/task-planner-get-list.md) in Tasks
+- Updated the main page of the [Daily Planner](./api-reference/tasks/planner/index.md) section in Tasks. Added introductory information and an overview of methods and relationships.
+- Updated the main page of the [Update Chat](./api-reference/chats/chat-update/index.md) section in Chats. Added introductory information and an overview of methods and relationships.
+- Added a new method for delegating tasks in the workflow [bizproc.task.delegate](./api-reference/bizproc/bizproc-task/bizproc-task-delegate.md)
+
+### August 13, 2025
+
+- Updated the method for retrieving stage movement history [crm.stagehistory.list](./api-reference/crm/crm-stage-history-list.md) in CRM. Added support for all CRM entities with stages and funnels.
+- Updated the main page of the [Users](./api-reference/user/index.md) section. Added introductory information and an overview of methods and relationships.
+- Updated the main event pages in the sections: [Telephony](./api-reference/telephony/events/index.md), [SIP and Built-in Telephony](./api-reference/telephony/voximplant/events/index.md), [Workgroups and Projects](./api-reference/sonet-group/events/index.md). Added introductory information and an overview of events.
+
+### August 6, 2025
+
+- Updated tutorial [Add a lead with files via web form](./tutorials/crm/how-to-add-crm-objects/how-to-add-lead-with-files.md)
+- Updated the main page of the [Booking Client](./api-reference/booking/booking/client/index.md) section in Online Booking. Added introductory information and an overview of methods and relationships.
+- Updated the main page of the [Users](./api-reference/chats/users/index.md) section in Chats. Added introductory information and an overview of methods and relationships.
+- Updated the main page of the [Call List](./api-reference/crm/call-list/index.md) section in CRM. Added introductory information and an overview of methods and relationships.
+- Updated the tutorial [How to create an open lines connector for chat on the site](./tutorials/openlines/example-connector.md)
+- Updated the tutorial [Add a lead or deal with an activity considering CRM mode](./tutorials/crm/how-to-add-crm-objects/how-to-add-objects-with-crm-mode.md)
+- Updated the documentation on deal user-defined field methods [crm.deal.userfield.*](./api-reference/crm/deals/user-defined-fields/index.md) in CRM.
+
+### July 30, 2025
+
+- Added documentation for call list methods [crm.calllist.*](./api-reference/crm/call-list/index.md) in CRM.
+- Updated documentation for comment handling methods [task.commentitem.*](./api-reference/tasks/comment-item/index.md) in Tasks.
+
+### July 23, 2025
+
+- Updated the main page of the [Slots](./api-reference/booking/resource/slots/index.md) section in Online Booking. Added introductory information and an overview of methods and relationships.
+- Updated the main page of the [Working with CRM Vendors](./api-reference/catalog/documentcontractor/index.md) section in the Trade Catalog. Added introductory information and an overview of methods and relationships.
+
+### July 16, 2025
+
+- Updated the main page of the [Resource Types](./api-reference/booking/resource/resource-type/index.md) section in Online Booking. Added introductory information and an overview of methods and relationships.
+- Updated the documentation for the methods of the directories [crm.status.*](./api-reference/crm/status/index.md) in CRM.
+- Updated the tutorial [How to add a template and create a document based on it](./tutorials/crm/how-to-add-crm-objects/how-to-generate-documents.md).
+- Updated the documentation for the VAT rate methods [crm.vat.*](./api-reference/crm/outdated/vat/index.md) in CRM.
+- Added a new tutorial [How to create a new funnel with stages in a SPA](./tutorials/crm/how-to-add-crm-objects/how-to-add-category-to-spa.md).
+- Updated the main pages of events in the sections: [Calendar Events](./api-reference/calendar/calendar-event/events/index.md), [Calendar](./api-reference/calendar/events/index.md). Added introductory information and an overview of events.
+
+### July 09, 2025
+
+- Added events for the Online Booking module: [onBooking*](./api-reference/booking/booking/events/index.md), [onBookingResource*](./api-reference/booking/resource/events/index.md), [onBookingResourceType*](./api-reference/booking/resource/resource-type/events/index.md), [onBookingWaitListItem*](./api-reference/booking/waitlist/events/index.md)
+- Updated the tutorial [Add a lead via web form](./tutorials/crm/how-to-add-crm-objects/how-to-add-lead.md)
+- Updated the main page of the [Head Products](./api-reference/catalog/product/sku/index.md) section in the Trade Catalog. Added introductory information as well as an overview of methods and relationships
+- Updated the main page of the [Smart Processes](./api-reference/crm/universal/user-defined-object-types/index.md) section in CRM. Added introductory information as well as an overview of methods and relationships
+- Updated the main page of the [Product Variations](./api-reference/catalog/product/offer/index.md) section in the Trade Catalog. Added introductory information as well as an overview of methods and relationships
+- Updated the tutorial [How to find duplicates in CRM by phone and email](./tutorials/crm/how-to-get-lists/search-by-phone-and-email.md)
+- Updated the main pages of events in the sections: [Tasks](./api-reference/tasks/events-tasks/index.md), [Comments](./api-reference/tasks/comment-item/events-comment/index.md). Added introductory information as well as an overview of events
+- Updated the documentation for methods related to settings [timeman.timecontrol.reports.settings.get](./api-reference/timeman/timecontrol/timeman-timecontrol-reports-settings-get.md), [timeman.timecontrol.settings.get](./api-reference/timeman/timecontrol/timeman-timecontrol-settings-get.md), [timeman.timecontrol.settings.set](./api-reference/timeman/timecontrol/timeman-timecontrol-settings-set.md) in the Time Control section.
+
+### July 02, 2025
+
+- Updated the main page of the [Services](./api-reference/catalog/product/service/index.md) section in the Trade catalog. Added introductory information and an overview of methods and relationships
+- Updated documentation for methods [crm.duplicate.volatileType.*](./api-reference/crm/duplicates/volatile-type/index.md) in CRM
+
+### June 25, 2025
+
+- Updated documentation for methods [crm.duplicate.findbycomm](./api-reference/crm/duplicates/crm-duplicate-find-by-comm.md), [crm.entity.mergeBatch](./api-reference/crm/duplicates/crm-entity-merge-batch.md), [crm.multifield.fields](./api-reference/crm/auxiliary/multifield/crm-multifield-fields.md) in CRM 
+- Updated documentation for enumeration methods [crm.enum.*](./api-reference/crm/auxiliary/enum/index.md) in CRM
+- Added article [Custom Field Types in CRM](./api-reference/crm/universal/user-defined-fields/userfield-type.md)
+- Updated tutorial [How to Send an E-mail to a Client on Behalf of an Employee](./tutorials/crm/how-to-add-crm-objects/how-to-send-email.md)
+
+### June 18, 2025
+
+- Updated the pages for [system events](./api-reference/common/events/index.md) and the event [onOfflineEvent](./api-reference/events/on-offline-event.md)
+
+### June 11, 2025
+
+- Updated the main event pages in the sections: [Contacts](./api-reference/crm/contacts/events/index.md), [Contact Custom Fields](./api-reference/crm/contacts/userfield/events/index.md), [Company Custom Fields](./api-reference/crm/companies/userfields/events/index.md), [Leads](./api-reference/crm/leads/events/index.md), [Lead Custom Fields](./api-reference/crm/leads/userfield/events/index.md), [Estimates](./api-reference/crm/quote/events/index.md), [Estimate Custom Fields](./api-reference/crm/quote/user-field/events/index.md), [Deals](./api-reference/crm/deals/events/index.md), [Deal Custom Fields](./api-reference/crm/deals/user-defined-fields/events/index.md), [Recurring Deals](./api-reference/crm/deals/recurring-deals/events/index.md). Added introductory information and an overview of events
+- Updated the main page of the [Custom Fields](./api-reference/user/userfields/index.md) section. Added introductory information and an overview of methods and relationships
+- Updated the event pages [onCrmDocumentGeneratorDocument*](./api-reference/crm/document-generator/documents/events/index.md)
+- Updated the documentation for the method to get the work schedule [timeman.schedule.get](./api-reference/timeman/schedule/timeman-schedule-get.md)
+- Added the article [How to Update and Delete Files](./api-reference/files/how-to-update-files.md)
+- Updated the tutorial [Add Contact with Requisites via Web Form](./tutorials/crm/how-to-add-crm-objects/how-to-add-contact-with-requisite.md)
+- Updated the tutorial [How to Edit or Remove Phone Numbers and Email](./tutorials/crm/how-to-edit-crm-objects/how-to-change-email-or-phone.md)
+- Updated the tutorial [Add Recurring Lead](./tutorials/crm/how-to-add-crm-objects/how-to-add-repeat-lead.md)
+  
+### June 04, 2025
+
+- Updated the documentation for working with [custom fields](./api-reference/user/userfields/index.md) in the Users section
+- Updated the documentation for the report methods [timeman.timecontrol.report.add](./api-reference/timeman/timecontrol/timeman-timecontrol-report-add.md), [timeman.timecontrol.report.get](./api-reference/timeman/timecontrol/timeman-timecontrol-reports-get.md), [timeman.timecontrol.reports.users.get](./api-reference/timeman/timecontrol/timeman-timecontrol-reports-users-get.md) in the Time Control section
+- Updated the tutorial [Add a company with details via web form](./tutorials/crm/how-to-add-crm-objects/how-to-add-company-with-requisite.md)
+- Updated the tutorial [Add a deal and company with details](./tutorials/crm/how-to-add-crm-objects/how-to-add-deal-with-choice-of-requisite.md)
+- Updated the main page of the [Product and Variation Properties](./api-reference/catalog/product-property/index.md) section in the Trade Catalog. Added introductory information and an overview of methods and relationships
+- Updated the main page of the [Files](./api-reference/chats/files/index.md) section in Chats. Added introductory information and an overview of methods and relationships
+
+### May 28, 2025
+
+- Updated tutorials: [Add Contact via Web Form](./tutorials/crm/how-to-add-crm-objects/how-to-add-contact.md), [Add Company via Web Form](./tutorials/crm/how-to-add-crm-objects/how-to-add-company.md), [Add Calendar Event for Client Work](./tutorials/crm/how-to-add-crm-objects/how-to-add-activity-to-contact.md)
+- Added new tutorial [How to Filter Elements by Stage Name](./tutorials/crm/how-to-get-lists/how-to-get-elements-by-stage-filter.md)
+
+### May 21, 2025
+
+- Updated the main page of the [Price](./api-reference/catalog/price/index.md) section in the Trade Catalog. Added introductory information as well as an overview of methods and connections
+- Updated main event pages: [News Feed](./api-reference/log/events/index.md), [Open Channels](./api-reference/imopenlines/openlines/events/index.md), [Open Line Connectors](./api-reference/imopenlines/imconnector/events/index.md). Added introductory information as well as an overview of events
+- Updated the main page of the [Departments](./api-reference/chats/departments/index.md) section in Chats. Added introductory information as well as an overview of methods and connections
+
+### May 14, 2025
+
+- Added methods for the BIconnector module: [Connector](./api-reference/biconnector/connector/index.md), [Sources](./api-reference/biconnector/source/index.md), [Datasets](./api-reference/biconnector/dataset/index.md)
+- Updated main event pages in the Product Catalog sections: [Unit of Measurement](./api-reference/catalog/measure/events/index.md), [Price](./api-reference/catalog/price/events/index.md), [Price Types](./api-reference/catalog/price-type/events/index.md), [Products](./api-reference/catalog/product/events/index.md), [Price Rounding Rules](./api-reference/catalog/rounding-rule/events/index.md). Added introductory information as well as an overview of events
+- Updated the main page of the [Chatbots](./api-reference/imopenlines/openlines/chat-bots/index.md) section in Open Channels. Added introductory information as well as an overview of methods and connections
+
+### May 7, 2025
+
+- Added information about new fields for working with message send time in methods [booking.v1.resource.*](./api-reference/booking/resource/index.md) and [booking.v1.resourcetype.*](./api-reference/booking/resource/resource-type/index.md)
+- Added a new tutorial [How to enter the payment date in the deal field](./tutorials/crm/how-to-edit-crm-objects/how-to-set-paid-date-to-deal.md)
+- Updated the main page of the [Booking](./api-reference/booking/booking/index.md) section in Online Booking. Added introductory information and an overview of methods and relationships.
+
+### April 30, 2025
+
+- Updated the main page of the [Resources](./api-reference/booking/resource/index.md) section in Online Booking. Added introductory information and an overview of methods and relationships.
+- Updated the main page of the [Waitlist](./api-reference/booking/waitlist/index.md) section in Online Booking. Added introductory information and an overview of methods and relationships.
+- Added a new tutorial [How to Mass Complete Workflows with Date Filter](./tutorials/bizproc/how-to-filter-and-kill-workflows.md).
+- Updated the main page of the [Online Booking: Methods Overview](./api-reference/booking/index.md) section. Added introductory information and an overview of methods and relationships.
+
+### April 23, 2025
+
+- Added methods for the new module [Online Booking](./api-reference/booking/index.md)
+- Added information on [UI Kit](./api-reference/widgets/ui-kit/index.md) — library of components and design patterns
+
+### April 16, 2025
+
+- Added a new tutorial [How to terminate workflows of a terminated employee](./tutorials/bizproc/how-to-kill-workflows.md)
+
+### April 9, 2025
+
+- Updated the main page of the section [Custom fields for estimates](./api-reference/crm/quote/user-field/index.md). Added introductory information and an overview of methods and errors
+- Updated the event pages for working with custom fields for estimates [onCrmQuoteUserField*](./api-reference/crm/quote/user-field/events/index.md)
+- Updated the main page of the section [News Feed](./api-reference/log/index.md). Added introductory information and an overview of methods and relationships
+- Updated the main page of the section [Group and project members](./api-reference/sonet-group/members/index.md). Added introductory information and an overview of methods and relationships
+- Updated the event pages for working with estimates [onCrmQuote*](./api-reference/crm/quote/events/index.md)
+- Updated the main page of the section [Notifications](./api-reference/chats/notifications/index.md) in Chats. Added introductory information and an overview of methods and relationships
+
+### April 3, 2025
+
+- Added the `storeId` parameter to the methods [crm.item.productrows.*](./api-reference/crm/universal/product-rows/index.md). The parameter is read-only
+- Updated event pages when working with user fields of companies [onCrmCompanyUserField*](./api-reference/crm/companies/userfields/events/index.md)
+- Updated the main page of the section [Message Providers, SMS Providers](./api-reference/messageservice/index.md). Added introductory information as well as an overview of methods and relationships
+- Updated event pages when working with companies [onCrmCompany*](./api-reference/crm/companies/events/index.md).
+- Updated event pages when working with user fields of leads [onCrmLeadUserField*](./api-reference/crm/leads/userfield/events/index.md)
+- Updated documentation on methods for working with [working hours](./api-reference/timeman/base/index.md) in the Time Tracking section
+- Updated documentation on methods for working with [office networks](./api-reference/timeman/networkrange/index.md) in the Time Tracking section
+- Updated the main page of the section [Search](./api-reference/chats/search/index.md) in Chats. Added introductory information as well as an overview of methods and relationships
+- Updated the main page of the section [Enumerations](./api-reference/crm/auxiliary/enum/index.md) in CRM. Added introductory information as well as an overview of methods and relationships
+
+### March 26, 2025
+
+- Updated the main pages of the sections [VAT Rates in CRM](./api-reference/crm/outdated/vat/index.md), [Lead Communication with Contacts](./api-reference/crm/leads/management-communication/index.md). Added introductory information as well as an overview of methods and connections
+- Updated event pages when working with leads [onCrmLead*](./api-reference/crm/leads/events/index.md)
+- Added support for the `contactIds` field in the filter for the method [crm.item.list](./api-reference/crm/universal/crm-item-list.md)
+- Updated event pages when working with currency [onCrmCurrency*](./api-reference/crm/currency/events/index.md)
+- Updated the main page of the section [Workgroups and Projects](./api-reference/sonet-group/events/index.md). Added introductory information as well as an overview of methods and connections
+- Updated event pages when working with workgroups [onSonetGroup*](./api-reference/sonet-group/events/index.md)
+
+### March 19, 2025
+
+- Added a new parameter `useOriginalUfNames` in the methods [crm.item.*](./api-reference/crm/universal/index.md) to control the format of custom field names
+- Added a new tutorial [How to move an activity from one object type to another](./tutorials/crm/how-to-edit-crm-objects/how-to-move-activity-between-objects.md)
+- Added a new tutorial [How to move an activity between elements of the same type](./tutorials/crm/how-to-edit-crm-objects/how-to-move-activity.md)
+- Updated the main page of the section [Delivery Service Handlers](./api-reference/sale/delivery/handler/index.md) in the Online Store. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Delivery Services](./api-reference/sale/delivery/delivery/index.md) in the Online Store. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the section [Special Operations](./api-reference/chats/special-operations/index.md) in Chats. Added introductory information, as well as an overview of methods and relationships
+
+### March 12, 2025
+
+- Updated the event pages for recurring deals [onCrmDealRecurring*](./api-reference/crm/deals/recurring-deals/events/index.md)
+- Updated the main page of the [Chat Participants](./api-reference/chats/chat-users/index.md) section. Added introductory information as well as an overview of methods and connections
+- Added an article describing the use of universal methods for new invoices [Invoices: Overview of Methods](./api-reference/crm/universal/invoice.md). Added introductory information as well as an overview of methods and connections
+
+### March 5, 2025
+
+- Updated the main page of the section [Recurring Deals](./api-reference/crm/deals/recurring-deals/index.md). Added introductory information as well as an overview of methods and connections
+- Updated the main page of the section [Linking Payments to Shipments](./api-reference/sale/payment-item-shipment/index.md). Added introductory information as well as an overview of methods and connections
+- Updated the main page of the section [Linking Basket Items to Payments](./api-reference/sale/payment-item-basket/index.md). Added introductory information as well as an overview of methods and connections
+- Updated the main page of the section [Inventory Management](./api-reference/catalog/document/index.md). Added introductory information as well as an overview of methods and connections
+- Updated the main page of the section [Order Sources](./api-reference/sale/trade-platform/index.md). Added introductory information as well as an overview of methods and connections
+- Updated the main page of the section [Linking Order Sources to Orders](./api-reference/sale/trade-binding/index.md). Added introductory information as well as an overview of methods and connections
+- Added a new tutorial [How to Set Up Rounding for a Custom Field of Type "Number"](./tutorials/crm/how-to-add-crm-objects/how-to-add-precision-to-user-field.md)
+- Updated the main page of the section [Time Tracking](./api-reference/timeman/index.md). Added introductory information as well as an overview of methods and connections
+
+### February 26, 2025
+
+- Updated the main page of the [Office Networks](./api-reference/timeman/networkrange/index.md) section. Added introductory information, as well as an overview of methods and connections
+- Added a new section on [Timeline Record Actions](./api-reference/crm/timeline/actions/index.md). Introduced new methods [crm.timeline.item.pin](./api-reference/crm/timeline/actions/crm-timeline-item-pin.md) and [crm.timeline.item.unpin](./api-reference/crm/timeline/actions/crm-timeline-item-unpin.md)
+
+### February 19, 2025
+
+- Updated documentation on methods for working with [stores](./api-reference/catalog/store/index.md) in the Sales Catalog section.
+- Added a section with methods for the [Signature](./api-reference/sign/index.md) module. New methods [sign.b2e.personal.tail](./api-reference/sign/sign-b2e-personal-tail.md) and [sign.b2e.mysafe.tail](./api-reference/sign/sign-b2e-mysafe-tail.md) were added.
+- Updated the main page of the [Stores](./api-reference/catalog/store/index.md) section. Added introductory information, as well as an overview of methods and connections.
+- Updated the main page of the [Time Control](./api-reference/timeman/timecontrol/index.md) section. Added introductory information, as well as an overview of methods and connections.
+- Updated the main page of the [VAT Rates](./api-reference/catalog/vat/index.md) section. Added introductory information, as well as an overview of methods and connections.
+- Updated the main page of the [Order Property Variants of ENUM Type](./api-reference/sale/property-variant/index.md) section. Added introductory information, as well as an overview of methods and connections.
+- Updated the main page of the [Shipment Item Table](./api-reference/sale/shipment-item/index.md) section. Added introductory information, as well as an overview of methods and connections.
+- Updated the main page of the [Business Process Tasks](./api-reference/bizproc/bizproc-task/index.md) section. Added introductory information, as well as an overview of methods and connections.
+- Updated the main page of the [Working Day](./api-reference/timeman/base/index.md) section. Added introductory information, as well as an overview of methods and connections.
+- Updated information on methods for CRM activities [crm.activity.*](./api-reference/crm/timeline/activities/activity-base/index.md).
+- Updated the main page of the [Product and Variation Images](./api-reference/catalog/product-image/index.md) section. Added introductory information, as well as an overview of methods and connections.
+
+### February 12, 2025
+
+- Updated information on universal deal methods in CRM [crm.activity.todo.*](./api-reference/crm/timeline/activities/todo/index.md)
+- Updated the main page of the [Business Process Templates](./api-reference/bizproc/template/index.md) section. Added introductory information and an overview of methods and connections.
+- Added a section on working with files with the article [How to Upload Files](./api-reference/files/how-to-upload-files.md)
+- Updated documentation on methods for working with [tasks](./api-reference/bizproc/bizproc-task/index.md) in the Business Processes and Automation Rules section.
+- Updated the main page of the [Units of Measurement](./api-reference/catalog/measure/index.md) section. Added introductory information and an overview of methods and connections.
+- Updated documentation on methods, structure, and badges for configurable deals in CRM [crm.activity.configurable.*](./api-reference/crm/timeline/activities/configurable/index.md)
+
+### February 5, 2025
+
+- Updated documentation on methods for binding CRM activities in the timeline [crm.activity.binding.*](./api-reference/crm/timeline/activities/binding/index.md)
+- Updated the main page of the [Open Lines Connectors](./api-reference/imopenlines/imconnector/index.md) section. Added introductory information as well as an overview of methods and connections.
+- Updated documentation on [application actions](./api-reference/bizproc/bizproc-activity/index.md) in the Business Processes and Automation rules section.
+- Updated documentation on [application automation rules](./api-reference/bizproc/bizproc-robot/index.md) in the Business Processes and Automation rules section.
+- Added a new tutorial [How to Create a Custom Field in a SPA](./tutorials/crm/how-to-add-crm-objects/how-to-add-user-field-to-spa.md).
+- Updated information on methods for custom activity types in CRM [crm.activity.type.*](./api-reference/crm/timeline/activities/types/index.md).
+- Updated information on activity events in CRM [onCrmActivity*](./api-reference/crm/timeline/activities/events/index.md).
+
+### January 29, 2025
+
+- Added descriptions for application embedding methods: [BX24.placement.info](./api-reference/widgets/ui-interaction/bx24-placement-info.md), [BX24.placement.getInterface](./api-reference/widgets/ui-interaction/bx24-placement-get-interface.md), [BX24.placement.call](./api-reference/widgets/ui-interaction/bx24-placement-call.md), and [BX24.placement.bindEvent](./api-reference/widgets/ui-interaction/bx24-placement-bind-event.md)
+- Updated the main page of the [Status Localization](./api-reference/sale/status-lang/index.md) section. Added introductory information as well as an overview of methods and relationships
+- Updated the main page of the [Calendar](./api-reference/calendar/index.md) section. Added introductory information as well as an overview of methods and relationships
+- Added a new tutorial [How to Attach a Task to a SPA](./tutorials/tasks/how-to-connect-task-to-spa.md)
+- Added descriptions for methods in the [Company Structure](./api-reference/departments/index.md) section
+- Updated documentation for [Business Process Templates](./api-reference/bizproc/template/index.md) in the Business Processes section
+- Updated the main page of the [Resource Booking](./api-reference/calendar/resource/index.md) section. Added introductory information as well as an overview of methods and relationships
+- Updated the main page of the [Shipment Property Values](./api-reference/sale/shipment-property-value/index.md) section. Added introductory information as well as an overview of methods and relationships
+- Updated the main page of the [Site Object](./api-reference/landing/site/index.md) section. Added introductory information as well as an overview of methods and relationships
+- Added a new method to get a custom CRM object type [crm.type.getByEntityTypeId](./api-reference/crm/universal/user-defined-object-types/crm-type-get-by-entity-type-id.md)
+- Added the ability to work with multiple fields in the [crm.item.add](./api-reference/crm/universal/crm-item-add.md) and [crm.item.update](./api-reference/crm/universal/crm-item-update.md) methods
+
+### January 22, 2025
+
+- Updated the main page of the [Calendar Events](./api-reference/calendar/calendar-event/index.md) section. Added introductory information and an overview of methods and connections
+- Updated the main page of the [Delivery Services](./api-reference/sale/delivery/index.md) section. Added introductory information and an overview of methods and connections
+- Updated the main page of the [Payer Type Statuses](./api-reference/sale/business-value-person-domain/index.md) section. Added introductory information and an overview of methods
+- Updated the main page of the [Shipments](./api-reference/sale/shipment/index.md) section. Added introductory information and an overview of methods
+- Updated the documentation for [Resource Booking](./api-reference/calendar/resource/index.md) in the Calendar section
+- Updated the documentation for [Custom Field Events for Deals](./api-reference/crm/deals/user-defined-fields/events/index.md)
+
+### January 15, 2025
+
+- Updated the main page of the section [Deal Connection with Contacts](./api-reference/crm/deals/contacts/index.md). Added introductory information and an overview of methods
+- Updated the main page of the section [Statuses](./api-reference/sale/status/index.md). Added introductory information and an overview of methods and relationships
+- Updated the documentation for methods working with deal product items [crm.deal.productrows.get](./api-reference/crm/deals/crm-deal-productrows-get.md), [crm.deal.productrows.set](./api-reference/crm/deals/crm-deal-productrows-set.md)
+- Updated the documentation for [Calendar](./api-reference/calendar/events/index.md) events
+- Updated the main page of the section [Lead Card Management](./api-reference/crm/leads/custom-form/index.md). Added introductory information and an overview of methods and relationships
+- Updated the main page of the section [Payer Types](./api-reference/sale/person-type/index.md). Added introductory information and an overview of methods and relationships
+- Updated the documentation for deal events [onCrmDealAdd](./api-reference/crm/deals/events/on-crm-deal-add.md), [onCrmDealUpdate](./api-reference/crm/deals/events/on-crm-deal-update.md), [onCrmDealDelete](./api-reference/crm/deals/events/on-crm-deal-delete.md)
+- Updated the documentation for working with translations of price type names [catalog.priceTypeLang.*](./api-reference/catalog/price-type/price-type-lang/index.md)
+- Added documentation for the deal funnel change event [onCrmDealMoveToCategory](./api-reference/crm/deals/events/on-crm-deal-move-to-category.md)
+
+### January 9, 2025
+
+- Updated the main page of the section [Deal Card Management](./api-reference/crm/deals/custom-form/index.md). Added introductory information and an overview of methods and relationships
+- Updated the main page of the section [Lead Custom Fields](./api-reference/crm/leads/userfield/index.md). Added introductory information and an overview of methods and errors
+- Updated the main page of the section [Deal Custom Fields](./api-reference/crm/deals/user-defined-fields/index.md). Added introductory information and an overview of methods and errors
+- Updated documentation for calendar methods [calendar.section.*](./api-reference/calendar/index.md)
+- Updated the main page of the section [Custom Contact Fields](./api-reference/crm/contacts/userfield/index.md). Added introductory information and an overview of methods and errors
+
+## 2024
+
+### December 25, 2024
+
+- Updated documentation for calendar settings methods [calendar.settings.get](./api-reference/calendar/calendar-settings-get.md), [calendar.user.settings.get](./api-reference/calendar/calendar-user-settings-get.md), and [calendar.user.settings.set](./api-reference/calendar/calendar-user-settings-set.md)
+- Updated documentation for calendar methods [calendar.meeting.status.get](./api-reference/calendar/calendar-event/calendar-meeting-status-get.md), [calendar.meeting.status.set](./api-reference/calendar/calendar-event/calendar-meeting-status-set.md), and [calendar.accessibility.get](./api-reference/calendar/calendar-event/calendar-accessibility-get.md)
+- Updated documentation for calendar event methods [calendar.event.*](./api-reference/calendar/calendar-event/index.md)
+- Updated the main pages of the contact section [Contact Relationship with Companies](./api-reference/crm/contacts/company/index.md), [Managing Contact Cards](./api-reference/crm/contacts/custom-form/index.md). Added introductory information and an overview of methods and relationships
+- Updated the main page of the section [Custom Fields for Companies](./api-reference/crm/companies/userfields/index.md). Added introductory information and an overview of methods and relationships
+- Updated documentation for events related to [price rounding rules](./api-reference/catalog/rounding-rule/index.md)
+- Updated the main page of the section [Mail Services](./api-reference/mailservice/index.md). Added introductory information and an overview of methods
+
+### December 18, 2024
+
+- Updated documentation for [price type](./api-reference/catalog/price-type/index.md) events
+- Updated documentation for [product](./api-reference/catalog/product/index.md) events
+- Updated documentation for [unit of measure](./api-reference/catalog/measure/index.md) events
+- Updated documentation for [price](./api-reference/catalog/price/index.md) events
+- Updated the main page of the [Shipment properties](./api-reference/sale/shipment-property/index.md) section. Added introductory information and an overview of methods and relationships
+- Updated the main page of the [Payments](./api-reference/sale/payment/index.md) section. Added introductory information and an overview of methods and relationships
+
+### December 11, 2024
+
+- Added a new method [imconnector.chat.name.set](./api-reference/imopenlines/imconnector/imconnector-chat-name-set.md).
+- Updated the main page of the [Company structure](./api-reference/departments/index.md) section. Added introductory information and an overview of methods and relationships.
+- Added a new article [How to fix the "Site does not allow connection" error when opening the application](./local-integrations/site-does-not-allow-connection.md).
+- Updated the main page of the [Order properties](./api-reference/sale/property/index.md) section. Added introductory information and an overview of methods and relationships.
+- Updated the main page of the [Basket properties](./api-reference/sale/basket-properties/index.md) section. Added introductory information and an overview of methods and relationships.
+- Updated the main page of the [Property groups](./api-reference/sale/property-group/index.md) section. Added introductory information and an overview of methods and relationships.
+- Updated the main page of the [Company contacts](./api-reference/crm/companies/contacts/index.md) section. Added introductory information and an overview of methods and relationships.
+- Updated the main page of the [Company card management](./api-reference/crm/companies/custom-form/index.md) section. Added introductory information and an overview of methods and relationships.
+- Updated the main page of the [Data storage](./api-reference/entity/index.md) section. Added introductory information and an overview of methods.
+
+### December 4, 2024
+
+- Updated the main page of the [Comments](./api-reference/tasks/comment-item/index.md) section. Added introductory information, as well as an overview of methods and relationships.
+- Added a new method [tasks.flow.flow.pin](./api-reference/tasks/flow/tasks-flow-flow-pin.md).
+- Added a description of the new type of distribution Self-distribution to the article [{#T}](./api-reference/tasks/flow/index.md). 
+- Updated the main page of the [User Fields](./api-reference/tasks/user-field/index.md) section. Added introductory information, as well as an overview of methods and relationships.
+- Added a new tutorial [How to create a comment in a task and attach a file](./tutorials/tasks/how-to-create-comment-with-file.md).
+- Added a new method [imconnector.connector.data.set](./api-reference/imopenlines/imconnector/imconnector-connector-data-set.md).
+- Added information about methods [telephony.externalcall.finish](./api-reference/telephony/telephony-external-call-finish.md), [voximplant.sip.add](./api-reference/telephony/voximplant/sip/voximplant-sip-add.md), and [voximplant.sip.status](./api-reference/telephony/voximplant/sip/voximplant-sip-status.md).
+- Updated the main page of the [Shopping cart](./api-reference/sale/basket-item/index.md) section. Added introductory information, as well as an overview of methods and relationships.
+- Added a new article [Features of REST calls when changing the Bitrix24 address](./settings/how-to-call-rest-api/change-domen.md).
+- Added a new tutorial [How to create a connector for open channels for online chat on your site](./tutorials/openlines/example-connector.md).
+- Added a new article [How to test your handler for processing Bitrix24 events](./api-reference/events/test-handler.md).
+
+### November 27, 2024
+
+- Updated the main page of the [Auxiliary Methods](./api-reference/crm/auxiliary/index.md) section in CRM. Added introductory information and an overview of methods
+- Updated the main page of the [Orders](./api-reference/sale/order/index.md) section. Added introductory information, as well as an overview of methods and relationships
+- Updated the main page of the [Catalog Sections](./api-reference/catalog/section/index.md) section. Added introductory information, as well as an overview of methods and relationships
+
+- Added a new method [messageservice.sender.update](./api-reference/messageservice/messageservice-sender-update.md)
+
+- Added new events [OnImConnectorDialogStart](./api-reference/imopenlines/imconnector/events/on-im-connector-dialog-start.md) and [OnImConnectorDialogFinish](./api-reference/imopenlines/imconnector/events/on-im-connector-dialog-finish.md)
+- Added new events [OnSessionStart](./api-reference/imopenlines/openlines/events/on-session-start.md) and [OnSessionFinish](./api-reference/imopenlines/openlines/events/on-session-finish.md)
+- Added new events [OnOpenLineMessageAdd](./api-reference/imopenlines/openlines/events/on-open-line-message-add.md), [OnOpenLineMessageUpdate](./api-reference/imopenlines/openlines/events/on-open-line-message-update.md), and [OnOpenLineMessageDelete](./api-reference/imopenlines/openlines/events/on-open-line-message-delete.md)
+
+- Added the `ACTIVE_ONLY` parameter to the [imopenlines.crm.chat.get](./api-reference/imopenlines/openlines/chats/imopenlines-crm-chat-get.md) method
+- Added an example response with a description of the returned data in the [imconnector.send.messages](./api-reference/imopenlines/imconnector/imconnector-send-messages.md) method. Now it returns information about the open line dialog
+
+### November 21, 2024
+
+- Added a new tutorial [How to add a comment to the smart process timeline](./tutorials/crm/how-to-add-crm-objects/how-to-add-comment-to-spa.md)
+
+- Updated documentation on working with margins [catalog.extra.*](./api-reference/catalog/extra/index.md)
+- Updated the main page of the [Product Catalog](./api-reference/catalog/catalog/index.md) section. Added introductory information and an overview of methods and relationships.
+  
+- Updated the main pages of the [Currencies](./api-reference/crm/currency/index.md) and [Currency Localizations](./api-reference/crm/currency/localizations/index.md) sections. Added introductory information and an overview of methods and relationships.
+
+### November 13, 2024
+
+- New tutorials added: [How to create a task with an attached file](./tutorials/tasks/how-to-create-task-with-file.md), [How to upload a file to a task](./tutorials/tasks/how-to-upload-file-to-task.md)
+
+- Updated the main pages in the Tasks section — [Tasks](./api-reference/tasks/index.md), [Flows](./api-reference/tasks/flow/index.md), [Task Result](./api-reference/tasks/flow/index.md). Added introductory information and an overview of methods and relationships.
+  
+- Updated the main page of the [Products](./api-reference/catalog/product/index.md) section. Added introductory information and an overview of methods and relationships.
+- Updated the documentation for working with the unit ratio [catalog.ratio.*](./api-reference/catalog/ratio/index.md)
+
+### November 6, 2024
+
+- Updated the main pages in the CRM section — [Search and Process Duplicates](./api-reference/crm/duplicates/index.md), [Activities](./api-reference/crm/timeline/activities/index.md), [Statuses and dropdowns](./api-reference/crm/status/index.md), [Timeline](./api-reference/crm/timeline/index.md). Added introductory information, as well as an overview of methods and connections
+
+- Updated the main pages in the Drive section — [Folder](./api-reference/disk/folder/index.md), [File](./api-reference/disk/file/index.md), [Drive](./api-reference/disk/index.md). Added introductory information, as well as an overview of methods and connections
+
+- Updated the main pages in the Tasks section —  [Kanban Stages and "My Planner"](./api-reference/tasks/stages/index.md) in tasks, [Scrum](./api-reference/sonet-group/scrum/index.md) in groups. Added introductory information, as well as an overview of methods and connections
+
+### October 30, 2024
+
+- Updated the main pages of the [Scrum Tasks](./api-reference/sonet-group/scrum/task/index.md), [Kanban](./api-reference/sonet-group/scrum/backlog/index.md), [Backlog](./api-reference/sonet-group/scrum/backlog/index.md) sections. Added introductory information, as well as an overview of methods and connections
+- Updated the main page of the [Working with Fields](./api-reference/lists/fields/index.md) section of universal lists. Added introductory information, as well as an overview of methods and connections
+- Added a new tutorial [How to Get a Client's Address from CRM](./tutorials/crm/how-to-get-lists/how-to-get-address.md)
+
+### October 23, 2024
+
+- Updated the main pages of the [Sprints](./api-reference/sonet-group/scrum/sprint/index.md), [Epics](./api-reference/sonet-group/scrum/epic/index.md) sections. Added introductory information as well as an overview of methods and connections
+- Updated the main pages of the [Pricing Rounding Rules](./api-reference/catalog/rounding-rule/index.md), [Price Types](./api-reference/catalog/price-type/index.md) sections. Added introductory information as well as an overview of methods and connections
+- Updated the main page of the [Universal Lists](./api-reference/lists/index.md) section. Added introductory information as well as an overview of methods and connections
+- Updated the main pages of the [Details](./api-reference/crm/requisites/index.md), [Estimates](./api-reference/crm/quote/index.md) sections. Added introductory information, an overview of methods and connections
+
+- Updated the documentation for working with product images [catalog.productImage.*](./api-reference/catalog/product-image/index.md)
+
+- Added documentation for the methods [landing.repowidget.getlist](./api-reference/vibe/landing-repowidget-get-list.md) and [landing.repowidget.debug](./api-reference/vibe/landing-repowidget-debug.md)
+
+### October 16, 2024
+
+- Updated documentation on price rounding rules [catalog.roundingrule.*](./api-reference/catalog/rounding-rule/index.md)
+- Updated documentation on price types [catalog.priceType.*](./api-reference/catalog/price-type/index.md)
+- Updated the main pages of the [Leads](./api-reference/crm/leads/index.md), [Deals](./api-reference/crm/deals/index.md), [Companies](./api-reference/crm/companies/index.md), [Contacts](./api-reference/crm/contacts/index.md) sections. Added introductory information, an overview of methods and relationships, and described additional capabilities for implementation via REST API with the entities cards.
+- Updated the main page of the [Time Tracking in Tasks section](./api-reference/tasks/elapsed-item/index.md). Added introductory information, an overview of methods and relationships.
+
+### October 9, 2024
+
+- Updated general methods with [user information](./api-reference/common/users/index.md)
+- Added information on [performance](./settings/performance/index.md) 
+
+### October 1, 2024
+
+- Added [OAuth server error codes](./settings/oauth/error-codes.md)
+- Added documentation for [Widgets for Vibes](./api-reference/vibe/index.md)
+
+### September 26, 2024
+
+- Updated documentation for core methods related to workflows [bizproc.workflow.*](./api-reference/bizproc/bizproc-workflow-start.md)
+
+### September 25, 2024
+
+- Updated documentation for [system methods](./api-reference/common/system/index.md)
+
+### September 24, 2024
+
+- Updated documentation for [contact events](./api-reference/crm/contacts/events/index.md) and [custom fields events for contacts](./api-reference/crm/contacts/userfield/events/index.md)
+- Updated documentation for working with VAT rates [catalog.vat.*](./api-reference/catalog/vat/index.md)
+
+### September 23, 2024
+
+- Updated documentation for core methods related to deals [crm.deal.*](./api-reference/crm/deals/index.md)
+
+### September 20, 2024
+
+- Updated documentation for general methods related to storing and retrieving [application settings](./api-reference/common/settings/index.md)
+
+### September 19, 2024
+
+- Updated documentation for embedding as custom field types [userfieldtype.*](./api-reference/widgets/user-field/index.md)
+- Updated documentation for working with contacts [crm.contact.*](./api-reference/crm/contacts/index.md)
+- Updated documentation for working with custom fields for contacts [crm.contact.userfield.*](./api-reference/crm/contacts/userfield/index.md)
+
+### September 17, 2024
+
+- Added documentation for [Flows](./api-reference/tasks/flow/index.md)
+
+### August 29, 2024
+
+- Thanks to [Andrey Nikolaev](https://github.com/gromdron)! Updated article [How to Make a Request](./settings/how-to-call-rest-api/general-principles.md), added important nuances and illustrative examples regarding the use of the [batch](./settings/how-to-call-rest-api/batch.md) method.
+  
+- Updated articles in the [contact events section](./api-reference/crm/contacts/events/index.md)
+- Updated articles in the [universal CRM events section](./api-reference/crm/universal/events/index.md)
+- Updated articles in the [custom field types CRM events section](./api-reference/crm/universal/events/index.md)
+- Updated articles in the [universal item details management methods section](./api-reference/crm/universal/item-details-configuration/index.md)
+- Updated articles in the [contact details management section](./api-reference/crm/contacts/custom-form/index.md)
+
+### August 27, 2024
+
+- Thanks to [Andrey Nikolaev](https://github.com/gromdron)! Updated article [Getting a List of Activities](./api-reference/crm/timeline/activities/activity-base/crm-activity-list.md), added important nuances regarding the relationships of activities with CRM objects, as well as three additional specific examples.
+  
+### August 21, 2024
+
+- Added [section with recordings of meetups and presentations for developers](./meetups.md)
+
+### August 2024
+
+We completely revamped the REST API documentation and changed the internal principles of its updates.
+
+- All materials have been converted to the markdown format accepted in the international developer community for technical documentation;
+- We combined existing separate materials and courses into a unified REST API documentation (the only exception remains the [video course](https://helpdesk.bitrix24.com/courses/index.php?COURSE_ID=268&INDEX=Y), which is intended for a quick overview);
+- The structure of the materials has been largely revised. We aimed to present the abundance of information in a sequence that helps solve practical issues. We continue to work on improving the structure;
+- Many articles on methods, events, and widgets have been completely rewritten. We aimed to make them as clear and detailed as possible. Together with the Bitrix24 developers, we continue to work on revising those articles that still contain incomplete information;
+- All materials are available on [github](https://github.com/bitrix-tools/b24-rest-docs) under the MIT license. We hope for your assistance in improving the documentation and welcome your edits, articles, and code examples. We promise to review any pull request as quickly as possible and monitor issues.

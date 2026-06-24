@@ -1,0 +1,520 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Update Cards in landing.block.updateCards"
+original_path: "api-reference/landing/block/methods/landing-block-update-cards.md"
+---
+
+# Update Cards in landing.block.updateCards
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`landing`](../../../scopes/permissions.md)
+>
+> Who can execute the method: a user with "edit" access permission for the site
+
+The method `landing.block.updateCards` updates a set of cards in a block and the nodes within those cards in the draft of the page.
+
+This method works with cards described in the `cards` key of the block manifest. If the page is already published, changes will be visible to visitors after publication through the interface or by using the [landing.landing.publication](../../page/methods/landing-landing-publication.md) method.
+
+## Method Parameters
+
+{% include [Note on required parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **scope**
+[`string`](../../../data-types.md) | Internal scope of landings. It is not related to the REST scope `landing` in the method name.
+
+The value of `scope` must correspond to the type of site [(detailed description)](../../types.md) ||
+|| **lid*** 
+[`integer`](../../../data-types.md) | Identifier of the page.
+
+The page identifier can be obtained using the [landing.landing.getlist](../../page/methods/landing-landing-get-list.md) method ||
+|| **block*** 
+[`integer`](../../../data-types.md) | Identifier of the block in the draft of the page.
+
+The block identifier can be obtained using the [landing.block.getlist](./landing-block-get-list.md) method with the parameter `params.edit_mode = 1` ||
+|| **data*** 
+[`object`](../../../data-types.md) | Set of changes for the block cards [(detailed description)](#data) ||
+|#
+
+### Parameter data {#data}
+
+#|
+|| **Key**
+`type` | **Description** ||
+|| **<card selector from manifest.cards>**
+[`object`](../../../data-types.md) | Card selector from the [cards section of the block manifest](../manifest.md#key-cards).
+
+The value describes the final set of cards for this selector and the changes to their nodes [(detailed description)](#card-data).
+
+To find available card selectors and presets for a specific block, retrieve the manifest using the [landing.block.getmanifest](./landing-block-get-manifest.md) method ||
+|#
+
+### Object <card selector from manifest.cards> {#card-data}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **source**
+[`array`](../../../data-types.md) | Defines the final order and number of cards [(detailed description)](#source) ||
+|| **values**
+[`array`](../../../data-types.md) | Updates nodes within cards after applying `source` [(detailed description)](#values) ||
+|#
+
+### Element of the source array {#source}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **type**
+[`string`](../../../data-types.md) | Type of the card source.
+
+Possible values:
+`card` - take the current card by index,
+`preset` - create a card from a preset in `manifest.cards.<selector>.presets`.
+
+Default - `card` ||
+|| **value**
+[`integer`](../../../data-types.md) \| [`string`](../../../data-types.md) | Value of the card source.
+
+For `card`, this is the index of the current card by selector, starting from `0`.
+
+For `preset`, this is the preset code from the block manifest ||
+|#
+
+If the `source` element does not contain `type`, the method uses the value `card`. If `value` is not provided, the method uses index `0`.
+
+To create a new card from a preset, specify `type` with the value `preset` and pass the preset code from the block manifest in `value`. For example:
+
+```json
+"source": [
+  {
+    "type": "card",
+    "value": 0
+  },
+  {
+    "type": "preset",
+    "value": "preset_code"
+  }
+]
+```
+
+### Element of the values array {#values}
+
+Each element of the `values` array must be an object that contains one or more node changes.
+
+#|
+|| **Key**
+`type` | **Description** ||
+|| **<node selector>@<position>**
+[`string`](../../../data-types.md) \| [`object`](../../../data-types.md) \| [`array`](../../../data-types.md) | Node selector within the card with position indicated by `@`.
+
+The position is numbered from `0` and indicates which card to modify the node in after applying `source`.
+
+The format of the value is the same as the `data` parameter in the [landing.block.updatenodes](./landing-block-update-nodes.md) method.
+
+One object in the `values` array can contain multiple keys for different nodes and positions ||
+|#
+
+If an element of the `values` array is not an object, the method will skip it without error. For example, in one element of the array, you can change multiple cards at once:
+
+```json
+"values": [
+  {
+    ".landing-block-node-title@0": "First Card",
+    ".landing-block-node-title@1": "Card from Preset"
+  }
+]
+```
+For detailed information on value formats for different node types, refer to the article [landing.block.updatenodes](./landing-block-update-nodes.md) and the overview [Node Types](../node-types.md).
+
+## Code Examples
+
+{% include [Note on examples](../../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+      -H "Content-Type: application/json" \
+      -d '{
+        "lid": 311,
+        "block": 6058,
+        "data": {
+          ".landing-block-card": {
+            "source": [
+              {
+                "type": "card",
+                "value": 0
+              },
+              {
+                "type": "preset",
+                "value": "preset_code"
+              }
+            ],
+            "values": [
+              {
+                ".landing-block-node-title@0": "First Card",
+                ".landing-block-node-title@1": "Card from Preset"
+              }
+            ]
+          }
+        }
+      }' \
+      "https://**put.your-domain-here**/rest/**user_id**/**webhook_code**/landing.block.updateCards.json"
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+      -H "Content-Type: application/json" \
+      -d '{
+        "lid": 311,
+        "block": 6058,
+        "data": {
+          ".landing-block-card": {
+            "source": [
+              {
+                "type": "card",
+                "value": 0
+              },
+              {
+                "type": "preset",
+                "value": "preset_code"
+              }
+            ],
+            "values": [
+              {
+                ".landing-block-node-title@0": "First Card",
+                ".landing-block-node-title@1": "Card from Preset"
+              }
+            ]
+          }
+        },
+        "auth": "**put_access_token_here**"
+      }' \
+      "https://**put.your-domain-here**/rest/landing.block.updateCards.json"
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    try {
+      const response = await $b24.actions.v2.call.make<boolean>({
+        method: 'landing.block.updateCards',
+        params: {
+          lid: 311,
+          block: 6058,
+          data: {
+            '.landing-block-card': {
+              source: [
+                {
+                  type: 'card',
+                  value: 0,
+                },
+                {
+                  type: 'preset',
+                  value: 'preset_code',
+                },
+              ],
+              values: [
+                {
+                  '.landing-block-node-title@0': 'First card',
+                  '.landing-block-node-title@1': 'Card from preset',
+                },
+              ],
+            },
+          },
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Cards updated:', result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function updateBlockCards() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'landing.block.updateCards',
+            params: {
+              lid: 311,
+              block: 6058,
+              data: {
+                '.landing-block-card': {
+                  source: [
+                    {
+                      type: 'card',
+                      value: 0,
+                    },
+                    {
+                      type: 'preset',
+                      value: 'preset_code',
+                    },
+                  ],
+                  values: [
+                    {
+                      '.landing-block-node-title@0': 'First card',
+                      '.landing-block-node-title@1': 'Card from preset',
+                    },
+                  ],
+                },
+              },
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Cards updated:', result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', updateBlockCards)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'landing.block.updateCards',
+                [
+                    'lid' => 311,
+                    'block' => 6058,
+                    'data' => [
+                        '.landing-block-card' => [
+                            'source' => [
+                                [
+                                    'type' => 'card',
+                                    'value' => 0,
+                                ],
+                                [
+                                    'type' => 'preset',
+                                    'value' => 'preset_code',
+                                ],
+                            ],
+                            'values' => [
+                                [
+                                    '.landing-block-node-title@0' => 'First Card',
+                                    '.landing-block-node-title@1' => 'Card from Preset',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            );
+
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+
+        echo 'Success: ' . var_export($result, true);
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error updating block cards: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'landing.block.updateCards',
+        {
+            lid: 311,
+            block: 6058,
+            data: {
+                '.landing-block-card': {
+                    source: [
+                        {
+                            type: 'card',
+                            value: 0
+                        },
+                        {
+                            type: 'preset',
+                            value: 'preset_code'
+                        }
+                    ],
+                    values: [
+                        {
+                            '.landing-block-node-title@0': 'First Card',
+                            '.landing-block-node-title@1': 'Card from Preset'
+                        }
+                    ]
+                }
+            }
+        },
+        function(result)
+        {
+            if (result.error())
+            {
+                console.error(result.error());
+            }
+            else
+            {
+                console.info(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'landing.block.updateCards',
+        [
+            'lid' => 311,
+            'block' => 6058,
+            'data' => [
+                '.landing-block-card' => [
+                    'source' => [
+                        [
+                            'type' => 'card',
+                            'value' => 0,
+                        ],
+                        [
+                            'type' => 'preset',
+                            'value' => 'preset_code',
+                        ],
+                    ],
+                    'values' => [
+                        [
+                            '.landing-block-node-title@0' => 'First Card',
+                            '.landing-block-node-title@1' => 'Card from Preset',
+                        ],
+                    ],
+                ],
+            ],
+        ]
+    );
+
+    if (isset($result['error']))
+    {
+        echo 'Error: ' . $result['error_description'];
+    }
+    else
+    {
+        echo '<pre>';
+        print_r($result['result']);
+        echo '</pre>';
+    }
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+    "result": true,
+    "time": {
+        "start": 1774525085,
+        "finish": 1774525085.858169,
+        "duration": 0.8581690788269043,
+        "processing": 0,
+        "date_start": "2026-03-26T14:38:05+02:00",
+        "date_finish": "2026-03-26T14:38:05+02:00",
+        "operating_reset_at": 1774525685,
+        "operating": 0
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`boolean`](../../../data-types.md) | Result of the card update. Returns `true` on successful execution ||
+|| **time**
+[`time`](../../../data-types.md#time) | Information about the execution time of the request ||
+|#
+
+## Error Handling
+
+HTTP Status: **400**
+
+```json
+{
+    "error": "MISSING_PARAMS",
+    "error_description": "Not enough call parameters, missing: data"
+}
+```
+
+{% include notitle [error handling](../../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** ||
+|| `MISSING_PARAMS` | Required parameter `lid`, `block`, or `data` is missing ||
+|| `LANDING_NOT_EXIST` | Page with identifier `lid` not found or not accessible to the current user ||
+|| `BLOCK_NOT_FOUND` | Block with identifier `block` not found on page `lid` or not accessible in the draft of the page ||
+|| `ACCESS_DENIED` | User does not have permission to edit the site ||
+|| `INCORRECT_AFFECTED` | The server could not confirm that the changes were applied correctly. The error depends on server settings and is not related to the request parameters ||
+|#
+
+{% include [system errors](../../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./landing-block-clone-card.md)
+- [{#T}](./landing-block-remove-card.md)
+- [{#T}](./landing-block-update-nodes.md)
+- [{#T}](./landing-block-add-card.md)
+- [{#T}](./landing-block-get-manifest.md)

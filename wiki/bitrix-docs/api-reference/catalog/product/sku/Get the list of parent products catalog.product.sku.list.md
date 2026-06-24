@@ -1,0 +1,661 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Get the list of parent products catalog.product.sku.list"
+original_path: "api-reference/catalog/product/sku/catalog-product-sku-list.md"
+---
+
+# Get the list of parent products catalog.product.sku.list
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`catalog`](../../../scopes/permissions.md)
+>
+> Who can execute the method: administrator
+
+The method returns a list of parent products based on the filter.
+
+## Method Parameters
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **select**
+[`array`](../../../data-types.md) | 
+An array of fields to be selected (see the fields of the [catalog_product_sku](../../data-types.md#catalog_product_sku) object).
+
+Required fields: `id`, `iblockId`
+||
+|| **filter**
+[`object`](../../../data-types.md) | An object for filtering the selected parent products in the format `{"field_1": "value_1", ... "field_N": "value_N"}`.
+
+Possible values for `field` correspond to the fields of the [catalog_product_sku](../../data-types.md#catalog_product_sku) object. 
+
+Required fields: `iblockId`.
+
+An additional prefix can be set for the key to specify the filter behavior. Possible prefix values:
+- `>=` — greater than or equal to
+- `>` — greater than
+- `<=` — less than or equal to
+- `<` — less than
+- `%` — LIKE, substring search. The `%` character in the filter value does not need to be passed. The search looks for the substring in any position of the string
+- `=%` — LIKE, substring search. The `%` character needs to be passed in the value. Examples:
+    - `"mol%"` — searches for values starting with "mol"
+    - `"%mol"` — searches for values ending with "mol"
+    - `"%mol%"` — searches for values where "mol" can be in any position
+- `%=` — LIKE (similar to `=%`)
+- `!%` — NOT LIKE, substring search. The `%` character in the filter value does not need to be passed. The search goes from both sides
+- `!=%` — NOT LIKE, substring search. The `%` character needs to be passed in the value. Examples:
+    - `"mol%"` — searches for values not starting with "mol"
+    - `"%mol"` — searches for values not ending with "mol"
+    - `"%mol%"` — searches for values where the substring "mol" is not present in any position
+- `!%=` — NOT LIKE (similar to `!=%`)
+- `=` — equal, exact match (used by default). For IN search, multiple values can be passed as an array 
+- `!=` — not equal
+- `!` — not equal. For NOT IN search, multiple values can be passed as an array ||
+|| **order**
+[`object`](../../../data-types.md) | 
+An object for sorting the selected parent products in the format `{"field_1": "order_1", ... "field_N": "order_N"}`.
+
+Possible values for `field` correspond to the fields of the [catalog_product_sku](../../data-types.md#catalog_product_sku) object.
+
+Possible values for `order`:
+- `asc` — in ascending order
+- `desc` — in descending order
+||
+|| **start**
+[`integer`](../../../data-types.md) | This parameter is used to manage pagination.
+
+The page size of results is always static — 50 records.
+
+To select the second page of results, pass the value `50`. To select the third page of results — the value `100`, and so on.
+
+The formula for calculating the `start` parameter value:
+
+`start = (N-1) * 50`, where `N` — the number of the desired page
+||
+|#
+
+## Code Examples
+
+{% include [Footnote on examples](../../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"select":["id","iblockId","name","active","available","bundle","canBuyZero","code","createdBy","dateActiveFrom","dateActiveTo","dateCreate","detailPicture","detailText","detailTextType","height","iblockSectionId","length","measure","modifiedBy","previewPicture","previewText","previewTextType","purchasingCurrency","purchasingPrice","quantity","sort","subscribe","timestampX","type","vatId","vatIncluded","weight","width","xmlId","property258","property259"],"filter":{"iblockId":23,">id":10,"vatId":[1,2]},"order":{"id":"desc"}}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/catalog.product.sku.list
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"select":["id","iblockId","name","active","available","bundle","canBuyZero","code","createdBy","dateActiveFrom","dateActiveTo","dateCreate","detailPicture","detailText","detailTextType","height","iblockSectionId","length","measure","modifiedBy","previewPicture","previewText","previewTextType","purchasingCurrency","purchasingPrice","quantity","sort","subscribe","timestampX","type","vatId","vatIncluded","weight","width","xmlId","property258","property259"],"filter":{"iblockId":23,">id":10,"vatId":[1,2]},"order":{"id":"desc"},"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/catalog.product.sku.list
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame, ISODate } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    type SkuItem = {
+      id: number
+      iblockId: number
+      iblockSectionId: number | null
+      name: string
+      active: string
+      available: string
+      bundle: string
+      canBuyZero: string
+      code: string
+      createdBy: number
+      dateActiveFrom: ISODate | null
+      dateActiveTo: ISODate | null
+      dateCreate: ISODate | null
+      detailPicture: { id: string; url: string; urlMachine: string } | null
+      detailText: string | null
+      detailTextType: string
+      height: number | null
+      length: number | null
+      measure: number | null
+      modifiedBy: number
+      previewPicture: { id: string; url: string; urlMachine: string } | null
+      previewText: string | null
+      previewTextType: string
+      purchasingCurrency: string | null
+      purchasingPrice: string | null
+      quantity: number | null
+      sort: number
+      subscribe: string
+      timestampX: ISODate | null
+      type: number
+      vatId: number | null
+      vatIncluded: string
+      weight: number | null
+      width: number | null
+      xmlId: string
+      property258: { value: string; valueId: string } | null
+      property259: Array<{ value: string; valueId: string }>
+    }
+
+    // Shape of the payload returned in result (match the "response handling" section of the page)
+    type SkuListResult = {
+      units: SkuItem[]
+    }
+
+    try {
+      // catalog.product.sku.list returns a single page (max 50 records). For the whole result set
+      // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+      // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+      // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+      // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+      const response = await $b24.actions.v2.call.make<SkuListResult>({
+        method: 'catalog.product.sku.list',
+        params: {
+          select: [
+            'id',
+            'iblockId',
+            'name',
+            'active',
+            'available',
+            'bundle',
+            'canBuyZero',
+            'code',
+            'createdBy',
+            'dateActiveFrom',
+            'dateActiveTo',
+            'dateCreate',
+            'detailPicture',
+            'detailText',
+            'detailTextType',
+            'height',
+            'iblockSectionId',
+            'length',
+            'measure',
+            'modifiedBy',
+            'previewPicture',
+            'previewText',
+            'previewTextType',
+            'purchasingCurrency',
+            'purchasingPrice',
+            'quantity',
+            'sort',
+            'subscribe',
+            'timestampX',
+            'type',
+            'vatId',
+            'vatIncluded',
+            'weight',
+            'width',
+            'xmlId',
+            'property258',
+            'property259',
+          ],
+          filter: {
+            iblockId: 23,
+            '>id': 10,
+            vatId: [1, 2],
+          },
+          order: {
+            id: 'desc',
+          },
+          start: 0,
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('SKUs on this page:', result.units.length, result.units)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function listProductSkus() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          // catalog.product.sku.list returns a single page (max 50 records). For the whole result set
+          // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+          // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+          // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+          // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+          const response = await $b24.actions.v2.call.make({
+            method: 'catalog.product.sku.list',
+            params: {
+              select: [
+                'id',
+                'iblockId',
+                'name',
+                'active',
+                'available',
+                'bundle',
+                'canBuyZero',
+                'code',
+                'createdBy',
+                'dateActiveFrom',
+                'dateActiveTo',
+                'dateCreate',
+                'detailPicture',
+                'detailText',
+                'detailTextType',
+                'height',
+                'iblockSectionId',
+                'length',
+                'measure',
+                'modifiedBy',
+                'previewPicture',
+                'previewText',
+                'previewTextType',
+                'purchasingCurrency',
+                'purchasingPrice',
+                'quantity',
+                'sort',
+                'subscribe',
+                'timestampX',
+                'type',
+                'vatId',
+                'vatIncluded',
+                'weight',
+                'width',
+                'xmlId',
+                'property258',
+                'property259',
+              ],
+              filter: {
+                iblockId: 23,
+                '>id': 10,
+                vatId: [1, 2],
+              },
+              order: {
+                id: 'desc',
+              },
+              start: 0,
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('SKUs on this page:', result.units.length, result.units)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', listProductSkus)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'catalog.product.sku.list',
+                [
+                    'select' => [
+                        'id',
+                        'iblockId',
+                        'name',
+                        'active',
+                        'available',
+                        'bundle',
+                        'canBuyZero',
+                        'code',
+                        'createdBy',
+                        'dateActiveFrom',
+                        'dateActiveTo',
+                        'dateCreate',
+                        'detailPicture',
+                        'detailText',
+                        'detailTextType',
+                        'height',
+                        'iblockSectionId',
+                        'length',
+                        'measure',
+                        'modifiedBy',
+                        'previewPicture',
+                        'previewText',
+                        'previewTextType',
+                        'purchasingCurrency',
+                        'purchasingPrice',
+                        'quantity',
+                        'sort',
+                        'subscribe',
+                        'timestampX',
+                        'type',
+                        'vatId',
+                        'vatIncluded',
+                        'weight',
+                        'width',
+                        'xmlId',
+                        'property258',
+                        'property259',
+                    ],
+                    'filter' => [
+                        'iblockId' => 23,
+                        '>id'      => 10,
+                        'vatId'    => [1, 2],
+                    ],
+                    'order'  => [
+                        'id' => 'desc',
+                    ],
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        echo 'Success: ' . print_r($result, true);
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error fetching product SKUs: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        "catalog.product.sku.list", {
+            "select": [
+                "id",
+                "iblockId",
+                "name",
+                "active",
+                "available",
+                "bundle",
+                "canBuyZero",
+                "code",
+                "createdBy",
+                "dateActiveFrom",
+                "dateActiveTo",
+                "dateCreate",
+                "detailPicture",
+                "detailText",
+                "detailTextType",
+                "height",
+                "iblockSectionId",
+                "length",
+                "measure",
+                "modifiedBy",
+                "previewPicture",
+                "previewText",
+                "previewTextType",
+                "purchasingCurrency",
+                "purchasingPrice",
+                "quantity",
+                "sort",
+                "subscribe",
+                "timestampX",
+                "type",
+                "vatId",
+                "vatIncluded",
+                "weight",
+                "width",
+                "xmlId",
+                "property258",
+                "property259",
+            ],
+            "filter": {
+                "iblockId": 23,
+                ">id": 10,
+                "vatId": [1, 2],
+            },
+            "order": {
+                "id": "desc",
+            }
+        },
+        function(result) {
+            if (result.error()) {
+                console.error(result.error());
+            } else {
+                console.info(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'catalog.product.sku.list',
+        [
+            'select' => [
+                "id",
+                "iblockId",
+                "name",
+                "active",
+                "available",
+                "bundle",
+                "canBuyZero",
+                "code",
+                "createdBy",
+                "dateActiveFrom",
+                "dateActiveTo",
+                "dateCreate",
+                "detailPicture",
+                "detailText",
+                "detailTextType",
+                "height",
+                "iblockSectionId",
+                "length",
+                "measure",
+                "modifiedBy",
+                "previewPicture",
+                "previewText",
+                "previewTextType",
+                "purchasingCurrency",
+                "purchasingPrice",
+                "quantity",
+                "sort",
+                "subscribe",
+                "timestampX",
+                "type",
+                "vatId",
+                "vatIncluded",
+                "weight",
+                "width",
+                "xmlId",
+                "property258",
+                "property259",
+            ],
+            'filter' => [
+                "iblockId" => 23,
+                ">id" => 10,
+                "vatId" => [1, 2],
+            ],
+            'order' => [
+                "id" => "desc",
+            ]
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP status: **200**
+
+```json
+{
+    "result": {
+        "units": [
+            {
+                "active": "Y",
+                "available": "N",
+                "bundle": "N",
+                "canBuyZero": "N",
+                "code": "product_sku",
+                "createdBy": 1,
+                "dateActiveFrom": "2024-05-28T10:00:00+02:00",
+                "dateActiveTo": "2024-05-29T10:00:00+02:00",
+                "dateCreate": "2024-05-27T10:00:00+02:00",
+                "detailPicture": {
+                    "id": "6546",
+                    "url": "\/rest\/catalog.product.download?fields%5BfieldName%5D=detailPicture\u0026fields%5BfileId%5D=6546\u0026fields%5BproductId%5D=1289",
+                    "urlMachine": "\/rest\/catalog.product.download?fields%5BfieldName%5D=detailPicture\u0026fields%5BfileId%5D=6546\u0026fields%5BproductId%5D=1289"
+                },
+                "detailText": null,
+                "detailTextType": "text",
+                "height": null,
+                "iblockId": 23,
+                "iblockSectionId": 47,
+                "id": 1289,
+                "length": null,
+                "measure": null,
+                "modifiedBy": 1,
+                "name": "Parent Product",
+                "previewPicture": {
+                    "id": "6545",
+                    "url": "\/rest\/catalog.product.download?fields%5BfieldName%5D=previewPicture\u0026fields%5BfileId%5D=6545\u0026fields%5BproductId%5D=1289",
+                    "urlMachine": "\/rest\/catalog.product.download?fields%5BfieldName%5D=previewPicture\u0026fields%5BfileId%5D=6545\u0026fields%5BproductId%5D=1289"
+                },
+                "previewText": null,
+                "previewTextType": "text",
+                "property258": {
+                    "value": "test",
+                    "valueId": "9877"
+                },
+                "property259": [
+                    {
+                        "value": "test1",
+                        "valueId": "9878"
+                    },
+                    {
+                        "value": "test2",
+                        "valueId": "9879"
+                    }
+                ],
+                "purchasingCurrency": null,
+                "purchasingPrice": null,
+                "quantity": null,
+                "sort": 100,
+                "subscribe": "Y",
+                "timestampX": "2024-06-17T14:30:33+02:00",
+                "type": 6,
+                "vatId": null,
+                "vatIncluded": "N",
+                "weight": null,
+                "width": null,
+                "xmlId": "1289"
+            }
+        ]
+    },
+    "total": 1,
+    "time": {
+        "start": 1718631434.15105,
+        "finish": 1718631434.921837,
+        "duration": 0.7707870006561279,
+        "processing": 0.3575417995452881,
+        "date_start": "2024-06-17T16:37:14+02:00",
+        "date_finish": "2024-06-17T16:37:14+02:00"
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`object`](../../../data-types.md) | The root element of the response ||
+|| **units**
+[`catalog_product_sku[]`](../../data-types.md#catalog_product_sku) | An array of objects with information about the selected parent products ||
+|| **total**
+[`integer`](../../../data-types.md) | The total number of records found ||
+|| **time**
+[`time`](../../../data-types.md) | Information about the execution time of the request ||
+|#
+
+## Error Handling
+
+HTTP status: **400**
+
+```json
+{
+    "error":200040300010,
+    "error_description":"Access denied"
+}
+```
+
+{% include notitle [error handling](../../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** ||
+|| `200040300010` | Insufficient rights to read the trade catalog
+|| 
+|| `0` | Fields `id`, `iblockId` not specified in the selection fields
+|| 
+|| `0` | Field `iblockId` not specified in the filter
+|| 
+|| `0` | Other errors (e.g., fatal errors)
+|| 
+|#
+
+{% include [system errors](../../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./catalog-product-sku-add.md)
+- [{#T}](./catalog-product-sku-update.md)
+- [{#T}](./catalog-product-sku-get.md)
+- [{#T}](./catalog-product-sku-download.md)
+- [{#T}](./catalog-product-sku-delete.md)
+- [{#T}](./catalog-product-sku-get-fields-by-filter.md)
+

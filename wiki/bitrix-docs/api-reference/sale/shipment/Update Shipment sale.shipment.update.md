@@ -1,0 +1,463 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Update Shipment sale.shipment.update"
+original_path: "api-reference/sale/shipment/sale-shipment-update.md"
+---
+
+# Update Shipment sale.shipment.update
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`sale`](../../scopes/permissions.md)
+>
+> Who can execute the method: administrator
+
+This method updates a shipment.
+
+## Method Parameters
+
+{% include [Note on required parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id***
+[`sale_order_shipment.id`](../data-types.md) | Shipment identifier ||
+|| **fields***
+[`object`](../../data-types.md) | Field values for updating the shipment ||
+|#
+
+### Parameter fields
+
+General parameters relevant for shipment properties of any type:
+
+{% include [Note on required parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **allowDelivery***
+[`string`](../../data-types.md) | Indicator of delivery permission.
+Possible values:
+- `Y` – yes (delivery allowed)
+- `N` – no (delivery not allowed) ||
+|| **deducted***
+[`string`](../../data-types.md) | Indicator of whether the shipment has been shipped.
+Possible values:
+- `Y` – yes (shipped)
+- `N` – no (not shipped) ||
+|| **deliveryId***
+[`sale_delivery_service`](../data-types.md) | Delivery service identifier ||
+|| **statusId**
+[`sale_status`](../../data-types.md) | Delivery status identifier.
+
+If not provided, the status DN is used (see the default status table in the documentation for [`sale.status.*`](../status/index.md)) ||
+|| **deliveryDocDate**
+[`datetime`](../../data-types.md) | Shipment document date ||
+|| **deliveryDocNum**
+[`string`](../../data-types.md) | Shipment document number ||
+|| **trackingNumber**
+[`string`](../../data-types.md) | Shipment identifier ||
+|| **basePriceDelivery**
+[`double`](../../data-types.md) | Base delivery cost (without discounts / surcharges).
+
+If provided, it is also used for setting the `priceDelivery` value. The provided `priceDelivery` value is ignored in this case.
+
+If neither basePriceDelivery nor priceDelivery is provided, both prices are set to 0 ||
+|| **priceDelivery**
+[`double`](../../data-types.md) | Delivery cost.
+
+If provided and basePriceDelivery is not set, it is also used for setting the basePriceDelivery value.
+
+If neither basePriceDelivery nor priceDelivery is provided, both prices are set to 0 ||
+|| **comments**
+[`string`](../../data-types.md) | Manager's comment ||
+|| **companyId**
+[`integer`](../../data-types.md) | Company identifier from the "Online Store" module.
+
+Currently not used ||
+|| **responsibleId**
+[`user`](../../data-types.md) | Identifier of the user responsible for the shipment ||
+|| **xmlId**
+[`string`](../../data-types.md) | External shipment identifier.
+
+Can be used for synchronizing the shipment with an external system ||
+|#
+|#
+
+## Code Examples
+
+{% include [Note on examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```http
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id":2452,"fields":{"allowDelivery":"N","deducted":"N","deliveryId":3,"statusId":"DD","deliveryDocDate":"2024-02-13T15:05:49","deliveryDocNum":"MyDocumentNumber","trackingNumber":"MyTrackingNumber","basePriceDelivery":1999.99,"comments":"My new comment for manager","responsibleId":1,"xmlId":"myNewXmlId"}}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/sale.shipment.update
+    ```
+
+- cURL (OAuth)
+
+    ```http
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id":2452,"fields":{"allowDelivery":"N","deducted":"N","deliveryId":3,"statusId":"DD","deliveryDocDate":"2024-02-13T15:05:49","deliveryDocNum":"MyDocumentNumber","trackingNumber":"MyTrackingNumber","basePriceDelivery":1999.99,"comments":"My new comment for manager","responsibleId":1,"xmlId":"myNewXmlId"},"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/sale.shipment.update
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame, ISODate } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of the payload returned in result (match the "response handling" section of the page)
+    type ShipmentUpdateResult = {
+      shipment: {
+        id: number
+        orderId: number
+        accountNumber: string
+        deliveryId: number
+        deliveryName: string
+        statusId: string
+        allowDelivery: string
+        deducted: string
+        canceled: string
+        marked: string
+        priceDelivery: number
+        basePriceDelivery: number
+        discountPrice: number
+        currency: string
+        comments: string
+        trackingNumber: string
+        deliveryDocNum: string
+        deliveryDocDate: ISODate | null
+        xmlId: string
+        companyId: number | null
+        responsibleId: number | null
+        dateInsert: ISODate | null
+        dateAllowDelivery: ISODate | null
+        dateDeducted: ISODate | null
+        shipmentItems: unknown[]
+      }
+    }
+
+    try {
+      const response = await $b24.actions.v2.call.make<ShipmentUpdateResult>({
+        method: 'sale.shipment.update',
+        params: {
+          id: 2452,
+          fields: {
+            allowDelivery: 'N',
+            deducted: 'N',
+            deliveryId: 3,
+            statusId: 'DD',
+            deliveryDocDate: '2024-02-13T15:05:49',
+            deliveryDocNum: 'MyDocumentNumber',
+            trackingNumber: 'MyTrackingNumber',
+            basePriceDelivery: 1999.99,
+            comments: 'My new comment for manager',
+            responsibleId: 1,
+            xmlId: 'myNewXmlId',
+          },
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Updated shipment id:', result.shipment.id, 'status:', result.shipment.statusId)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function updateShipment() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'sale.shipment.update',
+            params: {
+              id: 2452,
+              fields: {
+                allowDelivery: 'N',
+                deducted: 'N',
+                deliveryId: 3,
+                statusId: 'DD',
+                deliveryDocDate: '2024-02-13T15:05:49',
+                deliveryDocNum: 'MyDocumentNumber',
+                trackingNumber: 'MyTrackingNumber',
+                basePriceDelivery: 1999.99,
+                comments: 'My new comment for manager',
+                responsibleId: 1,
+                xmlId: 'myNewXmlId',
+              },
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Updated shipment id:', result.shipment.id, 'status:', result.shipment.statusId)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', updateShipment)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'sale.shipment.update',
+                [
+                    'id' => 2452,
+                    'fields' => [
+                        'allowDelivery'      => 'N',
+                        'deducted'           => 'N',
+                        'deliveryId'         => 3,
+                        'statusId'           => 'DD',
+                        'deliveryDocDate'    => '2024-02-13T15:05:49',
+                        'deliveryDocNum'     => 'MyDocumentNumber',
+                        'trackingNumber'     => 'MyTrackingNumber',
+                        'basePriceDelivery'  => 1999.99,
+                        'comments'           => 'My new comment for manager',
+                        'responsibleId'      => 1,
+                        'xmlId'              => 'myNewXmlId',
+                    ],
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        echo 'Success: ' . print_r($result, true);
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error updating shipment: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'sale.shipment.update', {
+            id: 2452,
+            fields: {
+                allowDelivery: 'N',
+                deducted: 'N',
+                deliveryId: 3,
+                statusId: 'DD',
+                deliveryDocDate: '2024-02-13T15:05:49',
+                deliveryDocNum: 'MyDocumentNumber',
+                trackingNumber: 'MyTrackingNumber',
+                basePriceDelivery: 1999.99,
+                comments: 'My new comment for manager',
+                responsibleId: 1,
+                xmlId: 'myNewXmlId',
+            }
+        },
+        function(result) {
+            if (result.error())
+                console.error(result.error().ex);
+            else
+                console.log(result.data());
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'sale.shipment.update',
+        [
+            'id' => 2452,
+            'fields' => [
+                'allowDelivery' => 'N',
+                'deducted' => 'N',
+                'deliveryId' => 3,
+                'statusId' => 'DD',
+                'deliveryDocDate' => '2024-02-13T15:05:49',
+                'deliveryDocNum' => 'MyDocumentNumber',
+                'trackingNumber' => 'MyTrackingNumber',
+                'basePriceDelivery' => 1999.99,
+                'comments' => 'My new comment for manager',
+                'responsibleId' => 1,
+                'xmlId' => 'myNewXmlId',
+            ]
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Successful Response
+
+HTTP status: **200**
+
+```json
+{
+   "result":{
+      "shipment":{
+         "accountNumber":"2068\/19",
+         "allowDelivery":"N",
+         "basePriceDelivery":1999.99,
+         "canceled":"N",
+         "comments":"My new comment for manager",
+         "companyId":null,
+         "currency":"USD",
+         "customPriceDelivery":"N",
+         "dateAllowDelivery":"2024-04-12T10:01:23+02:00",
+         "dateCanceled":null,
+         "dateDeducted":"2024-04-12T10:01:23+02:00",
+         "dateInsert":"2024-04-11T14:17:52+02:00",
+         "dateMarked":null,
+         "dateResponsibleId":"2024-04-12T10:01:23+02:00",
+         "deducted":"N",
+         "deliveryDocDate":"2024-02-13T14:05:49+02:00",
+         "deliveryDocNum":"MyDocumentNumber",
+         "deliveryId":3,
+         "deliveryName":"Pickup",
+         "deliveryXmlId":"",
+         "discountPrice":0,
+         "empAllowDeliveryId":1,
+         "empCanceledId":null,
+         "empDeductedId":1,
+         "empMarkedId":null,
+         "empResponsibleId":1,
+         "externalDelivery":"N",
+         "id":2452,
+         "id1c":"",
+         "marked":"N",
+         "orderId":2068,
+         "priceDelivery":1999.99,
+         "reasonMarked":"",
+         "reasonUndoDeducted":"",
+         "responsibleId":1,
+         "shipmentItems":[
+            
+         ],
+         "statusId":"DD",
+         "statusXmlId":"",
+         "system":"N",
+         "trackingDescription":"",
+         "trackingLastCheck":"",
+         "trackingNumber":"MyTrackingNumber",
+         "trackingStatus":"",
+         "updated1c":"N",
+         "version1c":"",
+         "xmlId":"myNewXmlId"
+      }
+   },
+   "time":{
+      "start":1712928678.417617,
+      "finish":1712928679.68092,
+      "duration":1.2633028030395508,
+      "processing":1.0808379650115967,
+      "date_start":"2024-04-12T16:31:18+02:00",
+      "date_finish":"2024-04-12T16:31:19+02:00"
+   }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`object`](../../data-types.md) | Root element of the response ||
+|| **shipment**
+[`sale_order_shipment`](../data-types.md) | Object with information about the updated shipment ||
+|| **time**
+[`time`](../../data-types.md) | Information about the request execution time ||
+|#
+
+## Error Handling
+
+HTTP status: **400**
+
+```json
+{
+   "error":0,
+   "error_description":"Required fields: name"
+}
+```
+
+{% include notitle [error handling](../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** ||
+|| `201140400001` | Shipment not found ||
+|| `200040300020` | Insufficient permissions to update the shipment ||
+|| `BX_INVALID_VALUE` | Value of one of the fields did not pass validation before saving ||
+|| `100` | Parameter `id` not specified ||
+|| `100` | Parameter `fields` not specified or empty ||
+|| `0` | Required fields of the `fields` structure not provided ||
+|| `0` | Other errors (e.g., fatal errors) ||
+|#
+
+{% include notitle [system errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./index.md)
+- [{#T}](./sale-shipment-add.md)
+- [{#T}](./sale-shipment-get.md)
+- [{#T}](./sale-shipment-list.md)
+- [{#T}](./sale-shipment-delete.md)
+- [{#T}](./sale-shipment-get-fields.md)

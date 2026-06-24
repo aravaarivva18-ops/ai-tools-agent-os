@@ -1,0 +1,77 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "MESSAGE Block"
+original_path: "api-reference/chat-bots/chat-bots-v2/imbot.v2/messages/attachments/block-collections/text.md"
+---
+
+# MESSAGE Block
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+The `MESSAGE` block displays the text portion of the attachment.
+
+![MESSAGE Block](./_images/text.png){width=420}
+
+## Block Parameters
+
+#| 
+|| **Name** 
+`type` | **Description** ||
+|| **MESSAGE*** 
+[`string`](../../../../../../data-types.md) | Text of the block. Supports BB codes ||
+|#
+
+## Supported BB Codes
+
+#| 
+|| **Code** | **Purpose** ||
+|| `USER` | Mention a user with a link to their profile in the chat ||
+|| `CHAT` | Link to the chat ||
+|| `SEND` | Clickable action "send text to chat" ||
+|| `PUT` | Clickable action "insert text into input field" ||
+|| `CALL` | Clickable action for making a call ||
+|| `BR` | Line break ||
+|| `B` | Bold text ||
+|| `U` | Underlined text ||
+|| `I` | Italic text ||
+|| `S` | Strikethrough text ||
+|| `URL` | Link ||
+|#
+
+## Example
+
+{% include [Example Note](../../../../../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- JS
+
+    ```js
+    {
+        MESSAGE: 'The API will be available in the update [B]im 24.0.0[/B]'
+    }
+    ```
+
+- PHP
+
+    ```php
+    [
+        'MESSAGE' => 'The API will be available in the update [B]im 24.0.0[/B]'
+    ]
+    ```
+
+{% endlist %}
+
+## Continue Learning
+
+- [API imbot.v2 Change Log](../../../../change-log.md)
+- [{#T}](./index.md)
+- [{#T}](./delimiter.md)
+- [{#T}](./grid.md)

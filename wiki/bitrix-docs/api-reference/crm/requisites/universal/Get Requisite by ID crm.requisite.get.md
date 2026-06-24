@@ -1,0 +1,361 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Get Requisite by ID crm.requisite.get"
+original_path: "api-reference/crm/requisites/universal/crm-requisite-get.md"
+---
+
+# Get Requisite by ID crm.requisite.get
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`crm`](../../../scopes/permissions.md)
+>
+> Who can execute the method: any user
+
+This method retrieves the requisite by its identifier `id`.
+
+## Method Parameters
+
+{% include [Note on required parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id***
+[`integer`](../../../data-types.md) | Identifier of the requisite.
+
+The identifier can be obtained using the [crm.requisite.list](./crm-requisite-list.md) method ||
+|#
+
+## Code Examples
+
+{% include [Note on examples](../../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id":27}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/crm.requisite.get
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"id":27,"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/crm.requisite.get
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame, ISODate } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of the payload returned in result (match the "response handling" section of the page)
+    type RequisiteGetResult = {
+      ID: string
+      ENTITY_TYPE_ID: string
+      ENTITY_ID: string
+      PRESET_ID: string
+      DATE_CREATE: ISODate | null
+      DATE_MODIFY: ISODate | null
+      CREATED_BY_ID: string
+      MODIFY_BY_ID: string | null
+      NAME: string
+      CODE: string | null
+      XML_ID: string | null
+      ORIGINATOR_ID: string | null
+      ACTIVE: string
+      ADDRESS_ONLY: string
+      SORT: string
+      RQ_COMPANY_NAME: string | null
+      RQ_COMPANY_FULL_NAME: string | null
+      RQ_COMPANY_REG_DATE: string | null
+      RQ_DIRECTOR: string | null
+      RQ_INN: string | null
+      RQ_KPP: string | null
+      RQ_OGRN: string | null
+      RQ_VAT_PAYER: string | null
+    }
+
+    try {
+      const response = await $b24.actions.v2.call.make<RequisiteGetResult>({
+        method: 'crm.requisite.get',
+        params: {
+          id: 27,
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info(result.ID, result.NAME, result.ENTITY_TYPE_ID)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function getRequisite() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'crm.requisite.get',
+            params: {
+              id: 27,
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info(result.ID, result.NAME, result.ENTITY_TYPE_ID)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', getRequisite)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'crm.requisite.get',
+                [
+                    'id' => 27
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        if ($result->error()) {
+            error_log($result->error());
+        } else {
+            echo 'Success: ' . print_r($result->data(), true);
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error getting requisite: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        "crm.requisite.get",
+        {
+            id: 27
+        },
+        function(result)
+        {
+            if(result.error())
+                console.error(result.error());
+            else
+                console.dir(result.data());
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'crm.requisite.get',
+        [
+            'id' => 27
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Successful Response
+
+HTTP Status: **200**
+
+```json
+{
+    "result": {
+        "ID": "27",
+        "ENTITY_TYPE_ID": "4",
+        "ENTITY_ID": "1",
+        "PRESET_ID": "1",
+        "DATE_CREATE": "2024-05-29T18:05:49+02:00",
+        "DATE_MODIFY": "",
+        "CREATED_BY_ID": "1",
+        "MODIFY_BY_ID": null,
+        "NAME": "Organization",
+        "CODE": null,
+        "XML_ID": "5e4641fd-1dd9-11e6-b2f2-005056c00008",
+        "ORIGINATOR_ID": null,
+        "ACTIVE": "Y",
+        "ADDRESS_ONLY": "N",
+        "SORT": "500",
+        "RQ_NAME": null,
+        "RQ_FIRST_NAME": null,
+        "RQ_LAST_NAME": null,
+        "RQ_SECOND_NAME": null,
+        "RQ_COMPANY_ID": null,
+        "RQ_COMPANY_NAME": "Ltd. \"QuickBooks and other similar platforms\"",
+        "RQ_COMPANY_FULL_NAME": "LIMITED LIABILITY COMPANY \"QuickBooks and other similar platforms\"",
+        "RQ_COMPANY_REG_DATE": "06.04.2007",
+        "RQ_DIRECTOR": "RYZHIKOV SERGEY VLADIMIROVICH",
+        "RQ_ACCOUNTANT": null,
+        "RQ_CEO_NAME": null,
+        "RQ_CEO_WORK_POS": null,
+        "RQ_CONTACT": null,
+        "RQ_EMAIL": null,
+        "RQ_PHONE": null,
+        "RQ_FAX": null,
+        "RQ_IDENT_TYPE": null,
+        "RQ_IDENT_DOC": null,
+        "RQ_IDENT_DOC_SER": null,
+        "RQ_IDENT_DOC_NUM": null,
+        "RQ_IDENT_DOC_PERS_NUM": null,
+        "RQ_IDENT_DOC_DATE": null,
+        "RQ_IDENT_DOC_ISSUED_BY": null,
+        "RQ_IDENT_DOC_DEP_CODE": null,
+        "RQ_INN": "7717586110",
+        "RQ_KPP": "770501001",
+        "RQ_USRLE": null,
+        "RQ_IFNS": null,
+        "RQ_OGRN": "5077746476209",
+        "RQ_OGRNIP": null,
+        "RQ_OKPO": null,
+        "RQ_OKTMO": null,
+        "RQ_OKVED": null,
+        "RQ_EDRPOU": null,
+        "RQ_DRFO": null,
+        "RQ_KBE": null,
+        "RQ_IIN": null,
+        "RQ_BIN": null,
+        "RQ_ST_CERT_SER": null,
+        "RQ_ST_CERT_NUM": null,
+        "RQ_ST_CERT_DATE": null,
+        "RQ_VAT_PAYER": "N",
+        "RQ_VAT_ID": null,
+        "RQ_VAT_CERT_SER": null,
+        "RQ_VAT_CERT_NUM": null,
+        "RQ_VAT_CERT_DATE": null,
+        "RQ_RESIDENCE_COUNTRY": null,
+        "RQ_BASE_DOC": null,
+        "RQ_REGON": null,
+        "RQ_KRS": null,
+        "RQ_PESEL": null,
+        "RQ_LEGAL_FORM": null,
+        "RQ_SIRET": null,
+        "RQ_SIREN": null,
+        "RQ_CAPITAL": null,
+        "RQ_RCS": null,
+        "RQ_CNPJ": null,
+        "RQ_STATE_REG": null,
+        "RQ_MNPL_REG": null,
+        "RQ_CPF": null
+    },
+    "time": {
+        "start": 1717078089.78188,
+        "finish": 1717078090.270494,
+        "duration": 0.4886140823364258,
+        "processing": 0.09770989418029785,
+        "date_start": "2024-05-30T16:08:09+02:00",
+        "date_finish": "2024-05-30T16:08:10+02:00",
+        "operating": 0
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+`Object`| An object containing the values of [requisite fields](./index.md#fields) ||
+|| **time**
+[`time`](../../../data-types.md) | Information about the execution time of the request ||
+|#
+
+## Error Response
+
+HTTP Status: **400**
+
+```json
+{
+    "error": "",
+    "error_description": "The Requisite with ID '27' is not found"
+}
+```
+
+{% include notitle [error handling](../../../../_includes/error-info.md) %}
+
+### Possible Errors
+
+#|  
+|| **Code** | **Error Text** | **Description** ||
+|| Empty string | The Requisite with ID '27' is not found | The requisite with the specified identifier was not found ||
+|| Empty string | Access denied. | Insufficient access permissions to retrieve the requisite ||
+|#
+
+{% include [system errors](../../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./index.md)
+- [{#T}](./crm-requisite-add.md)
+- [{#T}](./crm-requisite-update.md)
+- [{#T}](./crm-requisite-list.md)
+- [{#T}](./crm-requisite-delete.md)
+- [{#T}](./crm-requisite-fields.md)

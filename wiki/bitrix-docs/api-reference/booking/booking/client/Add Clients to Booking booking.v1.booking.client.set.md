@@ -1,0 +1,352 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Add Clients to Booking booking.v1.booking.client.set"
+original_path: "api-reference/booking/booking/client/booking-v1-booking-client-set.md"
+---
+
+# Add Clients to Booking booking.v1.booking.client.set
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`booking`](../../../scopes/permissions.md)
+>
+> Who can execute the method: any user
+
+The method `booking.v1.booking.client.set` sets clients for the specified booking.
+
+## Method Parameters
+
+{% include [Parameter Notes](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **bookingId***
+[`integer`](../../../data-types.md) | Booking identifier.
+Can be obtained using the methods [booking.v1.booking.add](../booking-v1-booking-add.md) and [booking.v1.booking.list](../booking-v1-booking-list.md)  ||
+|| **clients***
+[`array`](../../../data-types.md) | An array of objects containing information about clients [(detailed description)](#clients) ||
+|#
+
+### Parameter clients {#clients}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id***
+[`integer`](../../../data-types.md) | Client identifier, can be obtained using the method [crm.item.list](../../../crm/universal/crm-item-list.md) for contacts and companies ||
+|| **type***
+[`object`](../../../data-types.md) | Client type in the format `{"module": "crm", "code": "CONTACT"}`.
+Possible values for `code`:
+- `CONTACT` — [CRM contact](../../../crm/contacts/index.md)
+- `COMPANY` — [CRM company](../../../crm/companies/index.md)
+  
+The object structure is returned by the method [booking.v1.clienttype.list](../../booking-v1-clienttype-list.md) ||
+|#
+
+## Code Examples
+
+{% include [Example Notes](../../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"bookingId":14,"clients":[{"id":1,"type":{"module":"crm","code":"CONTACT"}},{"id":2,"type":{"module":"crm","code":"CONTACT"}}],"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/booking.v1.booking.client.set
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"bookingId":14,"clients":[{"id":1,"type":{"module":"crm","code":"CONTACT"}},{"id":2,"type":{"module":"crm","code":"CONTACT"}}]}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/booking.v1.booking.client.set
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    try {
+      const response = await $b24.actions.v2.call.make<boolean>({
+        method: 'booking.v1.booking.client.set',
+        params: {
+          bookingId: 14,
+          clients: [
+            {
+              id: 1,
+              type: {
+                module: 'crm',
+                code: 'CONTACT',
+              },
+            },
+            {
+              id: 2,
+              type: {
+                module: 'crm',
+                code: 'CONTACT',
+              },
+            },
+          ],
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Clients set successfully:', result)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function setBookingClients() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'booking.v1.booking.client.set',
+            params: {
+              bookingId: 14,
+              clients: [
+                {
+                  id: 1,
+                  type: {
+                    module: 'crm',
+                    code: 'CONTACT',
+                  },
+                },
+                {
+                  id: 2,
+                  type: {
+                    module: 'crm',
+                    code: 'CONTACT',
+                  },
+                },
+              ],
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Clients set successfully:', result)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', setBookingClients)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'booking.v1.booking.client.set',
+                [
+                    'bookingId' => 14,
+                    'clients'   => [
+                        [
+                            'id'   => 1,
+                            'type' => [
+                                'module' => 'crm',
+                                'code'   => 'CONTACT',
+                            ],
+                        ],
+                        [
+                            'id'   => 2,
+                            'type' => [
+                                'module' => 'crm',
+                                'code'   => 'CONTACT',
+                            ],
+                        ],
+                    ],
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        if ($result->error()) {
+            error_log($result->error());
+            echo 'Error: ' . $result->error();
+        } else {
+            echo 'Success: ' . print_r($result->data(), true);
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error setting booking client: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        "booking.v1.booking.client.set",
+        {
+            bookingId: 14,
+            clients: [
+                {
+                    id: 1,
+                    type: {
+                        module: "crm",
+                        code: "CONTACT"
+                    }
+                },
+                {
+                    id: 2,
+                    type: {
+                        module: "crm",
+                        code: "CONTACT"
+                    }
+                }
+            ]
+        },
+        result => {
+            if (result.error())
+                console.error(result.error());
+            else
+                console.dir(result.data());
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'booking.v1.booking.client.set',
+        [
+            'bookingId' => 14,
+            'clients' => [
+                [
+                    'id' => 1,
+                    'type' => [
+                        'module' => 'crm',
+                        'code' => 'CONTACT'
+                    ]
+                },
+                [
+                    'id' => 2,
+                    'type' => [
+                        'module' => 'crm',
+                        'code' => 'CONTACT'
+                    ]
+                }
+            ]
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+    "result": true,
+    "time": {
+        "start": 1724068028.331234,
+        "finish": 1724068028.726591,
+        "duration": 0.3953571319580078,
+        "processing": 0.13033390045166016,
+        "date_start": "2025-01-21T13:47:08+02:00",
+        "date_finish": "2025-01-21T13:47:08+02:00",
+        "operating": 0
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`boolean`](../../../data-types.md) | Root element of the response, contains `true` in case of success ||
+|| **time**
+[`time`](../../../data-types.md#time) | Information about the execution time of the request ||
+|#
+
+## Error Handling
+
+HTTP Status: **400**
+
+```json
+{
+    "error": 1021,
+    "error_description": "Booking not found"
+}
+```
+
+{% include notitle [error handling](../../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** | **Value** ||
+|| `0` | `Required fields:` | Required parameter not provided within `clients` ||
+|| `1021` | `Booking not found` | Booking with the specified `id` not found ||
+|| `100` | `Could not find value for parameter` | Required parameter not provided ||
+|#
+
+{% include [system errors](../../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./booking-v1-booking-client-unset.md)
+- [{#T}](./booking-v1-booking-client-list.md)

@@ -1,0 +1,298 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Start a Callback with voximplant.callback.start"
+original_path: "api-reference/telephony/voximplant/voximplant-callback-start.md"
+---
+
+# Start a Callback with voximplant.callback.start
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`telephony`](../../scopes/permissions.md)
+>
+> Who can execute the method: user with Outgoing Call — Execute permission
+
+The method `voximplant.callback.start` initiates a callback between an employee and a client.
+
+## Method Parameters
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **FROM_LINE***
+[`string`](../../data-types.md) | Identifier of the outgoing line from which the callback is initiated.
+
+A list of available lines can be obtained using the [voximplant.line.get](./lines/voximplant-line-get.md) method. ||
+|| **TO_NUMBER***
+[`string`](../../data-types.md) | The client's number to call. ||
+|| **TEXT_TO_PRONOUNCE***
+[`string`](../../data-types.md) | The text that the system will pronounce to the employee before connecting with the client. ||
+|| **VOICE**
+[`string`](../../data-types.md) | Identifier of the voice for speech synthesis.
+
+If not provided, the default voice for the account's language will be used.
+
+A list of available voices can be obtained using the [voximplant.tts.voices.get](./voximplant-tts-voices-get.md) method. ||
+|#
+
+## Code Examples
+
+{% include [Note on Examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"FROM_LINE":"reg151083","TO_NUMBER":"+19991234567","TEXT_TO_PRONOUNCE":"You have received a callback request","VOICE":"internalfemale"}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/voximplant.callback.start
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"FROM_LINE":"reg151083","TO_NUMBER":"+19991234567","TEXT_TO_PRONOUNCE":"You have received a callback request","VOICE":"internalfemale","auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/voximplant.callback.start
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of the payload returned in result (match the "response handling" section of the page)
+    type CallbackStartResult = {
+      RESULT: boolean
+      CALL_ID: string
+    }
+
+    try {
+      const response = await $b24.actions.v2.call.make<CallbackStartResult>({
+        method: 'voximplant.callback.start',
+        params: {
+          FROM_LINE: 'reg151083',
+          TO_NUMBER: '79991234567',
+          TEXT_TO_PRONOUNCE: 'You have received a callback request',
+          VOICE: 'ruinternalfemale',
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info(result.CALL_ID, result.RESULT)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function startCallback() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'voximplant.callback.start',
+            params: {
+              FROM_LINE: 'reg151083',
+              TO_NUMBER: '79991234567',
+              TEXT_TO_PRONOUNCE: 'You have received a callback request',
+              VOICE: 'ruinternalfemale',
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info(result.CALL_ID, result.RESULT)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', startCallback)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'voximplant.callback.start',
+                [
+                    'FROM_LINE' => 'reg151083',
+                    'TO_NUMBER' => '+19991234567',
+                    'TEXT_TO_PRONOUNCE' => 'You have received a callback request',
+                    'VOICE' => 'internalfemale',
+                ]
+            );
+
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+
+        echo 'Success: ' . print_r($result, true);
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'voximplant.callback.start',
+        {
+            FROM_LINE: 'reg151083',
+            TO_NUMBER: '+19991234567',
+            TEXT_TO_PRONOUNCE: 'You have received a callback request',
+            VOICE: 'internalfemale'
+        },
+        function(result)
+        {
+            if (result.error())
+            {
+                console.error(result.error(), result.error_description());
+            }
+            else
+            {
+                console.log(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'voximplant.callback.start',
+        [
+            'FROM_LINE' => 'reg151083',
+            'TO_NUMBER' => '+19991234567',
+            'TEXT_TO_PRONOUNCE' => 'You have received a callback request',
+            'VOICE' => 'internalfemale',
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+    "result": {
+        "RESULT": true,
+        "CALL_ID": "callback.72f42b118e019a4cc47629ff60525f43.1773736077"
+    },
+    "time": {
+        "start": 1773736066,
+        "finish": 1773736067.708955,
+        "duration": 1.7089550495147705,
+        "processing": 1,
+        "date_start": "2026-03-17T11:27:46+02:00",
+        "date_finish": "2026-03-17T11:27:47+02:00",
+        "operating_reset_at": 1773736666,
+        "operating": 0.9574570655822754
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`object`](../../data-types.md) | Object containing the result of the callback initiation. ||
+|| **RESULT**
+[`boolean`](../../data-types.md) | Indicator of successful initiation.
+
+`true` — callback successfully initiated. ||
+|| **CALL_ID**
+[`string`](../../data-types.md) | Identifier of the call. ||
+|| **time**
+[`time`](../../data-types.md#time) | Information about the request execution time. ||
+|#
+
+## Error Handling
+
+HTTP Status: **400**, **403**
+
+```json
+{
+    "error": "ERROR_CORE",
+    "error_description": "Could not find line reg000000"
+}
+```
+
+{% include notitle [error handling](../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** | **Value** ||
+|| `ERROR_CORE` | `Could not find line <LINE_ID>` | The line with the specified identifier was not found. ||
+|| `ERROR_CORE` | `Could not find config for number <LINE_ID>` | Configuration for the specified line was not found. ||
+|| `ERROR_CORE` | `Phone number is not correct` | Incorrect number in `TO_NUMBER`. ||
+|| `ACCESS_DENIED` | `Access denied` | Insufficient permissions to make outgoing calls. ||
+|#
+
+{% include [system errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./voximplant-callback-start.md)
+- [{#T}](./voximplant-infocall-start-with-sound.md)
+- [{#T}](./voximplant-infocall-start-with-text.md)
+- [{#T}](./voximplant-tts-voices-get.md)

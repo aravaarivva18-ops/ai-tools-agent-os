@@ -1,0 +1,112 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "How to Change the Scheduled Activity Time"
+original_path: "tutorials/crm/how-to-edit-crm-objects/how-to-change-date-in-activity.md"
+---
+
+# How to Change the Scheduled Activity Time
+
+{% if build == 'dev' %}
+
+{% note alert "TO-DO _not exported to prod_" %}
+
+The tutorial has been removed from the menu. It needs to be redone, crm.activity.update is not relevant.
+
+{% endnote %}
+
+{% endif %}
+
+> Scope: [`crm`](../../../api-reference/scopes/permissions.md)
+>
+> Who can execute the method: users with administrative access to the CRM section
+
+Example of changing the scheduled activity time to tomorrow, starting at the same time and ending 2 hours later.
+
+{% list tabs %}
+
+- JS
+
+    ```javascript
+    let activityID = 42;
+    let timeStart = Math.floor(Date.now() / 1000) + 86400; // tomorrow
+    let timeEnd = timeStart + 7200; // tomorrow plus 2 hours
+
+    BX24.callMethod(
+        "crm.activity.update",
+        {
+            id: activityID,
+            fields: {
+                "START_TIME": new Date(timeStart * 1000).toISOString().slice(0, 19).replace('T', ' '),
+                "END_TIME": new Date(timeEnd * 1000).toISOString().slice(0, 19).replace('T', ' ')
+            }
+        },
+        function(result) {
+            if(result.error())
+                console.error(result.error());
+            else
+                console.dir(result.data());
+        }
+    );
+    ```
+
+- PHP
+
+    {% note info %}
+
+    To use the examples in PHP, configure the *CRest* class and include the **crest.php** file in the files where this class is used. [Learn more](../../../first-steps/how-to-use-examples.md)
+
+    {% endnote %}
+
+    ```php
+    <?php
+    $activityID = 42;
+    $timeStart = time() + 86400; // tomorrow
+    $timeEnd = time() + 86400 + 7200; // tomorrow plus 2 hours
+    CRest::call(
+        'crm.activity.update',
+        [
+            'id' => $activityID,
+            'fields' => [
+                "START_TIME" => date("Y-m-d H:i:s", $timeStart),
+                "END_TIME" => date("Y-m-d H:i:s", $timeEnd),
+            ]
+        ]
+    );
+    ?>
+    ```
+
+- Python
+
+    ```python
+    from datetime import datetime, timedelta
+
+    from b24pysdk import BitrixWebhook, Client
+    from b24pysdk.errors import BitrixAPIError
+
+    client = Client(
+        BitrixWebhook(
+            domain="your-domain.bitrix24.com",
+            auth_token="your-webhook-token",
+        )
+    )
+
+    activity_id = 42
+    time_start = datetime.now() + timedelta(days=1)
+    time_end = time_start + timedelta(hours=2)
+
+    try:
+        client.crm.activity.update(
+            bitrix_id=activity_id,
+            fields={
+                "START_TIME": time_start.strftime("%Y-%m-%d %H:%M:%S"),
+                "END_TIME": time_end.strftime("%Y-%m-%d %H:%M:%S"),
+            },
+        ).response
+    except BitrixAPIError as error:
+        print(error)
+    ```
+
+{% endlist %}

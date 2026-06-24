@@ -1,0 +1,52 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Reload the Page BX24.reloadWindow"
+original_path: "sdk/bx24-js-sdk/additional-functions/bx24-reload-window.md"
+---
+
+# Reload the Page BX24.reloadWindow
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+The method `BX24.reloadWindow` sends a command to reload the page with the application. Starting from version `25.800.0` of the `rest` module, this method can be used in [embedding locations](../../../api-reference/widgets/index.md) of the application.
+
+```js
+void BX24.reloadWindow([Function callback])
+```
+
+## Parameters
+
+#| 
+|| **Name**
+`type` | **Description** ||
+|| **callback**
+`function` | Callback function that is executed after the command to reload the page is sent ||
+|#
+
+## Code Example
+
+{% include [Example Footnote](../../../_includes/examples.md) %}
+
+```js
+BX24.init(function () {
+    BX24.reloadWindow(function () {
+        console.log('The command to reload the page has been sent');
+    });
+});
+```
+
+## Response Handling
+
+The method does not return any data (`void`).
+
+## Continue Learning
+
+- [{#T}](./bx24-fit-window.md)
+- [{#T}](./bx24-resize-window.md)

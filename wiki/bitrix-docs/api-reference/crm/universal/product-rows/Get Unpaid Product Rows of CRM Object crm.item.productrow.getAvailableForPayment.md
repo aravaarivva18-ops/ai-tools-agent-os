@@ -1,0 +1,341 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Get Unpaid Product Rows of CRM Object crm.item.productrow.getAvailableForPayment"
+original_path: "api-reference/crm/universal/product-rows/crm-item-productrow-get-available-for-payment.md"
+---
+
+# Get Unpaid Product Rows of CRM Object crm.item.productrow.getAvailableForPayment
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`crm`](../../../scopes/permissions.md)
+>
+> Who can execute the method: requires read access permission for the CRM object whose product rows are being selected.
+
+The method retrieves product rows of the CRM object for which the client has not yet been billed.
+
+## Method Parameters
+
+{% include [Note on required parameters](../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **ownerId***
+[`integer`](../../../data-types.md) | Identifier of the CRM object ||
+|| **ownerType***
+[`string`](../../../data-types.md) | Identifier of the [`CRM object type`](../../data-types.md#object_type). Pass the [Short symbolic code of the type](../../data-types.md#object_type) ||
+|#
+
+## Code Examples
+
+{% include [Note on examples](../../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```http
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"ownerType":"D","ownerId":13144}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/crm.item.productrow.getAvailableForPayment
+    ```
+
+- cURL (OAuth)
+
+    ```http
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"ownerType":"D","ownerId":13144,"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/crm.item.productrow.getAvailableForPayment
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of the payload returned in result (match the "response handling" section of the page)
+    type GetAvailableForPaymentResult = {
+      productRows: {
+        id: number
+        ownerId: number
+        ownerType: string
+        productId: number
+        productName: string
+        price: number
+        priceAccount: number
+        priceExclusive: number
+        priceNetto: number
+        priceBrutto: number
+        quantity: number
+        discountTypeId: number
+        discountRate: number
+        discountSum: number
+        taxRate: number | null
+        taxIncluded: string
+        customized: string
+        measureCode: number
+        measureName: string
+        sort: number
+        xmlId: string
+        type: number
+      }[]
+    }
+
+    try {
+      const response = await $b24.actions.v2.call.make<GetAvailableForPaymentResult>({
+        method: 'crm.item.productrow.getAvailableForPayment',
+        params: {
+          ownerType: 'D',
+          ownerId: 13144,
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info(result.productRows)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function getAvailableForPayment() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'crm.item.productrow.getAvailableForPayment',
+            params: {
+              ownerType: 'D',
+              ownerId: 13144,
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info(result.productRows)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', getAvailableForPayment)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'crm.item.productrow.getAvailableForPayment',
+                [
+                    'ownerType' => 'D',
+                    'ownerId'   => 13144,
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        echo 'Success: ' . print_r($result, true);
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error getting available product rows for payment: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'crm.item.productrow.getAvailableForPayment', {
+            ownerType: 'D',
+            ownerId: 13144,
+        },
+        function(result) {
+            if (result.error()) {
+                console.error(result.error());
+            } else {
+                console.log(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'crm.item.productrow.getAvailableForPayment',
+        [
+            'ownerType' => 'D',
+            'ownerId' => 13144
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Successful Response
+
+HTTP Status: **200**
+
+```json
+{
+   "result":{
+      "productRows":[
+         {
+            "id":17657,
+            "ownerId":13144,
+            "ownerType":"D",
+            "productId":9621,
+            "productName":"iphone 14",
+            "price":79999,
+            "priceAccount":79999,
+            "priceExclusive":79999,
+            "priceNetto":79999,
+            "priceBrutto":79999,
+            "quantity":3,
+            "discountTypeId":2,
+            "discountRate":0,
+            "discountSum":0,
+            "taxRate":null,
+            "taxIncluded":"Y",
+            "customized":"Y",
+            "measureCode":796,
+            "measureName":"pcs",
+            "sort":10,
+            "xmlId":"sale_basket_8149",
+            "type":4
+         },
+         {
+            "id":17658,
+            "ownerId":13144,
+            "ownerType":"D",
+            "productId":9623,
+            "productName":"iphone 10xs",
+            "price":5550,
+            "priceAccount":5550,
+            "priceExclusive":5550,
+            "priceNetto":5550,
+            "priceBrutto":5550,
+            "quantity":3,
+            "discountTypeId":2,
+            "discountRate":0,
+            "discountSum":0,
+            "taxRate":null,
+            "taxIncluded":"Y",
+            "customized":"Y",
+            "measureCode":796,
+            "measureName":"pcs",
+            "sort":20,
+            "xmlId":"sale_basket_8150",
+            "type":4
+         }
+      ]
+   },
+   "time":{
+      "start":1716966560.3205,
+      "finish":1716966560.742781,
+      "duration":0.42228102684020996,
+      "processing":0.17676782608032227,
+      "date_start":"2024-05-29T10:09:20+02:00",
+      "date_finish":"2024-05-29T10:09:20+02:00"
+   }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`object`](../../../data-types.md) | Root element of the response ||
+|| **productRows**
+[`crm_item_product_row[]`](../../data-types.md#crm_item_product_row) | Array of objects containing information about all product rows of the CRM object for which the client has not yet been billed ||
+|| **time**
+[`time`](../../../data-types.md) | Information about the request execution time ||
+|#
+
+## Error Handling
+
+HTTP Status: **400**
+
+```json
+{
+   "error":"ACCESS_DENIED",
+   "error_description":"Access denied"
+}
+```
+
+{% include notitle [error handling](../../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** ||
+|| `ACCESS_DENIED` | Access denied ||
+|| `100` | Required parameters not provided ||
+|| `0` | Other errors (e.g., fatal errors) ||
+|#
+
+{% include notitle [system errors](../../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./index.md)
+- [{#T}](./crm-item-productrow-add.md)
+- [{#T}](./crm-item-productrow-fields.md)
+- [{#T}](./crm-item-productrow-get.md)
+- [{#T}](./crm-item-productrow-set.md)
+- [{#T}](./crm-item-productrow-update.md)
+- [{#T}](./crm-item-productrow-list.md)
+- [{#T}](./crm-item-productrow-delete.md)

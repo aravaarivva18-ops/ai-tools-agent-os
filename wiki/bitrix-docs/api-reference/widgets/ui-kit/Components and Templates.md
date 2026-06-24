@@ -1,0 +1,51 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Components and Templates"
+original_path: "api-reference/widgets/ui-kit/components.md"
+---
+
+# Components and Templates
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+The Bitrix24 UI Kit is a library of **design-consistent components** that can be combined, extended, and adapted for specific tasks. The main goal is to accelerate development and ensure uniformity of interfaces across all applications integrated into Bitrix24.
+
+## Categories of Components
+
+UI Kit components are grouped into meaningful categories:
+
+- **Actions** — buttons, dropdowns, modals, sliders
+- **Notifications** — alerts, toasts, tooltips, progress bars
+- **Information Display** — avatars, badges, icons, calendars, tables
+- **Data Input** — inputs, selectors, checkboxes, radio buttons
+- **Navigation** — menus, tabs, links
+
+For a complete list of available components, see the [detailed documentation](https://bitrix24.github.io/b24ui/docs/components/).
+
+### Component Approach
+
+All components:
+
+- are built on the principle of **composition** — easily combine with each other,
+- **work with theming** — external styling can be adjusted for light/dark themes,
+- are **responsive** — look good on different resolutions,
+- are **extensible** — through `slots` and `props`.
+
+You can assemble interfaces from ready-made parts without the need to manually describe visual styles.
+
+## Default Behavior
+
+The UI Kit implements behavior that Bitrix24 users are accustomed to:
+
+- margins, alignment, grids — as in the main platform,
+- logic for opening/closing modals, dropdowns, and popups — identical to platform behavior,
+- keyboard interaction and focus management — according to accessibility standards.
+
+This eliminates the need to "guess" how a component should behave — everything is already aligned with Bitrix24's UX patterns.

@@ -1,0 +1,33 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Event for Deleting a Custom Field onCrmInvoiceUserFieldDelete"
+original_path: "api-reference/crm/outdated/invoice/events-invoice/on-crm-invoice-user-field-delete.md"
+---
+
+# Event for Deleting a Custom Field onCrmInvoiceUserFieldDelete
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+The event is triggered when a custom field is deleted.
+
+## Parameters
+
+{% include [Note on Required Parameters](../../../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id** 
+[`integer`](../../../../data-types.md)| Identifier of the custom field ||
+|| **entityId** 
+[`string`](../../../../data-types.md)| Symbolic identifier of the entity for which the field was created ||
+|| **fieldName** 
+[`string`](../../../../data-types.md)| Name of the created custom field ||
+|#

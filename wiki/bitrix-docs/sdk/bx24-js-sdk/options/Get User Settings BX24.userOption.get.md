@@ -1,0 +1,55 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Get User Settings BX24.userOption.get"
+original_path: "sdk/bx24-js-sdk/options/bx24-user-option-get.md"
+---
+
+# Get User Settings BX24.userOption.get
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+```js
+BX24.userOption.get(string name): mixed;
+```
+
+The method `BX24.userOption.get` returns the value of the setting with the name `name` for the current user.
+
+## Method Parameters
+
+{% include [Note on required parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **name***
+[`string`](../../../api-reference/data-types.md) | Parameter code ||
+|#
+
+## Code Examples
+
+```js
+BX24.init(() => {
+    BX24.userOption.set('param_str', 'str');
+    BX24.userOption.set('param_numb', 1);
+    BX24.userOption.set('param_obj', {foo: 'bar'});
+
+    console.log(BX24.userOption.get('param_str')); //will return str
+    console.log(BX24.userOption.get('param_numb')); //will return 1
+    console.log(BX24.userOption.get('param_obj')); //will return {foo: 'bar'}
+});
+```
+
+{% include [Note on examples](../../../_includes/examples.md) %}
+
+## Continue Learning
+
+- [{#T}](./bx24-user-option-set.md)
+- [{#T}](./bx24-app-option-set.md)
+- [{#T}](./bx24-app-option-get.md)

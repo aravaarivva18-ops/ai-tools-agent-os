@@ -1,0 +1,563 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Get a List of documentgenerator.template.list Templates"
+original_path: "api-reference/document-generator/templates/document-generator-template-list.md"
+---
+
+# Get a List of documentgenerator.template.list Templates
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`documentgenerator`](../../scopes/permissions.md)
+>
+> Who can execute the method: a user with permission to modify document generator templates
+
+The method `documentgenerator.template.list` returns a list of templates based on the filter.
+
+## Method Parameters
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **select**
+[`array`](../../data-types.md) | An array of fields to return. Default is `["*"]`.
+
+For `field_N`, use fields from the [fields table](#list-fields).
+
+To retrieve access codes and providers, add the `users` and `providers` fields to `select` ||
+|| **order**
+[`object`](../../data-types.md) | An object for sorting templates in the format `{"field_1":"value_1", ... "field_N":"value_N"}`.
+
+The sorting direction can take the following values:
+- `asc` — ascending
+- `desc` — descending
+
+For `field_N`, use fields from the [fields table](#list-fields).
+||
+|| **filter**
+[`object`](../../data-types.md) | An object for filtering templates in the format `{"field_1":"value_1", ... "field_N":"value_N"}`.
+
+For `field_N`, use fields from the [fields table](#list-fields).
+
+You can add a prefix to the `field_n` keys to specify the filter operation. Possible prefix values:
+- `>=` — greater than or equal to
+- `>` — greater than
+- `<=` — less than or equal to
+- `<` — less than
+- `@` — IN, an array is passed as the value
+- `!@` — NOT IN, an array is passed as the value
+- `%` — LIKE, substring search. The `%` symbol should not be included in the filter value. The search looks for the substring in any position of the string
+- `=%` — LIKE, substring search. The `%` symbol must be included in the value. Examples:
+  - `"mol%"` — searches for values starting with "mol"
+  - `"%mol"` — searches for values ending with "mol"
+  - `"%mol%"` — searches for values where "mol" can be in any position
+- `%=` — LIKE (similar to `=%`)
+- `=` — equal, exact match (used by default)
+- `!=` — not equal
+- `!` — not equal
+
+By default, the filter `isDeleted = "N"` is applied ||
+|| **start**
+[`integer`](../../data-types.md) | This parameter is used to manage pagination.
+
+The page size for results is always static — 50 records.
+
+To select the second page of results, you need to pass the value `50`. To select the third page of results — the value `100`, and so on.
+
+The formula for calculating the `start` parameter value:
+
+`start = (N — 1) * 50`, where `N` is the desired page number ||
+|#
+
+### Fields for select, order, filter {#list-fields}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id**
+[`integer`](../../data-types.md) | Template identifier ||
+|| **active**
+[`char`](../../data-types.md) | Template activity. Possible values:
+- `Y` — active
+- `N` — inactive
+||
+|| **name**
+[`string`](../../data-types.md) | Template name ||
+|| **code**
+[`string`](../../data-types.md) | Template symbolic code ||
+|| **region**
+[`string`](../../data-types.md) | Template region ||
+|| **sort**
+[`integer`](../../data-types.md) | Sort index ||
+|| **createTime**
+[`datetime`](../../data-types.md) | Creation date and time ||
+|| **updateTime**
+[`datetime`](../../data-types.md) | Update date and time ||
+|| **numeratorId**
+[`integer`](../../data-types.md) | Identifier of the numerator ||
+|| **withStamps**
+[`char`](../../data-types.md) | Use of stamps and signatures. Possible values:
+- `Y` — yes
+- `N` — no
+||
+|| **users**
+[`array`](../../data-types.md) | Access codes for the template. Only for `select` ||
+|| **providers**
+[`array`](../../data-types.md) | Data providers for the template. Only for `select` ||
+|#
+
+## Code Examples
+
+{% include [Note on Examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+  ```bash
+  curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{
+      "select": [
+        "*",
+        "users",
+        "providers"
+      ],
+      "order": {
+        "id": "desc"
+      },
+      "filter": {
+        "region": "de",
+        "active": "Y",
+        ">=createTime": "2026-03-18T00:00:00+01:00"
+      },
+      "start": 0
+    }' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/documentgenerator.template.list
+  ```
+
+- cURL (OAuth)
+
+  ```bash
+  curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{
+      "select": [
+        "*",
+        "users",
+        "providers"
+      ],
+      "order": {
+        "id": "desc"
+      },
+      "filter": {
+        "region": "de",
+        "active": "Y",
+        ">=createTime": "2026-03-18T00:00:00+01:00"
+      },
+      "start": 0,
+      "auth": "**put_access_token_here**"
+    }' \
+    https://**put_your_bitrix24_address**/rest/documentgenerator.template.list
+  ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame, ISODate } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    type TemplateItem = {
+      id: string
+      active: string
+      name: string
+      code: string
+      region: string
+      sort: string
+      createTime: ISODate | null
+      updateTime: ISODate | null
+      createdBy: string
+      updatedBy: string
+      moduleId: string
+      fileId: string
+      bodyType: string
+      numeratorId: string
+      withStamps: string
+      productsTableVariant: string
+      isDeleted: string
+      isDefault: string
+      download: string
+      downloadMachine: string
+      users?: string[]
+      providers?: string[]
+    }
+
+    // Shape of the payload returned in result (match the "response handling" section of the page)
+    type TemplateListResult = {
+      templates: Record<string, TemplateItem>
+    }
+
+    try {
+      // documentgenerator.template.list returns a single page (max 50 records). For the whole result set
+      // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+      // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+      // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+      // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+      const response = await $b24.actions.v2.call.make<TemplateListResult>({
+        method: 'documentgenerator.template.list',
+        params: {
+          select: ['*', 'users', 'providers'],
+          order: {
+            id: 'desc',
+          },
+          filter: {
+            region: 'ru',
+            active: 'Y',
+            '>=createTime': '2026-03-18T00:00:00+03:00',
+          },
+          start: 0,
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Templates count:', Object.keys(result.templates).length, result.templates)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function listTemplates() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          // documentgenerator.template.list returns a single page (max 50 records). For the whole result set
+          // use a list helper: $b24.actions.v2.callList.make() returns every record as one
+          // array, $b24.actions.v2.fetchList.make() yields them in chunks (async generator).
+          // NOTE: the list helpers do not accept `order` (it is excluded from their params, so
+          // passing it is a TS error) — keep this call.make + `start` variant when sort matters.
+          const response = await $b24.actions.v2.call.make({
+            method: 'documentgenerator.template.list',
+            params: {
+              select: ['*', 'users', 'providers'],
+              order: {
+                id: 'desc',
+              },
+              filter: {
+                region: 'ru',
+                active: 'Y',
+                '>=createTime': '2026-03-18T00:00:00+03:00',
+              },
+              start: 0,
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Templates count:', Object.keys(result.templates).length, result.templates)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', listTemplates)
+    </script>
+    ```
+
+- PHP
+
+  ```php
+  try {
+      $response = $b24Service->core->call(
+          'documentgenerator.template.list',
+          [
+              'select' => ['*', 'users', 'providers'],
+              'order' => [
+                  'id' => 'desc'
+              ],
+              'filter' => [
+                  'region' => 'de',
+                  'active' => 'Y',
+                  '>=createTime' => '2026-03-18T00:00:00+01:00'
+              ],
+              'start' => 0,
+          ]
+      );
+
+      $result = $response->getResponseData()->getResult();
+      print_r($result);
+  } catch (Throwable $e) {
+      echo $e->getMessage();
+  }
+  ```
+
+- BX24.js
+
+  ```js
+  BX24.callMethod(
+      'documentgenerator.template.list',
+      {
+          select: ['*', 'users', 'providers'],
+          order: {
+              id: 'desc'
+          },
+          filter: {
+              region: 'de',
+              active: 'Y',
+              '>=createTime': '2026-03-18T00:00:00+01:00'
+          }
+      },
+      function(result)
+      {
+          if (result.error())
+          {
+              console.error(result.error());
+          }
+          else
+          {
+              console.log(result.data());
+
+              if (result.more())
+              {
+                  result.next();
+              }
+          }
+      }
+  );
+  ```
+
+- PHP CRest
+
+  ```php
+  require_once('crest.php');
+
+  $result = CRest::call(
+      'documentgenerator.template.list',
+      [
+          'select' => ['*', 'users', 'providers'],
+          'order' => [
+              'id' => 'desc'
+          ],
+          'filter' => [
+              'region' => 'de',
+              'active' => 'Y',
+              '>=createTime' => '2026-03-18T00:00:00+01:00'
+          ],
+          'start' => 0,
+      ]
+  );
+
+  print_r($result);
+  ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+    "result": {
+        "templates": {
+            "57": {
+                "id": "57",
+                "active": "Y",
+                "name": "SUPPLY_CONTRACT_NEW Template",
+                "code": "REST_TEMPLATE",
+                "region": "de",
+                "sort": "700",
+                "createTime": "2026-03-23T16:51:25+01:00",
+                "updateTime": "2026-03-23T17:26:39+01:00",
+                "createdBy": "503",
+                "updatedBy": "503",
+                "moduleId": "rest",
+                "fileId": "5641",
+                "bodyType": "Bitrix\\DocumentGenerator\\Body\\Docx",
+                "numeratorId": "3",
+                "withStamps": "N",
+                "productsTableVariant": "",
+                "isDeleted": "N",
+                "isDefault": "N",
+                "download": "/bitrix/services/main/ajax.php?action=documentgenerator.api.template.download&SITE_ID=s1&id=57",
+                "providers": [
+                    "bitrix\\documentgenerator\\dataprovider\\rest"
+                ],
+                "users": [
+                    "U503"
+                ],
+                "downloadMachine": "https://mysite.com/rest/documentgenerator.api.template.download.json?auth=3f5cc2690000071b00000844000001f7f0f107506cefda4aa5b9d0dc80371e7f0f7e26&token=documentgenerator%7CYWN0aW9uPWRvY3VtZW50Z2VuZXJhdG9yLmFwaS50ZW1wbGF0ZS5kb3dubG9hZCZTSVRFX0lEPXMxJmlkPTU3Jl89RFB3MHZYN1A3RXdiMm5EenY2VFYyc1Vkb0hPejA3SlM%3D%7CImRvY3VtZW50Z2VuZXJhdG9yLmFwaS50ZW1wbGF0ZS5kb3dubG9hZCZkb2N1bWVudGdlbmVyYXRvcnxZV04wYVc5dVBXUnZZM1Z0Wlc1MFoyVnVaWEpoZEc5eUxtRndhUzUwWlcxd2JHRjBaUzVrYjNkdWJHOWhaQ1pUU1ZSRlgwbEVQWE14Sm1sa1BUVTNKbDg5UkZCM01IWllOMUEzUlhkaU1tNUVlblkyVkZZeWMxVmtiMGhQZWpBM1NsTT18M2Y1Y2MyNjkwMDAwMDcxYjAwMDAwODQ0MDAwMDAxZjdmMGYxMDc1MDZjZWZkYTRhYTViOWQwZGM4MDM3MWU3ZjBmN2UyNiI%3D.XuC83kQJE21vRoqv1%2FgdT8OiYq4JdpiSLxumy%2F1UcB0%3D"
+            },
+            "53": {
+                "id": "53", // description of the next template
+                ...
+            },
+            "51": {
+                "id": "51", // description of the next template
+                ...
+            }
+        }
+    },
+    "total": 3,
+    "time": {
+        "start": 1774341679,
+        "finish": 1774341679.641056,
+        "duration": 0.6410560607910156,
+        "processing": 0,
+        "date_start": "2026-03-24T11:41:19+01:00",
+        "date_finish": "2026-03-24T11:41:19+01:00",
+        "operating_reset_at": 1774342279,
+        "operating": 0
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`object`](../../data-types.md) | Root element of the response [(detailed description)](#result) ||
+|| **total**
+[`integer`](../../data-types.md) | Total number of templates in the list ||
+|| **time**
+[`time`](../../data-types.md#time) | Information about the execution time of the request ||
+|#
+
+#### Result Object {#result}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **templates**
+[`object`](../../data-types.md) | Object of templates, where the key is `id`, and the value is the template data [(detailed description)](#template) ||
+|#
+
+#### Template Object Element {#template}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id**
+[`string`](../../data-types.md) | Template identifier ||
+|| **active**
+[`char`](../../data-types.md) | Template activity. Possible values:
+- `Y` — active
+- `N` — inactive
+||
+|| **name**
+[`string`](../../data-types.md) | Template name ||
+|| **code**
+[`string`](../../data-types.md) | Template symbolic code ||
+|| **region**
+[`string`](../../data-types.md) | Template region ||
+|| **sort**
+[`string`](../../data-types.md) | Sort index ||
+|| **createTime**
+[`datetime`](../../data-types.md) | Creation date and time ||
+|| **updateTime**
+[`datetime`](../../data-types.md) | Update date and time ||
+|| **createdBy**
+[`string`](../../data-types.md) | Identifier of the user who created the template ||
+|| **updatedBy**
+[`string`](../../data-types.md) | Identifier of the user who updated the template ||
+|| **moduleId**
+[`string`](../../data-types.md) | Module identifier ||
+|| **fileId**
+[`string`](../../data-types.md) | Template file identifier ||
+|| **bodyType**
+[`string`](../../data-types.md) | Class of the template body type ||
+|| **numeratorId**
+[`string`](../../data-types.md) | Identifier of the numerator ||
+|| **withStamps**
+[`char`](../../data-types.md) | Use of stamps and signatures. Possible values:
+- `Y` — yes
+- `N` — no
+||
+|| **productsTableVariant**
+[`string`](../../data-types.md) | Variant of the products table ||
+|| **isDeleted**
+[`char`](../../data-types.md) | Deletion flag of the template. Possible values:
+- `Y` — deleted
+- `N` — not deleted
+||
+|| **isDefault**
+[`char`](../../data-types.md) | Default template flag. Possible values:
+- `Y` — yes
+- `N` — no
+||
+|| **download**
+[`string`](../../data-types.md) | Link to download the template ||
+|| **downloadMachine**
+[`string`](../../data-types.md) | Link to download the template for machine processing ||
+|| **users**
+[`array`](../../data-types.md) | Array of access codes if the field is selected in `select` ||
+|| **providers**
+[`array`](../../data-types.md) | Array of providers if the field is selected in `select` ||
+|#
+
+## Error Handling
+
+HTTP Status: **400**
+
+```json
+{
+    "error": "0",
+    "error_description": "You do not have permissions to modify templates"
+}
+```
+
+{% include notitle [error handling](../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Status** | **Code** | **Description** | **Value** ||
+|| `400` | `0` | You do not have permissions to modify templates | Insufficient rights to retrieve the list of templates ||
+|#
+
+{% include [system errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./document-generator-template-add.md)
+- [{#T}](./document-generator-template-update.md)
+- [{#T}](./document-generator-template-get.md)
+- [{#T}](./document-generator-template-delete.md)
+- [{#T}](./document-generator-template-get-fields.md)

@@ -1,0 +1,66 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Call the interface to register a new event handler callBind"
+original_path: "sdk/bx24-js-sdk/how-to-call-rest-methods/bx24-call-bind.md"
+---
+
+# Call the interface to register a new event handler callBind
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+```js
+BX24.callBind(
+    String event,
+    String handler[
+        Integer auth_type[
+            Function callback
+        ]
+    ]
+);
+```
+
+This interface is for the method [event.bind](../../../api-reference/events/event-bind.md), which registers a new [event](../../../api-reference/common/events/index.md) handler.
+
+{% note info %}
+
+Works only when authorized as a user with **portal administration** rights.
+
+{% endnote %}
+
+## Parameters
+
+{% include [Note on required parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **event***
+[`string`](../../../api-reference/data-types.md) | Event name ||
+|| **handler***
+[`string`](../../../api-reference/data-types.md) | Link to the event handler ||
+|| **auth_type**
+[`integer`](../../../api-reference/data-types.md) | Identifier of the user under which the event handler is authorized. By default, the authorization of the user whose actions triggered the event will be used ||
+|| **callback**
+[`function`](../../../api-reference/data-types.md) | Function to handle the result of the method call ||
+|#
+
+## Example
+
+```http
+BX24.callBind('OnAppUninstall', 'http://www.my-domain.com/handler/');
+```
+
+{% include [Note on examples](../../../_includes/examples.md) %}
+
+## Continue your exploration
+
+- [{#T}](./bx24-call-unbind.md)
+- [{#T}](./bx24-call-method.md)
+- [{#T}](./bx24-call-batch.md)

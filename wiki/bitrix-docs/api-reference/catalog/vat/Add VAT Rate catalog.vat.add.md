@@ -1,0 +1,335 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Add VAT Rate catalog.vat.add"
+original_path: "api-reference/catalog/vat/catalog-vat-add.md"
+---
+
+# Add VAT Rate catalog.vat.add
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`catalog`](../../scopes/permissions.md)
+>
+> Who can execute the method: administrator
+
+This method adds a new VAT rate.
+
+## Method Parameters
+
+{% include [Note on required parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **fields***
+[`object`](../../data-types.md) | Field values for creating a new VAT rate ([detailed description](#fields)) ||
+|#
+
+### Parameter fields {#fields}
+
+{% include [Note on required parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **name***
+[`string`](../../data-types.md) | Name of the VAT rate ||
+|| **active**
+[`string`](../../data-types.md) | Indicator of the VAT rate's activity. Possible values:
+- `Y` — active
+- `N` — inactive
+
+Default is `Y`
+||
+|| **rate***
+[`double`](../../data-types.md) | Value of the VAT rate ||
+|| **sort**
+[`integer`](../../data-types.md) | Sorting.
+
+Default is `100`
+||
+|#
+
+## Code Examples
+
+{% include [Note on examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"fields":{"name":"Tax 13%","rate":13,"sort":10,"active":"Y"}}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/catalog.vat.add
+    ```
+
+- cURL (OAuth)
+
+    ```bash
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"fields":{"name":"Tax 13%","rate":13,"sort":10,"active":"Y"},"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/catalog.vat.add
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame, ISODate } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of the payload returned in result (match the "response handling" section of the page)
+    type CatalogVatAddResult = {
+      vat: {
+        active: string
+        id: number
+        name: string
+        rate: number
+        sort: number
+        timestampX: ISODate
+      }
+    }
+
+    try {
+      const response = await $b24.actions.v2.call.make<CatalogVatAddResult>({
+        method: 'catalog.vat.add',
+        params: {
+          fields: {
+            name: 'Tax 13%',
+            rate: 13,
+            sort: 10,
+            active: 'Y',
+          },
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info('Added VAT rate:', result.vat.id, result.vat.name, result.vat.rate)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function addVatRate() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'catalog.vat.add',
+            params: {
+              fields: {
+                name: 'Tax 13%',
+                rate: 13,
+                sort: 10,
+                active: 'Y',
+              },
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info('Added VAT rate:', result.vat.id, result.vat.name, result.vat.rate)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', addVatRate)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'catalog.vat.add',
+                [
+                    'fields' => [
+                        'name'   => 'Tax 13%',
+                        'rate'   => 13,
+                        'sort'   => 10,
+                        'active' => "Y",
+                    ],
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        if ($result->error()) {
+            error_log($result->error());
+            echo 'Error: ' . $result->error();
+        } else {
+            echo 'Success: ' . print_r($result->data(), true);
+        }
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error adding VAT: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+    'catalog.vat.add',
+            {
+                fields: {
+                        name: 'Tax 13%',
+                        rate: 13,
+                        sort: 10,
+                        active: "Y",
+                }
+            },
+    function(result) {
+            if (result.error())
+                console.error(result.error());
+            else
+                console.log(result.data());
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'catalog.vat.add',
+        [
+            'fields' => [
+                'name' => 'Tax 13%',
+                'rate' => 13,
+                'sort' => 10,
+                'active' => "Y"
+            ]
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP status: **200**
+
+```json
+{
+    "result": {
+        "vat": {
+            "active": "Y",
+            "id": 5,
+            "name": "Tax 13%",
+            "rate": 13,
+            "sort": 10,
+            "timestampX": "2024-09-16T11:20:38+02:00"
+        }
+    },
+    "time": {
+        "start": 1716552521.40908,
+        "finish": 1716552521.69852,
+        "duration": 0.289434909820557,
+        "processing": 0.011207103729248,
+        "date_start": "2024-09-16T11:20:38+02:00",
+        "date_finish": "2024-09-16T11:20:38+02:00",
+        "operating": 0
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`object`](../../data-types.md) | Root element of the response ||
+|| **vat**
+[`catalog_vat`](../data-types.md#catalog_vat) | Object containing information about the created VAT rate
+||
+|| **time**
+[`time`](../../data-types.md#time) | Information about the request execution time ||
+|#
+
+## Error Handling
+
+HTTP status: **400**
+
+```json
+{
+    "error": 200040300020,
+    "error_description": "Access Denied"
+}
+```
+
+{% include notitle [error handling](../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** ||
+|| `200040300020` | Insufficient permissions to edit
+||
+|| `100` | Required parameter `fields` not provided
+||
+|| `0` | Required fields not set
+|| 
+|| `0` | Other errors (e.g., fatal errors)
+|| 
+|#
+
+{% include [system errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./catalog-vat-update.md)
+- [{#T}](./catalog-vat-get.md)
+- [{#T}](./catalog-vat-list.md)
+- [{#T}](./catalog-vat-delete.md)
+- [{#T}](./catalog-vat-get-fields.md)

@@ -1,0 +1,31 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Overview of Methods"
+original_path: "api-reference/catalog/catalog/index.md"
+---
+
+# Overview of Methods
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`catalog`](../../scopes/permissions.md)
+>
+> Who can execute the method: administrator
+
+#|
+|| **Method** | **Description** ||
+|| [catalog.catalog.add](./catalog-catalog-add.md) | Adds a trade catalog ||
+|| [catalog.catalog.update](./catalog-catalog-update.md) | Updates fields of the trade catalog ||
+|| [catalog.catalog.get](./catalog-catalog-get.md) | Returns values of all fields in the trade catalog ||
+|| [catalog.catalog.list](./catalog-catalog-list.md) | Returns a list of trade catalogs ||
+|| [catalog.catalog.isOffers](./catalog-catalog-is-offers.md) | Checks if the trade catalog is an offers catalog ||
+|| [catalog.catalog.delete](./catalog-catalog-delete.md) | Deletes a trade catalog ||
+|| [catalog.catalog.getFields](./catalog-catalog-get-fields.md) | Returns available fields of the trade catalog ||
+|#

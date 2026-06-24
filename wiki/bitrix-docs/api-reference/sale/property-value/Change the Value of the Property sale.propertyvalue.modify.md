@@ -1,0 +1,585 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Change the Value of the Property sale.propertyvalue.modify"
+original_path: "api-reference/sale/property-value/sale-property-value-modify.md"
+---
+
+# Change the Value of the Property sale.propertyvalue.modify
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`sale`](../../scopes/permissions.md)
+>
+> Who can execute the method: administrator
+
+This method updates the property values of an order.
+
+**Please note** that this method accepts **all** property values of the order as input. If values for any properties are not provided, their current values will be removed from the order as a result of the request.
+
+## Method Parameters
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **fields***
+[`object`](../../data-types.md) | The root element that transmits the request parameters in the form of a structure:
+
+```json
+{
+    "order":
+    {
+        "id": "value",
+        "propertyValues": {
+            "orderPropsId": "value",
+            "value": "value"
+        },
+    }
+}
+```
+
+||
+|#
+
+### Parameter fields
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **order***
+[`object`](../../data-types.md) | An object containing the order ID and property values in the form of a structure:
+
+```json
+"id": "value",
+"propertyValues": {
+    "orderPropsId": "value",
+    "value": "value"
+},
+```
+
+||
+|#
+
+### Parameter order
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **id***
+[`sale_order.id`](../data-types.md) | Order identifier ||
+|| **propertyValues***
+[`object[]`](../../data-types.md) | An array of objects (see the description of the `propertyValues` object [below](#parametr-propertyvalues)), containing the order property identifier and property value ||
+|#
+
+### Parameter propertyValues
+
+{% include [Note on Required Parameters](../../../_includes/required.md) %}
+
+#|
+|| **Value**
+`type` | **Description** ||
+|| **orderPropsId***
+[`sale_order_property.id`](../data-types.md) | Order property identifier ||
+|| **value***
+[`any`](../../data-types.md) | Order property value.
+
+For multiple order properties, an array of values can be transmitted.
+
+For properties of type `file`, an object in the format `{"fileData": ["value1", "value2"]}` should be provided:
+- `value1` — file name with extension,
+- `value2` — file in [base64](../../files/how-to-upload-files.md) format.
+
+To delete a file, use an object in the format `{"remove": "Y"}` ||
+|#
+
+## Code Examples
+
+{% include [Note on Examples](../../../_includes/examples.md) %}
+
+{% list tabs %}
+
+- cURL (Webhook)
+
+    ```http
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"fields":{"order":{"id":2066,"propertyValues":[{"orderPropsId":20,"value":"John Smith"},{"orderPropsId":21,"value":"johnsmith@example.com"},{"orderPropsId":22,"value":"+10907996161"},{"orderPropsId":25,"value":"0000073738"},{"orderPropsId":26,"value":"900 S Holland Ave, Springfield, MO 65806, United States"},{"orderPropsId":51,"value":"04/17/2024"},{"orderPropsId":52,"value":"Y"},{"orderPropsId":53,"value":"948"},{"orderPropsId":54,"value":"10"}]}}}' \
+    https://**put_your_bitrix24_address**/rest/**put_your_user_id_here**/**put_your_webhook_here**/sale.propertyvalue.modify
+    ```
+
+- cURL (OAuth)
+
+    ```http
+    curl -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -d '{"fields":{"order":{"id":2066,"propertyValues":[{"orderPropsId":20,"value":"John Smith"},{"orderPropsId":21,"value":"johnsmith@example.com"},{"orderPropsId":22,"value":"+10907996161"},{"orderPropsId":25,"value":"0000073738"},{"orderPropsId":26,"value":"900 S Holland Ave, Springfield, MO 65806, United States"},{"orderPropsId":51,"value":"04/17/2024"},{"orderPropsId":52,"value":"Y"},{"orderPropsId":53,"value":"948"},{"orderPropsId":54,"value":"10"}]}},"auth":"**put_access_token_here**"}' \
+    https://**put_your_bitrix24_address**/rest/sale.propertyvalue.modify
+    ```
+
+- JS (TS)
+
+    ```ts
+    // This snippet is an ES module: top-level await requires type="module" or a bundler.
+    // $b24 is an already-initialized SDK instance (see the SDK "Get started" guide).
+    import { Text } from '@bitrix24/b24jssdk'
+    import type { B24Frame } from '@bitrix24/b24jssdk'
+
+    declare const $b24: B24Frame
+
+    // Shape of the payload returned in result (match the "response handling" section of the page)
+    type PropertyValueModifyResult = {
+      propertyValues: {
+        code: string
+        id: number
+        name: string
+        orderPropsId: number
+        orderPropsXmlId: string | null
+        value: string | object
+      }[]
+    }
+
+    try {
+      const response = await $b24.actions.v2.call.make<PropertyValueModifyResult>({
+        method: 'sale.propertyvalue.modify',
+        params: {
+          fields: {
+            order: {
+              id: 2066,
+              propertyValues: [
+                { orderPropsId: 20, value: 'John Smith' },
+                { orderPropsId: 21, value: 'johnsmith@example.com' },
+                { orderPropsId: 22, value: '+10907996161' },
+                { orderPropsId: 25, value: '0000073738' },
+                { orderPropsId: 26, value: '900 S Holland Ave, Springfield, MO 65806, United States' },
+                { orderPropsId: 51, value: '17.04.2024' },
+                { orderPropsId: 52, value: 'Y' },
+                { orderPropsId: 53, value: '948' },
+                { orderPropsId: 54, value: '10' },
+              ],
+            },
+          },
+        },
+        requestId: Text.getUuidRfc4122()
+      })
+
+      // The payload is available only on a successful response
+      if (!response.isSuccess) {
+        console.error(response.getErrorMessages().join('; '))
+      } else {
+        const result = response.getData()!.result
+        console.info(result.propertyValues)
+      }
+    } catch (error) {
+      // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+      console.error(error)
+    }
+    ```
+
+- JS (UMD)
+
+    ```html
+    <!-- Load the SDK (UMD build); it is exposed as the global B24Js -->
+    <script src="https://unpkg.com/@bitrix24/b24jssdk@1/dist/umd/index.min.js"></script>
+    <script>
+      async function modifyPropertyValues() {
+        try {
+          // Initialize the SDK inside a Bitrix24 frame
+          const $b24 = await B24Js.initializeB24Frame()
+
+          const response = await $b24.actions.v2.call.make({
+            method: 'sale.propertyvalue.modify',
+            params: {
+              fields: {
+                order: {
+                  id: 2066,
+                  propertyValues: [
+                    { orderPropsId: 20, value: 'John Smith' },
+                    { orderPropsId: 21, value: 'johnsmith@example.com' },
+                    { orderPropsId: 22, value: '+10907996161' },
+                    { orderPropsId: 25, value: '0000073738' },
+                    { orderPropsId: 26, value: '900 S Holland Ave, Springfield, MO 65806, United States' },
+                    { orderPropsId: 51, value: '17.04.2024' },
+                    { orderPropsId: 52, value: 'Y' },
+                    { orderPropsId: 53, value: '948' },
+                    { orderPropsId: 54, value: '10' },
+                  ],
+                },
+              },
+            },
+            requestId: B24Js.Text.getUuidRfc4122()
+          })
+
+          // The payload is available only on a successful response
+          if (!response.isSuccess) {
+            console.error(response.getErrorMessages().join('; '))
+            return
+          }
+
+          const result = response.getData().result
+          console.info(result.propertyValues)
+        } catch (error) {
+          // Thrown on transport or SDK failures (AjaxError, SdkError, etc.)
+          console.error(error)
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', modifyPropertyValues)
+    </script>
+    ```
+
+- PHP
+
+    ```php
+    try {
+        $response = $b24Service
+            ->core
+            ->call(
+                'sale.propertyvalue.modify',
+                [
+                    'fields' => [
+                        'order' => [
+                            'id'            => 2066,
+                            'propertyValues' => [
+                                [
+                                    'orderPropsId' => 20,
+                                    'value'        => 'John Smith'
+                                ],
+                                [
+                                    'orderPropsId' => 21,
+                                    'value'        => 'johnsmith@example.com'
+                                ],
+                                [
+                                    'orderPropsId' => 22,
+                                    'value'        => '+10907996161'
+                                ],
+                                [
+                                    'orderPropsId' => 25,
+                                    'value'        => '0000073738'
+                                ],
+                                [
+                                    'orderPropsId' => 26,
+                                    'value'        => '900 S Holland Ave, Springfield, MO 65806, United States'
+                                ],
+                                [
+                                    'orderPropsId' => 51,
+                                    'value'        => '04/17/2024'
+                                ],
+                                [
+                                    'orderPropsId' => 52,
+                                    'value'        => 'Y'
+                                ],
+                                [
+                                    'orderPropsId' => 53,
+                                    'value'        => '948'
+                                ],
+                                [
+                                    'orderPropsId' => 54,
+                                    'value'        => '10'
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            );
+    
+        $result = $response
+            ->getResponseData()
+            ->getResult();
+    
+        echo 'Success: ' . print_r($result, true);
+    
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        echo 'Error modifying sale property value: ' . $e->getMessage();
+    }
+    ```
+
+- BX24.js
+
+    ```js
+    BX24.callMethod(
+        'sale.propertyvalue.modify', {
+            fields: {
+                order: {
+                    id: 2066,
+                    propertyValues: [{
+                            orderPropsId: 20,
+                            value: 'John Smith'
+                        },
+                        {
+                            orderPropsId: 21,
+                            value: 'johnsmith@example.com'
+                        },
+                        {
+                            orderPropsId: 22,
+                            value: '+10907996161'
+                        },
+                        {
+                            orderPropsId: 25,
+                            value: '0000073738'
+                        },
+                        {
+                            orderPropsId: 26,
+                            value: '900 S Holland Ave, Springfield, MO 65806, United States'
+                        },
+                        {
+                            orderPropsId: 51,
+                            value: '04/17/2024'
+                        },
+                        {
+                            orderPropsId: 52,
+                            value: 'Y'
+                        },
+                        {
+                            orderPropsId: 53,
+                            value: '948'
+                        },
+                        {
+                            orderPropsId: 54,
+                            value: '10'
+                        },
+                    ],
+                },
+            }
+        },
+        function(result) {
+            if (result.error()) {
+                console.error(result.error());
+            } else {
+                console.info(result.data());
+            }
+        }
+    );
+    ```
+
+- PHP CRest
+
+    ```php
+    require_once('crest.php');
+
+    $result = CRest::call(
+        'sale.propertyvalue.modify',
+        [
+            'fields' => [
+                'order' => [
+                    'id' => 2066,
+                    'propertyValues' => [
+                        [
+                            'orderPropsId' => 20,
+                            'value' => 'John Smith'
+                        ],
+                        [
+                            'orderPropsId' => 21,
+                            'value' => 'johnsmith@example.com'
+                        ],
+                        [
+                            'orderPropsId' => 22,
+                            'value' => '+10907996161'
+                        ],
+                        [
+                            'orderPropsId' => 25,
+                            'value' => '0000073738'
+                        ],
+                        [
+                            'orderPropsId' => 26,
+                            'value' => '900 S Holland Ave, Springfield, MO 65806, United States'
+                        ],
+                        [
+                            'orderPropsId' => 51,
+                            'value' => '04/17/2024'
+                        ],
+                        [
+                            'orderPropsId' => 52,
+                            'value' => 'Y'
+                        ],
+                        [
+                            'orderPropsId' => 53,
+                            'value' => '948' // Corrected quotation marks
+                        ],
+                        [
+                            'orderPropsId' => 54,
+                            'value' => '10' // Corrected quotation marks
+                        ],
+                    ],
+                ],
+            ]
+        ]
+    );
+
+    echo '<PRE>';
+    print_r($result);
+    echo '</PRE>';
+    ```
+
+{% endlist %}
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+    "result": {
+        "propertyValues": [
+            {
+                "code": "DELIVERY_DATE",
+                "id": 13167,
+                "name": "Delivery Date",
+                "orderPropsId": 51,
+                "orderPropsXmlId": null,
+                "value": "04/17/2024"
+            },
+            {
+                "code": "DELEVERY_REQUIRED",
+                "id": 13168,
+                "name": "Delivery Required",
+                "orderPropsId": 52,
+                "orderPropsXmlId": null,
+                "value": "Y"
+            },
+            {
+                "code": "DOC",
+                "id": 13170,
+                "name": "Document Confirming the Right to Purchase the Product",
+                "orderPropsId": 53,
+                "orderPropsXmlId": null,
+                "value": {
+                    "contentType": "image/jpeg",
+                    "description": "",
+                    "externalId": "89359a6dc806e5dc5404962d1be0ba42",
+                    "fileName": "fit.jpeg",
+                    "fileSize": "84058",
+                    "handlerId": null,
+                    "height": "800",
+                    "id": "948",
+                    "meta": "",
+                    "moduleId": "fileman",
+                    "originalName": "fit.jpeg",
+                    "src": "/upload/medialibrary/5bd/ukgwed4vdxe1qaqv85pqrvdgq5moyhqh/fit.jpeg",
+                    "subdir": "medialibrary/5bd/ukgwed4vdxe1qaqv85pqrvdgq5moyhqh",
+                    "timestampX": "04/02/2024 09:13:29",
+                    "versionOriginalId": null,
+                    "width": "600"
+                }
+            },
+            {
+                "code": "MAX_DELIVERY_DAYS",
+                "id": 13171,
+                "name": "Deliver No Later Than (Days After Order)",
+                "orderPropsId": 54,
+                "orderPropsXmlId": null,
+                "value": "10"
+            },
+            {
+                "code": "FIO",
+                "id": 13163,
+                "name": "Full Name",
+                "orderPropsId": 20,
+                "orderPropsXmlId": null,
+                "value": "John Smith"
+            },
+            {
+                "code": "EMAIL",
+                "id": 13164,
+                "name": "E-Mail",
+                "orderPropsId": 21,
+                "orderPropsXmlId": null,
+                "value": "johnsmith@example.com"
+            },
+            {
+                "code": "PHONE",
+                "id": 13165,
+                "name": "Phone",
+                "orderPropsId": 22,
+                "orderPropsXmlId": null,
+                "value": "+10907996161"
+            },
+            {
+                "code": "LOCATION",
+                "id": 13166,
+                "name": "Location",
+                "orderPropsId": 25,
+                "orderPropsXmlId": "bx_63e3a3b974932",
+                "value": "0000073738"
+            },
+            {
+                "code": "ADDRESS",
+                "id": 13162,
+                "name": "Delivery Address",
+                "orderPropsId": 26,
+                "orderPropsXmlId": null,
+                "value": "900 S Holland Ave, Springfield, MO 65806, United States"
+            }
+        ]
+    },
+    "time": {
+        "start": 1712049055.756753,
+        "finish": 1712049056.823234,
+        "duration": 1.066481113433838,
+        "processing": 0.7959079742431641,
+        "date_start": "2024-04-02T12:10:55+02:00",
+        "date_finish": "2024-04-02T12:10:56+02:00"
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **result**
+[`object`](../../data-types.md) | The root element of the response ||
+|| **propertyValues**
+[`sale_order_property_value[]`](../data-types.md) | An array of objects containing information about the order property values ||
+|| **time**
+[`time`](../../data-types.md) | Information about the request execution time ||
+|#
+
+## Error Handling
+
+HTTP Status: **400**
+
+```json
+{
+    "error": 100,
+    "error_description": "Could not find value for parameter {fields}"
+}
+```
+
+{% include notitle [error handling](../../../_includes/error-info.md) %}
+
+### Possible Error Codes
+
+#|
+|| **Code** | **Description** ||
+|| `200040300020` | Insufficient permissions to change order property values ||
+|| `100` | Parameter `fields` is not specified or is empty ||
+|| `0` | Order not found ||
+|| `0` | Required parameters are not specified ||
+|| `0` | Other errors (e.g., fatal errors) ||
+|#
+
+{% include [system errors](../../../_includes/system-errors.md) %}
+
+## Continue Learning
+
+- [{#T}](./index.md)
+- [{#T}](./sale-property-value-get.md)
+- [{#T}](./sale-property-value-list.md)
+- [{#T}](./sale-property-value-delete.md)
+- [{#T}](./sale-property-value-get-fields.md)

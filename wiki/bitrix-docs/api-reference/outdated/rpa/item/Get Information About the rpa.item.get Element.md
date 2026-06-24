@@ -1,0 +1,131 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Get Information About the rpa.item.get Element"
+original_path: "api-reference/outdated/rpa/item/rpa-item-get.md"
+---
+
+# Get Information About the rpa.item.get Element
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+> Scope: [`rpa`](../../../scopes/permissions.md)
+>
+> Who can execute the method: any user
+
+{% note warning "DEPRECATED" %}
+
+The development of this method has been halted. Use [Smart scripts](../../../crm/universal/user-defined-object-types/index.md) as an alternative to this functionality.
+
+{% endnote %}
+
+This method retrieves information about the element with the identifier `id` of the process with the identifier `typeId`.
+
+#|
+|| **Name**
+`type` | **Description** ||
+|| **typeId** 
+[`integer`](../../../data-types.md) | Identifier of the process ||
+|| **id** 
+[`integer`](../../../data-types.md) | Identifier of the element ||
+|#
+
+## Response Handling
+
+HTTP Status: **200**
+
+```json
+{
+    "item": {
+        "id": 43,
+        "stageId": 4,
+        "previousStageId": 3,
+        "name": "Element Name",
+        "typeId": 1,
+        "createdBy": 1,
+        "updatedBy": 1,
+        "createdTime": "03/19/2020 01:07:39 PM",
+        "updatedTime": "03/23/2020 06:34:05 PM",
+        "movedTime": "03/23/2020 06:34:05 PM",
+        "detailUrl": "/rpa/item/1/43/",
+        "movedBy": 1,
+        "UF_RPA_1_NAME": "Element Name",
+        "tasksCounter": 0,
+        "tasksFaces": {
+            "completed": [
+                1
+            ],
+            "running": [],
+            "all": [
+                1
+            ]
+        },
+        "users": {
+            "1": {
+                "id": "1",
+                "name": "Anthony",
+                "secondName": null,
+                "lastName": "",
+                "title": null,
+                "workPosition": null,
+                "fullName": "Anthony",
+                "link": "/company/personal/user/1/"
+            }
+        }
+    }
+}
+```
+
+### Returned Data
+
+#|
+|| **Name** | **Description** ||
+|| **stageId** | Identifier of the stage the element is currently in ||
+|| **previousStageId** | Identifier of the previous stage of the element ||
+|| **name** | Name of the element ||
+|| **typeId** | Identifier of the process ||
+|| **createdBy** | Identifier of the user who created the element ||
+|| **updatedBy** | Identifier of the user who modified the element ||
+|| **movedBy** | Identifier of the user who changed the stage of the element ||
+|| **createdTime** | Time the element was created ||
+|| **updatedTime** | Time the element was modified ||
+|| **movedTime** | Time the stage of the element was changed ||
+|| **detailUrl** | Link to the detail form of the element ||
+|| **tasksCounter** | Number of tasks associated with the element for the user ||
+|| **tasksFaces** | Information for rendering the sequence of responsible parties during approval:
+- `completed` — who completed the task
+- `running` — who is currently working on the task
+- `all` — all participants ||
+|| **users** | Aggregated information about all users related to the element. A list where the key is the user identifier:
+- `id` — identifier
+- `name` — first name
+- `secondName` — middle name
+- `lastName` — last name
+- `title` — title
+- `workPosition` — position
+- `fullName` — formatted name
+- `link` — link to the profile ||
+|| **UF_RPA_...** | Values of custom fields.
+
+Values of multiple fields are returned as an array.
+
+File-type field values are returned as a list:
+- `id` — identifier
+- `url` — link to the file on the account
+- `urlMachine` — link to the file for the application ||
+|#
+
+## Continue Exploring 
+
+- [{#T}](./index.md)
+- [{#T}](./rpa-item-add.md)
+- [{#T}](./rpa-item-update.md)
+- [{#T}](./rpa-item-get-tasks.md)
+- [{#T}](./rpa-item-list.md)
+- [{#T}](./rpa-item-delete.md)

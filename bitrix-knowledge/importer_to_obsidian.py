@@ -19,10 +19,10 @@ class ObsidianImporter:
         """Initializes importer configuration."""
         if workspace_dir is None:
             self.root = Path(os.getcwd()) / "bitrix-knowledge"
-            self.vault_dir = Path(os.getcwd()) / "vault" / "bitrix-docs"
+            self.vault_dir = Path(os.getcwd()) / "wiki" / "bitrix-docs"
         else:
             self.root = Path(workspace_dir)
-            self.vault_dir = self.root.parent / "vault" / "bitrix-docs"
+            self.vault_dir = self.root.parent / "wiki" / "bitrix-docs"
 
         self.state_file = self.root / "import_state.json"
         self._ensure_dirs()

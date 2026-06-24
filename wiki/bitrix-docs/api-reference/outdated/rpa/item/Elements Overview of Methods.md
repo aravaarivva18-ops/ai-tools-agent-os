@@ -1,0 +1,42 @@
+---
+tags:
+  - bitrix
+  - api
+  - docs
+title: "Elements: Overview of Methods"
+original_path: "api-reference/outdated/rpa/item/index.md"
+---
+
+# Elements: Overview of Methods
+
+{% note tip "" %}
+
+If you are developing integrations for Bitrix24 using AI tools (Codex, Claude Code, Cursor), connect to the [MCP server](../../../../ai-tools/mcp.md) so that the assistant can utilize the official REST documentation.
+
+{% endnote %}
+
+{% note warning "" %}
+
+**DEPRECATED**
+
+The development of methods rpa.item.* has been halted.  
+Please use the [SPA CRM](../../../crm/universal/user-defined-object-types/index.md) section.
+
+{% endnote %}
+
+> Scope: [`rpa`](../../../scopes/permissions.md)  
+> Who can execute the method: any user
+
+Since the elements of each workflow are stored in separate tables, the identifiers of elements from different workflows will overlap.
+
+Therefore, it is necessary to pass the workflow identifier `typeId` to all methods.
+
+#|  
+|| **Method** | **Description** ||  
+|| [rpa.item.add](./rpa-item-add.md) | Adds a new element to the workflow with the identifier `typeId` ||  
+|| [rpa.item.update](./rpa-item-update.md) | Updates the element with the identifier `id` in the workflow with the identifier `typeId` ||  
+|| [rpa.item.get](./rpa-item-get.md) | Retrieves information about the element with the identifier `id` in the workflow with the identifier `typeId` ||  
+|| [rpa.item.getTasks](./rpa-item-get-tasks.md) | Retrieves data about the current tasks of the element with the identifier `id` in the workflow with the identifier `typeId` ||  
+|| [rpa.item.list](./rpa-item-list.md) | Retrieves a list of elements in the workflow with the identifier `typeId` ||  
+|| [rpa.item.delete](./rpa-item-delete.md) | Deletes the element ||  
+|#
