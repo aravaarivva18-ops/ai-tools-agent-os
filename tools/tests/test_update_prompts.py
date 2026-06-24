@@ -90,6 +90,38 @@ def test_update_gem_bot_prompts(temp_prompts_db):
     assert kb_row is not None
     assert "База знаний" in kb_row["prompt"]
 
+    # Check for Gemini Bot Developer Mode
+    cursor.execute(
+        "SELECT * FROM prompts WHERE act = ?", ("Gemini Bot Developer Mode",)
+    )
+    dev_mode_row = cursor.fetchone()
+    assert dev_mode_row is not None
+    assert "Developer" in dev_mode_row["prompt"] or "Lead Software Engineer" in dev_mode_row["prompt"]
+
+    # Check for Gemini Bot Prompt Architect Mode
+    cursor.execute(
+        "SELECT * FROM prompts WHERE act = ?", ("Gemini Bot Prompt Architect Mode",)
+    )
+    arch_mode_row = cursor.fetchone()
+    assert arch_mode_row is not None
+    assert "Prompt Architect" in arch_mode_row["prompt"]
+
+    # Check for Gemini Bot Prompt Generator Mode
+    cursor.execute(
+        "SELECT * FROM prompts WHERE act = ?", ("Gemini Bot Prompt Generator Mode",)
+    )
+    gen_mode_row = cursor.fetchone()
+    assert gen_mode_row is not None
+    assert "Prompt Generator" in gen_mode_row["prompt"]
+
+    # Check for Gemini Bot Audit Specialist Mode
+    cursor.execute(
+        "SELECT * FROM prompts WHERE act = ?", ("Gemini Bot Audit Specialist Mode",)
+    )
+    audit_mode_row = cursor.fetchone()
+    assert audit_mode_row is not None
+    assert "Systems Auditor" in audit_mode_row["prompt"] or "AUDIT AND SYSTEM" in audit_mode_row["prompt"]
+
     # Check for ADRs
     cursor.execute("SELECT * FROM prompts WHERE act LIKE 'ADR:%'")
     adr_rows = cursor.fetchall()

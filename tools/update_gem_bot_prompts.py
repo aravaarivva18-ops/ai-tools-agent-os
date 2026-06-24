@@ -27,6 +27,18 @@ def main() -> None:
         "gemini_bot_knowledge_base.md": [
             "Gemini Bot Knowledge Base",
         ],
+        "gem_bot_developer.md": [
+            "Gemini Bot Developer Mode",
+        ],
+        "gem_bot_prompt_architect.md": [
+            "Gemini Bot Prompt Architect Mode",
+        ],
+        "gem_bot_prompt_generator.md": [
+            "Gemini Bot Prompt Generator Mode",
+        ],
+        "gem_bot_audit_specialist.md": [
+            "Gemini Bot Audit Specialist Mode",
+        ],
     }
 
     conn = sqlite3.connect(DB_PATH)
