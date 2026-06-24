@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
-import sys
 from selectolax.lexbor import LexborHTMLParser
+
 
 def main():
     file_path = "/Users/rus/.gemini/antigravity-cli/brain/b9246f7a-f837-41b3-bc8f-33a42a774453/.system_generated/steps/855/content.md"
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             html = f.read()
     except Exception as e:
         print(f"Error reading file: {e}")
         return
 
     parser = LexborHTMLParser(html)
-    
+
     # Попробуем найти описание по разным селекторам hh.ru
     desc_node = parser.css_first("[data-qa='vacancy-description']")
     if not desc_node:
         desc_node = parser.css_first(".g-user-content")
-    
+
     if desc_node:
         print("--- ВАКАНСИЯ: ОПИСАНИЕ ---")
         print(desc_node.text(separator="\n").strip())
@@ -26,7 +26,7 @@ def main():
         # Выведем хотя бы заголовки H1-H3 для ориентира
         for h in parser.css("h1, h2, h3"):
             print(f"{h.tag}: {h.text().strip()}")
-        
+
         # Попробуем вывести текстовое содержимое body
         body = parser.css_first("body")
         if body:
