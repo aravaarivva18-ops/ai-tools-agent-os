@@ -304,6 +304,7 @@ def enforce_anti_clutter(file_path: str) -> bool:
         "/Users/rus/ai-tools/tools",
         "/Users/rus/ai-tools/vault",
         "/Users/rus/ai-tools/dashboard-hand-on-pulse",
+        "/Users/rus/ai-tools/wiki",
     }
     if any(path_str.startswith(d) for d in allowed_dirs):
         return True
