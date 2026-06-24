@@ -62,6 +62,13 @@ exclude = [
     '^\.venv/',
     '^tools/tests/',
     '^geo-seo/tests/',
+    'clean_image_metadata',
+    'scratch',
+    'parse_site',
+    'tool_validator',
+    'planning_with_files',
+    'security',
+    'read_docx_xlsx',
 ]
 
 

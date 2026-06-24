@@ -33,7 +33,7 @@ Every meaningful change requires a DOX pass before the task is done. Update the 
 - [[bitrix-knowledge/AGENTS.md]] — Persistent 1C-Bitrix knowledge base & Obsidian RAG index.
 - [[youtube-faceless-pipeline/AGENTS.md]] — Script generation, scene rendering, and upload CLI.
 - [[dashboard-hand-on-pulse/AGENTS.md]] — Client Streamlit dashboard for Target Media.
-- [[tools/prompt_validator.py]] — нормализация и health check конституции
+- [[tools/rules_validator.py]] — нормализация и health check конституции
 - [[tools/self_improve.py]] — главный автоцикл улучшения
 
 ---
@@ -51,4 +51,8 @@ Every meaningful change requires a DOX pass before the task is done. Update the 
 - **Плагины**: Обязательно использование `agent-skills` (слэш-команды), `fablize` (DoD и доказательства) и `ponytail` (YAGNI/контроль абстракций).
 - **YAGNI & Code Style**: Философия Karpathy Vibe Coding (линейный код, макс 2 уровня абстракции) и levelsio YAGNI (минималистичный стек, SQLite). В ходе YAGNI-аудита v10 удалено 14% bloat из `tools/`.
 - **Безопасность (SAST)**: SAST-сканер секретов оптимизирован (выполнение за 0.33с за счет os.walk обрезки `.venv`, `vault` и `bitrix-knowledge`).
-- **Процесс**: Spec -> Research -> Plan -> Implement -> Test (Sandbox `tools/tests/test_healer.py` с "diff-only" наложением патчей, авто-откатом при сбоях синтаксиса/тестов, тайм-аутами и Stealth Stop на 3-й раз) -> Ship (`tools/self_improve.py` с авто-классификацией, замером времени выкупа и логированием всех попыток в `dashboard.db` через `log_change` с SQLite WAL + retry).
+- **Процесс**: Spec -> Research -> Plan -> Implement -> Test -> Ship.
+  * *Режим Fast-Track*: для задач <30 строк изменений и <=1 измененного файла пропускать Spec/Planning и писать код напрямую.
+  * *JIT Testing*: в процессе кодинга запускать только точечные тесты через `tools/test_healer.py --diff`. Полный прогон pytest выполнять только перед коммитом на шаге Ship.
+  * *Commit-on-DoD*: коммиты выполнять только после успешного завершения логической вехи (DoD) и зеленых тестов. Промежуточные "сырые" изменения не коммитить.
+  * *Сброс истории*: при длине диалога >40-50k токенов агент сохраняет чекпоинт в `implementation_plan.md` и предлагает открыть новый чат для очистки контекста.

@@ -32,8 +32,8 @@
    * Использование: Поиск и запись долгосрочного контекста.
 4. **`obsidian_cli.py`** (`/Users/rus/ai-tools/tools/obsidian_cli.py`)
    * Назначение: Мост к локальному Obsidian REST API для работы с базой знаний (заметки, холсты, задачи, Daily Note).
-5. **`advanced_workflow.py`** (`/Users/rus/ai-tools/tools/advanced_workflow.py`)
-   * Назначение: Оркестратор линейного выполнения последовательных шагов автоматизации.
+5. **`planning_with_files.py`** (`/Users/rus/ai-tools/tools/planning_with_files.py`)
+   * Назначение: Восстановление контекста сессии через Markdown-файлы. Единый оркестратор планирования.
 6. **`lead_swarm.py`** (`/Users/rus/ai-tools/tools/lead_swarm.py`)
    * Назначение: Модуль агрегации лидов, их BANT/MEDDIC скоринга и роутинга между департаментами.
 7. **`interaction_core.py`** (`/Users/rus/ai-tools/tools/interaction_core.py`)

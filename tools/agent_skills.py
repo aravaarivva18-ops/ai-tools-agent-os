@@ -15,29 +15,40 @@ from typing import Any
 
 from pydantic import BaseModel
 
-try:
-    from tools.tool_validator import (
-        LLMValidationError,
-        generate_tool_schema,
-        validate_llm_output,
-    )
-except ImportError:
-    from tool_validator import (
-        LLMValidationError,
-        generate_tool_schema,
-        validate_llm_output,
-    )
+LLMValidationError: Any = None
+generate_tool_schema: Any = None
+validate_llm_output: Any = None
 
 try:
-    from tools.prompt_validator import enforce_anti_clutter
+    import tools.tool_validator
+
+    LLMValidationError = tools.tool_validator.LLMValidationError
+    generate_tool_schema = tools.tool_validator.generate_tool_schema
+    validate_llm_output = tools.tool_validator.validate_llm_output
 except ImportError:
     try:
-        from prompt_validator import enforce_anti_clutter
+        import tool_validator
+
+        LLMValidationError = tool_validator.LLMValidationError
+        generate_tool_schema = tool_validator.generate_tool_schema
+        validate_llm_output = tool_validator.validate_llm_output
     except ImportError:
-        enforce_anti_clutter = None
+        pass
+
+enforce_anti_clutter: Any = None
+try:
+    import tools.rules_validator
+
+    enforce_anti_clutter = tools.rules_validator.enforce_anti_clutter
+except ImportError:
+    try:
+        import rules_validator
+
+        enforce_anti_clutter = rules_validator.enforce_anti_clutter
+    except ImportError:
+        pass
 
 __all__ = ["AgentSkillsManager", "LLMValidationError"]
-
 
 
 class AgentSkillsManager:
@@ -195,8 +206,8 @@ description: {description.strip()}
 - [ ] Code is formatted with Ruff.
 - [ ] Tests run successfully offline.
 """
-        if enforce_anti_clutter:
-            enforce_anti_clutter(skill_md_path)
+        if enforce_anti_clutter is not None:
+            enforce_anti_clutter(str(skill_md_path))
         skill_md_path.write_text(template_content, encoding="utf-8")
 
         # Create scripts, examples and tests placeholders

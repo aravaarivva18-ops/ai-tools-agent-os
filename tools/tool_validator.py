@@ -181,7 +181,7 @@ def generate_tool_schema(func: Callable[..., Any]) -> dict[str, Any]:
         param_type = _get_json_type(unwrapped_annot)
         param_desc = doc_params.get(param_name, "")
 
-        prop_def = {"type": param_type}
+        prop_def: dict[str, Any] = {"type": param_type}
         if param_desc:
             prop_def["description"] = param_desc
 
@@ -206,7 +206,7 @@ def generate_tool_schema(func: Callable[..., Any]) -> dict[str, Any]:
 
         properties[param_name] = prop_def
 
-    schema = {
+    schema: dict[str, Any] = {
         "name": func.__name__,
         "description": summary or func.__doc__ or "",
         "parameters": {

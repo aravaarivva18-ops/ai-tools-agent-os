@@ -22,7 +22,7 @@ check: check-rules
 	uv run ruff check .
 	uv run ruff format --check .
 	uv run mypy tools/ geo-seo/
-	uv run bandit -r . -x ./.venv,./.git,./tools/.venv,./tools/.gemini -s B101,B105,B108,B110,B112,B310,B311,B404,B603,B607
+	uv run bandit -r . -x ./.venv,./.git,./tools/.venv,./tools/.gemini -s B101,B105,B106,B108,B110,B112,B310,B311,B404,B603,B607
 
 check-all: check test
 

@@ -8,6 +8,7 @@ from tools.self_improve import (
     cleanup_clutter,
     generate_improvement_report,
     maintain_constitution,
+    yagni_audit_dependencies,
 )
 
 
@@ -266,9 +267,13 @@ def test_maintain_constitution_flow(tmp_path):
     assert "## 🏛️ 5. Раздел один" in backups[0].read_text(encoding="utf-8")
 
     # Проверяем, что создалась ADR-запись
-    adr_file = tmp_path / "vault" / "adr" / "ADR_0016_automated_constitution_maintenance.md"
+    adr_file = (
+        tmp_path / "vault" / "adr" / "ADR_0016_automated_constitution_maintenance.md"
+    )
     assert adr_file.exists()
-    assert "ADR 0016: Автоматическое обслуживание конституции" in adr_file.read_text(encoding="utf-8")
+    assert "ADR 0016: Автоматическое обслуживание конституции" in adr_file.read_text(
+        encoding="utf-8"
+    )
 
 
 def test_maintain_constitution_health_cleanup_trigger(tmp_path):
@@ -282,8 +287,7 @@ def test_maintain_constitution_health_cleanup_trigger(tmp_path):
         "Текст один\n"
         "\n"
         "## 🧠 2. Раздел два\n"
-        "Текст два\n"
-        + ("A" * 60000)
+        "Текст два\n" + ("A" * 60000)
     )
     constitution_file.write_text(content, encoding="utf-8")
 
@@ -292,7 +296,6 @@ def test_maintain_constitution_health_cleanup_trigger(tmp_path):
     # Должен создаться бэкап, так как health == needs_cleanup, даже при правильной нумерации
     backups = list(tmp_path.glob("GEMINI_ANTIGRAVITY.md.bak.*"))
     assert len(backups) == 1
-
 
 
 def test_cleanup_clutter(tmp_path):
@@ -317,4 +320,35 @@ def test_cleanup_clutter(tmp_path):
     assert not old_backup.exists()
 
 
+def test_yagni_audit_dependencies(tmp_path):
+    # Create mock pyproject.toml
+    pyproject = tmp_path / "pyproject.toml"
+    pyproject.write_text(
+        """
+[project]
+dependencies = [
+    "requests>=2.0.0",
+    "numpy>=1.20.0",
+    "unused-lib>=1.0.0",
+]
+""",
+        encoding="utf-8",
+    )
 
+    # Create mock code files importing some of these
+    tools_dir = tmp_path / "tools"
+    tools_dir.mkdir()
+    (tools_dir / "my_script.py").write_text(
+        "import requests\nfrom tools.nested import something\n", encoding="utf-8"
+    )
+
+    nested_dir = tools_dir / "nested"
+    nested_dir.mkdir()
+    (nested_dir / "something.py").write_text("import numpy as np\n", encoding="utf-8")
+
+    # Run audit
+    unused = yagni_audit_dependencies(tmp_path)
+
+    assert "unused-lib" in unused
+    assert "requests" not in unused
+    assert "numpy" not in unused

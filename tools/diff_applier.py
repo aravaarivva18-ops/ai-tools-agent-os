@@ -165,13 +165,21 @@ if __name__ == "__main__":
 
     # Проверяем на anti-clutter перед записью
     try:
+        enforce_fn = None
         try:
-            from tools.prompt_validator import enforce_anti_clutter
+            import tools.rules_validator
+
+            enforce_fn = tools.rules_validator.enforce_anti_clutter
         except ImportError:
-            from prompt_validator import enforce_anti_clutter
-        if enforce_anti_clutter:
-            enforce_anti_clutter(target_path)
-            enforce_anti_clutter(backup_path)
+            try:
+                import rules_validator
+
+                enforce_fn = rules_validator.enforce_anti_clutter
+            except ImportError:
+                pass
+        if enforce_fn is not None:
+            enforce_fn(target_path)
+            enforce_fn(backup_path)
     except Exception as e:
         print(f"Anti-Clutter error: {e}")
         sys.exit(1)

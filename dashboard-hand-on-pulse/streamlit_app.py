@@ -312,7 +312,11 @@ def render_sidebar():
         if check_constitution_health:
             health = check_constitution_health()
             if health.get("status") != "missing":
-                score = get_constitution_health_score() if get_constitution_health_score else 100
+                score = (
+                    get_constitution_health_score()
+                    if get_constitution_health_score
+                    else 100
+                )
                 h_status = health.get("health", "unknown").upper()
                 h_color = "#4CAF50" if score >= 90 else "#FF9800"
                 st.markdown(

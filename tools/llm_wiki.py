@@ -10,15 +10,20 @@ import os
 import re
 import sys
 from pathlib import Path
+from typing import Any
 
+enforce_anti_clutter: Any = None
 try:
-    from tools.prompt_validator import enforce_anti_clutter
+    import tools.rules_validator
+
+    enforce_anti_clutter = tools.rules_validator.enforce_anti_clutter
 except ImportError:
     try:
-        from prompt_validator import enforce_anti_clutter
-    except ImportError:
-        enforce_anti_clutter = None
+        import rules_validator
 
+        enforce_anti_clutter = rules_validator.enforce_anti_clutter
+    except ImportError:
+        pass
 
 
 class LLMWiki:
@@ -127,8 +132,8 @@ class LLMWiki:
             link_str = f"- [[{name}]]"
             if link_str not in index_content:
                 index_lines.append(link_str)
-        if enforce_anti_clutter:
-            enforce_anti_clutter(index_file)
+        if enforce_anti_clutter is not None:
+            enforce_anti_clutter(str(index_file))
         index_file.write_text("\n".join(index_lines) + "\n", encoding="utf-8")
 
         # Update Log.md
@@ -140,8 +145,8 @@ class LLMWiki:
             log_entry = f"- **{timestamp}**: Ingested raw file [[{name}]]."
             if log_entry not in log_content:
                 log_lines.append(log_entry)
-        if enforce_anti_clutter:
-            enforce_anti_clutter(log_file)
+        if enforce_anti_clutter is not None:
+            enforce_anti_clutter(str(log_file))
         log_file.write_text("\n".join(log_lines) + "\n", encoding="utf-8")
 
     def query(self, start_node: str, max_depth: int = 2) -> str:

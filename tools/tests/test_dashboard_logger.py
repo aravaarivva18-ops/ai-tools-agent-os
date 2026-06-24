@@ -270,4 +270,3 @@ def test_log_session_start_invalid_project(temp_db):
             project_name=None,
             description="Session start: ну как ты",
         )
-

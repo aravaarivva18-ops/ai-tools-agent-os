@@ -12,7 +12,7 @@ from typing import Any
 try:
     from tools.planning_with_files import PlanningWithFiles
 except ImportError:
-    from planning_with_files import PlanningWithFiles
+    from planning_with_files import PlanningWithFiles  # type: ignore[no-redef]
 
 
 class SoloLoopV10:
@@ -25,7 +25,7 @@ class SoloLoopV10:
             self.workspace_root = Path(workspace_path)
 
         self.planner = PlanningWithFiles(self.workspace_root)
-        self.error_registry = {}  # Tracks error_message -> count
+        self.error_registry: dict[str, int] = {}  # Tracks error_message -> count
         self.stealth_stop_triggered = False
 
     def startup_restore(self) -> dict[str, Any]:

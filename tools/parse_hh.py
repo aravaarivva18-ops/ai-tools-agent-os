@@ -39,5 +39,6 @@ def main():
                 end = min(len(text), idx + 2000)
                 print(text[start:end])
 
+
 if __name__ == "__main__":
     main()

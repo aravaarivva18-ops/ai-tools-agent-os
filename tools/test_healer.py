@@ -3,30 +3,49 @@ import os
 import re
 import subprocess
 import sys
+from typing import Any
 
+SoloLoopV10: Any = None
 try:
-    from core.solo_loop import SoloLoopV10
+    import core.solo_loop
+
+    SoloLoopV10 = core.solo_loop.SoloLoopV10
 except ImportError:
     try:
-        from tools.core.solo_loop import SoloLoopV10
-    except ImportError:
-        SoloLoopV10 = None
+        import tools.core.solo_loop
 
+        SoloLoopV10 = tools.core.solo_loop.SoloLoopV10
+    except ImportError:
+        pass
+
+log_change: Any = None
 try:
-    from tools.dashboard_logger import log_change
+    import tools.dashboard_logger
+
+    log_change = tools.dashboard_logger.log_change
 except ImportError:
     try:
-        from dashboard_logger import log_change
-    except ImportError:
-        log_change = None
+        import dashboard_logger
 
+        log_change = dashboard_logger.log_change
+    except ImportError:
+        pass
+
+parse_blocks: Any = None
+apply_blocks: Any = None
 try:
-    from tools.diff_applier import apply_blocks, parse_blocks
+    import tools.diff_applier
+
+    parse_blocks = tools.diff_applier.parse_blocks
+    apply_blocks = tools.diff_applier.apply_blocks
 except ImportError:
     try:
-        from diff_applier import apply_blocks, parse_blocks
+        import diff_applier
+
+        parse_blocks = diff_applier.parse_blocks
+        apply_blocks = diff_applier.apply_blocks
     except ImportError:
-        parse_blocks, apply_blocks = None, None
+        pass
 
 
 def apply_patch_file(target_file, patch_file_or_text):
@@ -180,7 +199,7 @@ def parse_pytest_error(stdout_text):
     Парсит лог pytest и извлекает очищенные трейсбеки.
     Возвращает список словарей: [{'test_name': '...', 'message': '...'}]
     """
-    errors = []
+    errors: list[dict[str, Any]] = []
 
     # 1. Поиск блока сбоев (FAILURES)
     if "=== FAILURES ===" not in stdout_text and "___" not in stdout_text:
@@ -221,6 +240,71 @@ def parse_pytest_error(stdout_text):
     return errors
 
 
+def detect_tests_from_diff(root_path) -> list:
+    """Автоматически определяет список тест-файлов на основе git diff."""
+    import subprocess
+    from pathlib import Path
+
+    root_dir = Path(root_path).resolve()
+    changed_files = []
+
+    try:
+        # Получаем измененные файлы (рабочая копия + индекс)
+        output = subprocess.check_output(
+            ["git", "diff", "--name-only"], cwd=str(root_dir)
+        ).decode("utf-8")
+        changed_files.extend(output.splitlines())
+
+        output_cached = subprocess.check_output(
+            ["git", "diff", "--cached", "--name-only"], cwd=str(root_dir)
+        ).decode("utf-8")
+        changed_files.extend(output_cached.splitlines())
+    except Exception as e:
+        print(f"Error checking git diff: {e}", file=sys.stderr)
+        return []
+
+    # Уникальные файлы в виде путей
+    unique_changed = sorted({f.strip() for f in changed_files if f.strip()})
+
+    test_files = set()
+    tests_dir = root_dir / "tools" / "tests"
+
+    for rel_path in unique_changed:
+        abs_path = root_dir / rel_path
+        file_name = abs_path.name
+
+        # 1. Если это сам тест (лежит в папке tests)
+        if (
+            file_name.startswith("test_")
+            and file_name.endswith(".py")
+            and "tests" in rel_path
+        ):
+            if abs_path.exists():
+                test_files.add(str(abs_path))
+            continue
+
+        # 2. Если это обычный питоновский файл
+        if file_name.endswith(".py"):
+            base_name = file_name[:-3]  # без .py
+            # Ищем тест с соответствующим именем
+            candidate_test = tests_dir / f"test_{base_name}.py"
+            if candidate_test.exists():
+                test_files.add(str(candidate_test))
+
+            # Сканируем всю папку тестов на предмет импорта этого модуля
+            if tests_dir.exists():
+                for test_file in tests_dir.glob("test_*.py"):
+                    try:
+                        content = test_file.read_text(encoding="utf-8")
+                        # Простой поиск по ключевому слову/импорту
+                        if base_name in content:
+                            test_files.add(str(test_file))
+                    except Exception:
+                        pass
+
+    return sorted(test_files)
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -239,6 +323,11 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--timeout", type=int, default=10, help="Test execution timeout in seconds"
+    )
+    parser.add_argument(
+        "--diff",
+        action="store_true",
+        help="Auto-detect and run tests for modified files based on git diff",
     )
 
     args = parser.parse_args()
@@ -333,90 +422,90 @@ if __name__ == "__main__":
                 print(output_to_parse)
             sys.exit(1)
 
-    # Case 2: Process auto-heal queue
-    if not args.test_file:
+    # Case 2: Process auto-heal queue OR git diff detection
+    if not args.test_file or args.diff:
         from pathlib import Path
 
-        # Read auto-heal queue
-        queue_path = Path(project_root) / "vault" / "auto_heal_queue.json"
-        if queue_path.exists():
-            try:
-                with open(queue_path, encoding="utf-8") as f:
-                    data = json.load(f)
-                candidates = data.get("heal_candidates", [])
-                if candidates:
-                    print(
-                        f"Found {len(candidates)} heal candidates in auto-heal queue."
+        candidates = []
+        source_label = "queue"
+
+        # 1. Если явно запрошен --diff
+        if args.diff:
+            candidates = detect_tests_from_diff(project_root)
+            source_label = "git diff auto-detect"
+        else:
+            queue_path = Path(project_root) / "vault" / "auto_heal_queue.json"
+            if queue_path.exists():
+                try:
+                    with open(queue_path, encoding="utf-8") as f:
+                        data = json.load(f)
+                    candidates = data.get("heal_candidates", [])
+                except Exception as e:
+                    print(f"Error reading auto-heal queue: {e}")
+
+            # Фолбэк на git diff, если очередь пустая
+            if not candidates:
+                candidates = detect_tests_from_diff(project_root)
+                source_label = "git diff auto-detect (fallback)"
+
+        if candidates:
+            print(f"Found {len(candidates)} test candidates via {source_label}.")
+            all_success = True
+            for cand in candidates:
+                # Resolve path relative to project root
+                cand_path = Path(cand)
+                if not cand_path.is_absolute():
+                    cand_path = Path(project_root) / cand
+
+                if cand_path.exists():
+                    print(f"\nRunning candidate tests: {cand}")
+
+                    success, stdout, stderr = run_test_file(
+                        str(cand_path), timeout=args.timeout
                     )
-                    all_success = True
-                    for cand in candidates:
-                        # Resolve path relative to project root
-                        cand_path = Path(cand)
-                        if not cand_path.is_absolute():
-                            cand_path = Path(project_root) / cand
 
-                        if cand_path.exists():
-                            print(f"\nHealing candidate: {cand}")
-                            if log_change:
-                                log_change(
-                                    "Self-Healing",
-                                    f"Attempting to heal queue candidate: {cand}",
-                                )
+                    # Track execution in Solo Loop
+                    if loop:
+                        track_res = loop.track_execution(
+                            str(cand_path), success, stdout + "\n" + stderr
+                        )
+                        if track_res["stealth_stop"]:
+                            print(track_res["compressed_output"])
+                            sys.exit(3)
+                        output_to_parse = track_res["compressed_output"]
+                    else:
+                        output_to_parse = stdout
 
-                            success, stdout, stderr = run_test_file(
-                                str(cand_path), timeout=args.timeout
+                    if success:
+                        print(f"✅ Success: Tests in {cand} passed cleanly.")
+                    else:
+                        print(
+                            f"❌ Tests Failed in {cand}. Generating Clean Traceback for AI:"
+                        )
+                        if log_change:
+                            log_change(
+                                "Self-Healing",
+                                f"Failed test candidate: {cand}",
                             )
-
-                            # Track execution in Solo Loop
-                            if loop:
-                                track_res = loop.track_execution(
-                                    str(cand_path), success, stdout + "\n" + stderr
-                                )
-                                if track_res["stealth_stop"]:
-                                    print(track_res["compressed_output"])
-                                    sys.exit(3)
-                                output_to_parse = track_res["compressed_output"]
-                            else:
-                                output_to_parse = stdout
-
-                            if success:
-                                print(f"✅ Success: Tests in {cand} passed cleanly.")
-                                if log_change:
-                                    log_change(
-                                        "Self-Healing",
-                                        f"Successfully healed queue candidate: {cand}",
-                                    )
-                            else:
-                                print(
-                                    f"❌ Tests Failed in {cand}. Generating Clean Traceback for AI:"
-                                )
-                                if log_change:
-                                    log_change(
-                                        "Self-Healing",
-                                        f"Failed healing queue candidate: {cand}",
-                                    )
-                                print("=" * 60)
-                                errors = parse_pytest_error(output_to_parse)
-                                if errors:
-                                    for err in errors:
-                                        print(f"Target Test: {err['test_name']}")
-                                        print(f"Traceback Summary:\n{err['message']}")
-                                        print("-" * 60)
-                                else:
-                                    print(output_to_parse)
-                                all_success = False
+                        print("=" * 60)
+                        errors = parse_pytest_error(output_to_parse)
+                        if errors:
+                            for err in errors:
+                                print(f"Target Test: {err['test_name']}")
+                                print(f"Traceback Summary:\n{err['message']}")
+                                print("-" * 60)
                         else:
-                            print(
-                                f"Warning: Candidate file {cand} not found at {cand_path}"
-                            )
-                    sys.exit(0 if all_success else 1)
-            except Exception as e:
-                print(f"Error reading auto-heal queue: {e}")
-
-        print(
-            "Usage: python3 test_healer.py <test_file_path> [--target <target_file> --patch <patch_file>]"
-        )
-        sys.exit(1)
+                            print(output_to_parse)
+                        all_success = False
+                else:
+                    print(f"Warning: Candidate file {cand} not found at {cand_path}")
+            sys.exit(0 if all_success else 1)
+        else:
+            print(
+                "Usage: python3 test_healer.py <test_file_path> [--target <target_file> --patch <patch_file>]\n"
+                "Or run with --diff to auto-detect tests based on modified files."
+            )
+            sys.exit(1)
 
     # Case 3: Diagnostics for a single test file
     test_path = args.test_file
@@ -425,8 +514,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print(f"Running tests in {test_path}...")
-    if log_change:
-        log_change("Self-Healing", f"Running diagnostic test run for: {test_path}")
 
     success, stdout, stderr = run_test_file(test_path, timeout=args.timeout)
 
@@ -442,8 +529,6 @@ if __name__ == "__main__":
 
     if success:
         print("Success: All tests passed cleanly.")
-        if log_change:
-            log_change("Self-Healing", f"Tests passed cleanly for: {test_path}")
         sys.exit(0)
     else:
         print("\n❌ Tests Failed. Generating Clean Traceback for AI:")

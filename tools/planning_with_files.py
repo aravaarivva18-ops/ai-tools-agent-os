@@ -30,7 +30,7 @@ class PlanningWithFiles:
         Returns:
             dict: Containing 'title', 'steps', 'completed_steps', 'next_step', 'findings'.
         """
-        state = {
+        state: dict[str, Any] = {
             "title": "Unknown Plan",
             "steps": [],
             "completed_steps": [],

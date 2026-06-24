@@ -71,7 +71,7 @@ def main():
     # 3. Check tool scripts executable
     tools_ok = True
     tools_to_check = [
-        (tools_dir / "check_rules.py", []),
+        (tools_dir / "rules_validator.py", []),
         (tools_dir / "test_healer.py", [str(tools_dir / "test_diff_applier.py")]),
     ]
 

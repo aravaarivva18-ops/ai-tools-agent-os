@@ -76,6 +76,7 @@ max-complexity = 20
 "**/dashboard-hand-on-pulse/*.py" = ["C408", "E741", "S105", "S106", "B904", "S110", "F841", "W293"]
 "**/dashboard-hand-on-pulse/tests/*.py" = ["S101", "S108", "ARG001", "ARG002", "S105", "S106"]
 "tools/security/security_scanner.py" = ["C901"]
+"tools/generate_workflows.py" = ["A002"]
 
 [format]
 quote-style = "double"

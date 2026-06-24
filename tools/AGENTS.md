@@ -10,8 +10,8 @@
 - `test_healer.py`: Catch-and-heal testing loop daemon.
 - `llm_wiki.py`: Local knowledge core manager (RWS pipeline).
 - `obsidian_cli.py`: Connector to Obsidian API.
-- `prompts_repository.py`: Fast SQLite full-text search database manager for prompts.chat.
-- `prompts_cli.py`: Command Line interface for importing, finding and getting prompts.
+- `prompts.py`: Unified SQLite FTS5 prompts database manager with CLI interface (WAL mode).
+- `rules_validator.py`: Unified rules/constitution validator (merged check_rules + prompt_validator).
 - `uupm_adapter.py`: Design tokens compiler for layouts.
 - `video_skills_adapter.py`: Wrapper for Remotion video pipelines.
 

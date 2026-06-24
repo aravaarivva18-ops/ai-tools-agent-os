@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tools.tests.test_healer import apply_patch_file, run_test_file
+from tools.test_healer import apply_patch_file, detect_tests_from_diff, run_test_file
 
 
 @pytest.fixture
@@ -116,3 +116,31 @@ def test_healer_timeout_handling():
     os.close(fd)
     if test_path.exists():
         test_path.unlink()
+
+
+def test_detect_tests_from_diff(monkeypatch):
+    # Mock subprocess.check_output to return specific changed files
+    def mock_check_output(cmd, *args, **kwargs):
+        return b"tools/rules_validator.py\ntools/tests/test_healer.py\n"
+
+    import subprocess
+
+    monkeypatch.setattr(subprocess, "check_output", mock_check_output)
+
+    # We also mock os.path.exists to return True for files we check
+    orig_exists = os.path.exists
+
+    def mock_exists(path):
+        p_str = str(path)
+        if "test_rules_validator.py" in p_str or "test_healer.py" in p_str:
+            return True
+        return orig_exists(path)
+
+    monkeypatch.setattr(os.path, "exists", mock_exists)
+
+    # Mock open inside detect_tests_from_diff if it scans files
+    # (or we can just let it search directory and return test_rules_validator.py because it exists)
+    tests = detect_tests_from_diff(Path("/Users/rus/ai-tools"))
+
+    assert any("test_rules_validator.py" in str(t) for t in tests)
+    assert any("test_healer.py" in str(t) for t in tests)

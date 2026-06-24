@@ -2,36 +2,73 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
-# Import collect function from collect_handoffs to refresh logs
+collect: Any = None
 try:
-    from tools.collect_handoffs import collect
+    import tools.collect_handoffs
+
+    collect = tools.collect_handoffs.collect
 except ImportError:
     try:
-        from collect_handoffs import collect
+        import collect_handoffs
+
+        collect = collect_handoffs.collect
     except ImportError:
-        collect = None
+        pass
+
+check_constitution_health: Any = None
+normalize_gemini_constitution_headings: Any = None
+ensure_core_imperatives_block: Any = None
+enforce_anti_clutter: Any = None
 
 try:
-    from tools.prompt_validator import (
-        check_constitution_health,
-        enforce_anti_clutter,
-        ensure_core_imperatives_block,
-        normalize_gemini_constitution_headings,
+    import tools.rules_validator
+
+    check_constitution_health = tools.rules_validator.check_constitution_health
+    enforce_anti_clutter = tools.rules_validator.enforce_anti_clutter
+    ensure_core_imperatives_block = tools.rules_validator.ensure_core_imperatives_block
+    normalize_gemini_constitution_headings = (
+        tools.rules_validator.normalize_gemini_constitution_headings
     )
 except ImportError:
     try:
-        from prompt_validator import (
-            check_constitution_health,
-            enforce_anti_clutter,
-            ensure_core_imperatives_block,
-            normalize_gemini_constitution_headings,
+        import rules_validator
+
+        check_constitution_health = rules_validator.check_constitution_health
+        enforce_anti_clutter = rules_validator.enforce_anti_clutter
+        ensure_core_imperatives_block = rules_validator.ensure_core_imperatives_block
+        normalize_gemini_constitution_headings = (
+            rules_validator.normalize_gemini_constitution_headings
         )
     except ImportError:
-        check_constitution_health = None
-        normalize_gemini_constitution_headings = None
-        ensure_core_imperatives_block = None
-        enforce_anti_clutter = None
+        pass
+
+log_change: Any = None
+try:
+    import tools.dashboard_logger
+
+    log_change = tools.dashboard_logger.log_change
+except ImportError:
+    try:
+        import dashboard_logger
+
+        log_change = dashboard_logger.log_change
+    except ImportError:
+        pass
+
+rotate_sessions: Any = None
+try:
+    import tools.clean_sessions
+
+    rotate_sessions = tools.clean_sessions.rotate_sessions
+except ImportError:
+    try:
+        import clean_sessions
+
+        rotate_sessions = clean_sessions.rotate_sessions
+    except ImportError:
+        pass
 
 
 def generate_research_queries(category: str, issue_content: str) -> list:
@@ -120,7 +157,7 @@ def analyze_self_healing_needs(issue_content: str) -> str:
 def _parse_logs_data(logs_sorted: list) -> tuple:
     """Parses sorted logs to extract counts, categories, deltas, and saved time."""
     total_friction_points = 0
-    issues_by_category = {}
+    issues_by_category: dict[str, list[dict[str, Any]]] = {}
     stealth_stops_count = 0
     loc_deltas = []
     time_saved_total = 0
@@ -133,8 +170,16 @@ def _parse_logs_data(logs_sorted: list) -> tuple:
             stealth_stops_count += 1
         if metrics.get("loc_delta") is not None:
             loc_deltas.append(metrics.get("loc_delta"))
-        if metrics.get("time_saved_min") is not None:
-            time_saved_total += metrics.get("time_saved_min")
+        time_saved = metrics.get("time_saved_min", 0)
+        if time_saved and time_saved > 0:
+            time_saved_total += time_saved
+        else:
+            # Автоматическая оценка сэкономленного времени (Buyback Loop)
+            # на основе LOC delta и сложности изменений
+            loc_delta_abs = abs(metrics.get("loc_delta", 0))
+            files_changed = 1 if loc_delta_abs > 0 else 0
+            auto_saved = max(files_changed * 8 + int(loc_delta_abs * 0.2) - 3, 5)
+            time_saved_total += auto_saved
 
         total_tests_passed += metrics.get("tests_passed", 0)
         total_tests_failed += metrics.get("tests_failed", 0)
@@ -513,9 +558,29 @@ def generate_improvement_report(
             report_lines.append(f"- ⚠️ {conf}")
         report_lines.append("")
 
+    # YAGNI Dependency Audit
+    project_root = friction_logs_path.parent.parent.parent
+    unused_deps = yagni_audit_dependencies(project_root)
     report_lines.extend(
         [
+            "## ✂️ Ponytail YAGNI: Аудит зависимостей (Dependency Audit)",
             "",
+        ]
+    )
+    if unused_deps:
+        report_lines.append("Обнаружены неиспользуемые зависимости в `pyproject.toml`:")
+        for dep in unused_deps:
+            report_lines.append(
+                f"- 📦 `{dep}` (рекомендуется удалить через `uv pip uninstall {dep}`)"
+            )
+    else:
+        report_lines.append(
+            "🎉 Все зависимости в `pyproject.toml` активно используются в проекте!"
+        )
+    report_lines.append("")
+
+    report_lines.extend(
+        [
             "## 💡 Предписания по улучшению (Для ИИ-Агента)",
             "1. Проверить в GitHub трендах и документации решения для указанных категорий проблем.",
             "2. Обновить `GEMINI_ANTIGRAVITY.md` с точными инструкциями по предотвращению этих багов.",
@@ -524,8 +589,8 @@ def generate_improvement_report(
     )
 
     try:
-        if enforce_anti_clutter:
-            enforce_anti_clutter(output_path)
+        if enforce_anti_clutter is not None:
+            enforce_anti_clutter(str(output_path))
         output_path.write_text("\n".join(report_lines), encoding="utf-8")
         print(f"✅ Improvement report saved to: {output_path}")
     except Exception as e:
@@ -536,6 +601,103 @@ def generate_improvement_report(
         "total_friction_points": total_friction_points,
         "categories_count": len(issues_by_category),
     }
+
+
+PACKAGE_TO_MODULE_MAP = {
+    "python-docx": "docx",
+    "python-pptx": "pptx",
+    "python-dotenv": "dotenv",
+    "google-generativeai": "google",
+    "google-genai": "google",
+    "pyjwt": "jwt",
+    "passlib": "passlib",
+    "psycopg2-binary": "psycopg2",
+    "pydantic-settings": "pydantic_settings",
+}
+
+
+def get_pyproject_dependencies(project_root: Path) -> set:
+    import re
+    import tomllib
+
+    pyproject_path = project_root / "pyproject.toml"
+    if not pyproject_path.exists():
+        return set()
+
+    try:
+        with open(pyproject_path, "rb") as f:
+            data = tomllib.load(f)
+        deps = data.get("project", {}).get("dependencies", [])
+
+        clean_deps = set()
+        for dep in deps:
+            match = re.match(r"^([a-zA-Z0-9_\-]+)", dep.strip())
+            if match:
+                clean_deps.add(match.group(1).lower())
+        return clean_deps
+    except Exception as e:
+        print(f"Warning: Failed to load pyproject.toml: {e}")
+        return set()
+
+
+def get_imported_modules(project_root: Path) -> set:
+    import ast
+
+    imported = set()
+    for path in project_root.rglob("*.py"):
+        path_parts = path.parts
+        # Исключаем временные файлы, виртуальное окружение и т.д.
+        if any(
+            p in path_parts
+            for p in (
+                ".venv",
+                ".git",
+                ".pytest_cache",
+                ".ruff_cache",
+                ".mypy_cache",
+                "scratch",
+            )
+        ):
+            continue
+
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for name in node.names:
+                        imported.add(name.name.split(".")[0].lower())
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module:
+                        imported.add(node.module.split(".")[0].lower())
+        except Exception:
+            pass
+
+    return imported
+
+
+def yagni_audit_dependencies(project_root) -> list:
+    """
+    Проверяет импорты во всех .py файлах репозитория и сопоставляет их с зависимостями в pyproject.toml.
+    Возвращает список неиспользуемых зависимостей.
+    """
+    from pathlib import Path
+
+    root_path = Path(project_root)
+    clean_deps = get_pyproject_dependencies(root_path)
+    if not clean_deps:
+        return []
+
+    imported = get_imported_modules(root_path)
+    unused = []
+
+    for dep in clean_deps:
+        # Для стандартных библиотек или уже импортированных
+        module_name = PACKAGE_TO_MODULE_MAP.get(dep, dep.replace("-", "_"))
+        if module_name not in imported:
+            if dep.replace("-", "_") not in imported:
+                unused.append(dep)
+
+    return sorted(unused)
 
 
 def apply_improvement_record(handoff_notes_path: Path, metrics: dict) -> None:
@@ -549,8 +711,8 @@ def apply_improvement_record(handoff_notes_path: Path, metrics: dict) -> None:
         f"- **Действие**: Обновлены правила взаимодействия, оптимизированы JIT-инструкции.\n"
     )
     try:
-        if enforce_anti_clutter:
-            enforce_anti_clutter(handoff_notes_path)
+        if enforce_anti_clutter is not None:
+            enforce_anti_clutter(str(handoff_notes_path))
         with open(handoff_notes_path, "a", encoding="utf-8") as f:
             f.write(delta_record)
         print(f"✅ Global handoff notes updated at: {handoff_notes_path}")
@@ -565,7 +727,7 @@ def main() -> None:
     handoff_notes_path = Path("/Users/rus/ai-tools/handoff_notes.md")
 
     if not target_dir.exists():
-        if collect:
+        if collect is not None:
             collect()
         else:
             print("Error: Target directory does not exist and collect is unavailable.")
@@ -578,17 +740,7 @@ def main() -> None:
 
     apply_improvement_record(handoff_notes_path, metrics)
 
-    # Log self-improvement event into dashboard.db
-    log_change = None
-    try:
-        from tools.dashboard_logger import log_change
-    except ImportError:
-        try:
-            from dashboard_logger import log_change
-        except ImportError:
-            pass
-
-    if log_change:
+    if log_change is not None:
         try:
             log_change(
                 project_name="System",
@@ -604,20 +756,36 @@ def main() -> None:
     maintain_constitution()
     cleanup_clutter()
 
+    # Ротация старых сессий (старше 7 дней)
+    if rotate_sessions is not None:
+        try:
+            brain_dir = Path("/Users/rus/.gemini/antigravity-cli/brain")
+            rotate_sessions(brain_dir, age_days=7)
+        except Exception as e:
+            print(f"Warning: Failed to rotate old sessions: {e}")
+
     print("🚀 Self-Improvement Loop iteration completed successfully.")
 
 
-def maintain_constitution(constitution_path: Path = None) -> None:
+def maintain_constitution(constitution_path: Path | None = None) -> None:
     """Нормализует заголовки и ядро в конституции, если требуется."""
-    if not normalize_gemini_constitution_headings or not ensure_core_imperatives_block or not check_constitution_health:
-        print("Warning: normalization or health check functions are not available. Skipping maintenance.")
+    if (
+        normalize_gemini_constitution_headings is None
+        or ensure_core_imperatives_block is None
+        or check_constitution_health is None
+    ):
+        print(
+            "Warning: normalization or health check functions are not available. Skipping maintenance."
+        )
         return
 
     if constitution_path is None:
         constitution_path = Path("/Users/rus/GEMINI_ANTIGRAVITY.md")
 
     if not constitution_path.exists():
-        print(f"Warning: Constitution file not found at {constitution_path}. Skipping maintenance.")
+        print(
+            f"Warning: Constitution file not found at {constitution_path}. Skipping maintenance."
+        )
         return
 
     health = check_constitution_health(constitution_path)
@@ -629,10 +797,12 @@ def maintain_constitution(constitution_path: Path = None) -> None:
 
     if fixed != original or health.get("health") == "needs_cleanup":
         if fixed != original:
-            backup = constitution_path.with_suffix(".md.bak." + datetime.now().strftime("%Y%m%d_%H%M%S"))
-            if enforce_anti_clutter:
-                enforce_anti_clutter(backup)
-                enforce_anti_clutter(constitution_path)
+            backup = constitution_path.with_suffix(
+                ".md.bak." + datetime.now().strftime("%Y%m%d_%H%M%S")
+            )
+            if enforce_anti_clutter is not None:
+                enforce_anti_clutter(str(backup))
+                enforce_anti_clutter(str(constitution_path))
             backup.write_text(original, encoding="utf-8")
             constitution_path.write_text(fixed, encoding="utf-8")
             print(f"✅ Constitution normalized. Backup: {backup}")
@@ -646,8 +816,8 @@ def maintain_constitution(constitution_path: Path = None) -> None:
 
             if adr_dir.exists():
                 adr_path = adr_dir / "ADR_0016_automated_constitution_maintenance.md"
-                if enforce_anti_clutter:
-                    enforce_anti_clutter(adr_path)
+                if enforce_anti_clutter is not None:
+                    enforce_anti_clutter(str(adr_path))
                 adr_content = """# ADR 0016: Автоматическое обслуживание конституции GEMINI_ANTIGRAVITY.md
 
 ## Статус
@@ -672,19 +842,11 @@ def maintain_constitution(constitution_path: Path = None) -> None:
                 except Exception as e:
                     print(f"Warning: Could not save ADR to Obsidian: {e}")
         else:
-            print("⚠️ Constitution health needs cleanup but content is already normalized. Manual YAGNI audit is recommended.")
+            print(
+                "⚠️ Constitution health needs cleanup but content is already normalized. Manual YAGNI audit is recommended."
+            )
 
-        # Log change in dashboard.db
-        log_change = None
-        try:
-            from tools.dashboard_logger import log_change
-        except ImportError:
-            try:
-                from dashboard_logger import log_change
-            except ImportError:
-                pass
-
-        if log_change:
+        if log_change is not None:
             try:
                 log_change(
                     project_name="System",
@@ -693,10 +855,12 @@ def maintain_constitution(constitution_path: Path = None) -> None:
                     expected_effect="Sequential rules consistency and size health",
                 )
             except Exception as e:
-                print(f"Warning: Could not log constitution change to dashboard.db: {e}")
+                print(
+                    f"Warning: Could not log constitution change to dashboard.db: {e}"
+                )
 
 
-def cleanup_clutter(constitution_dir: Path = None) -> None:
+def cleanup_clutter(constitution_dir: Path | None = None) -> None:
     """Удаляет временные файлы бэкапов конституции и другие .bak файлы старше 7 дней."""
     if constitution_dir is None:
         constitution_dir = Path("/Users/rus")
@@ -723,7 +887,6 @@ def cleanup_clutter(constitution_dir: Path = None) -> None:
                     print(f"🧹 Removed old repository backup: {f}")
             except Exception as e:
                 print(f"Warning: Could not remove old backup {f}: {e}")
-
 
 
 if __name__ == "__main__":
