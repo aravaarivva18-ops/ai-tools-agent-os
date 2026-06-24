@@ -28,6 +28,9 @@
 - **Генерация PDF-документов (Typst)**: См. [skills/typst-pdf/SKILL.md](file:///Users/rus/ai-tools/skills/typst-pdf/SKILL.md)
 - **Хранение данных и RLS (Supabase / pgvector / Alembic)**: См. [skills/database-persistence/SKILL.md](file:///Users/rus/ai-tools/skills/database-persistence/SKILL.md)
 - **Создание и стандартизация JIT-навыков (Pydantic / Agno-style)**: См. [skills/skill-creator/SKILL.md](file:///Users/rus/ai-tools/skills/skill-creator/SKILL.md)
+- **Проектирование архитектуры автоматизации и навыков (Solo Loop / Harness)**: См. [skills/harness/SKILL.md](file:///Users/rus/ai-tools/skills/harness/SKILL.md)
+- **Воркфлоу и генерация контента (ComfyUI / Vast.ai)**: См. [skills/comfyui/SKILL.md](file:///Users/rus/ai-tools/skills/comfyui/SKILL.md)
+- **Клонирование и реверс-инжиниринг сайтов (Browser Automation / Next.js)**: См. [skills/website-cloner/SKILL.md](file:///Users/rus/ai-tools/skills/website-cloner/SKILL.md)
 
 
 
