@@ -31,6 +31,8 @@
 - **Проектирование архитектуры автоматизации и навыков (Solo Loop / Harness)**: См. [skills/harness/SKILL.md](file:///Users/rus/ai-tools/skills/harness/SKILL.md)
 - **Воркфлоу и генерация контента (ComfyUI / Vast.ai)**: См. [skills/comfyui/SKILL.md](file:///Users/rus/ai-tools/skills/comfyui/SKILL.md)
 - **Клонирование и реверс-инжиниринг сайтов (Browser Automation / Next.js)**: См. [skills/website-cloner/SKILL.md](file:///Users/rus/ai-tools/skills/website-cloner/SKILL.md)
+- **Генерация требований к продукту (PRD) по шагам**: См. [skills/prd/SKILL.md](file:///Users/rus/ai-tools/skills/prd/SKILL.md)
+- **Конвертация требований в задачи для цикла Ralph**: См. [skills/ralph/SKILL.md](file:///Users/rus/ai-tools/skills/ralph/SKILL.md)
 
 
 
