@@ -30,3 +30,5 @@ scratch/
 Desktop/*.py
 ~/*.md
 **/__pycache__/
+tools/obsidian/handoffs_index.json
+
