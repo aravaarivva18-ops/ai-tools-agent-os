@@ -2,9 +2,9 @@
 import argparse
 import os
 import re
+import shutil
 import subprocess  # nosec B404
 import sys
-import shutil
 from datetime import datetime
 
 
@@ -112,6 +112,20 @@ def main():
 
     if not success:
         sys.exit(1)
+
+    # Автоматически переиндексируем файлы хандоффов
+    try:
+        print("⚙️ Запуск автоматической переиндексации базы знаний...")
+        python_exe = sys.executable
+        search_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "semantic_search.py")
+        subprocess.run(  # nosec B603
+            [python_exe, search_script, "--index"],
+            check=True
+        )
+        print("✅ База знаний успешно переиндексирована!")
+    except Exception as e:
+        print(f"⚠️ Предупреждение: Не удалось обновить индекс: {e}")
+
 
 if __name__ == "__main__":
     main()
