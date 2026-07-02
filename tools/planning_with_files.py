@@ -40,6 +40,12 @@ class PlanningWithFiles:
         Returns:
             dict: Containing 'title', 'steps', 'completed_steps', 'next_step', 'findings'.
         """
+        try:
+            from tools.repo_mapper import write_repo_map
+            write_repo_map(self.workspace_root)
+        except Exception:
+            pass
+
         state: dict[str, Any] = {
             "title": "Unknown Plan",
             "steps": [],
