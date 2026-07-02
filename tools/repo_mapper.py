@@ -17,18 +17,18 @@ def get_function_sig(node: ast.FunctionDef) -> str:
         # Игнорируем self для краткости методов
         if arg.arg != "self":
             args.append(arg.arg)
-    
+
     # Keyword-only аргументы
     if node.args.kwonlyargs:
         args.append("*")
         for arg in node.args.kwonlyargs:
             args.append(arg.arg)
-            
+
     if node.args.vararg:
         args.append(f"*{node.args.vararg.arg}")
     if node.args.kwarg:
         args.append(f"**{node.args.kwarg.arg}")
-        
+
     return f"def {node.name}({', '.join(args)})"
 
 
@@ -53,13 +53,13 @@ def parse_py_file(file_path: Path) -> str:
             doc = ast.get_docstring(node)
             doc_suffix = f"  # {doc.strip().splitlines()[0]}" if doc else ""
             lines.append(f"  - {sig}{doc_suffix}")
-            
+
         elif isinstance(node, ast.ClassDef):
             lines.append(f"  - class {node.name}:")
             class_doc = ast.get_docstring(node)
             if class_doc:
                 lines.append(f"    # {class_doc.strip().splitlines()[0]}")
-                
+
             for sub_node in node.body:
                 if isinstance(sub_node, ast.FunctionDef):
                     sig = get_function_sig(sub_node)
@@ -73,33 +73,33 @@ def parse_py_file(file_path: Path) -> str:
 def generate_map(workspace_root: Path) -> str:
     """Сканирует core/ и tools/ и генерирует карту символов репозитория."""
     map_parts = []
-    
+
     # Папки для сканирования
     dirs_to_scan = ["core", "tools"]
-    
+
     for dir_name in dirs_to_scan:
         scan_dir = workspace_root / dir_name
         if not scan_dir.exists():
             continue
-            
+
         map_parts.append(f"=== Directory: {dir_name}/ ===")
-        
+
         # Обходим файлы рекурсивно
         for root, _, files in os.walk(scan_dir):
             # Игнорируем тесты и служебные директории
             if "tests" in root or "__pycache__" in root:
                 continue
-                
+
             for file in sorted(files):
                 if file.endswith(".py"):
                     full_path = Path(root) / file
                     rel_path = full_path.relative_to(workspace_root)
-                    
+
                     file_map = parse_py_file(full_path)
                     if file_map:
                         map_parts.append(f"\nFile: {rel_path}")
                         map_parts.append(file_map)
-                        
+
     return "\n".join(map_parts)
 
 

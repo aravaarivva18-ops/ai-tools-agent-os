@@ -1,6 +1,8 @@
 import shutil
 from pathlib import Path
+
 import pytest
+
 from tools.repo_mapper import generate_map, write_repo_map
 
 TEST_WORKSPACE = Path(__file__).resolve().parents[2] / "vault" / "tmp_repo_test"
@@ -21,7 +23,7 @@ def test_repo_mapper_parsing():
     """Проверяет правильность AST-парсинга сигнатур классов, методов и функций."""
     core_dir = TEST_WORKSPACE / "core"
     core_dir.mkdir(parents=True, exist_ok=True)
-    
+
     test_code = '''"""Module docstring."""
 
 def top_function(x, y, *, key=None):
@@ -35,10 +37,10 @@ class MyClass:
         pass
 '''
     (core_dir / "my_module.py").write_text(test_code, encoding="utf-8")
-    
+
     # Генерируем карту
     repo_map = generate_map(TEST_WORKSPACE)
-    
+
     # Проверяем наличие всех ключевых элементов
     assert "File: core/my_module.py" in repo_map
     assert "# Module docstring." in repo_map
@@ -55,9 +57,9 @@ def test_write_repo_map():
     core_dir = TEST_WORKSPACE / "core"
     core_dir.mkdir(parents=True, exist_ok=True)
     (core_dir / "my_module.py").write_text("def run(): pass", encoding="utf-8")
-    
+
     write_repo_map(TEST_WORKSPACE)
-    
+
     out_file = TEST_WORKSPACE / "vault" / "repo_map.txt"
     assert out_file.exists()
     content = out_file.read_text(encoding="utf-8")
