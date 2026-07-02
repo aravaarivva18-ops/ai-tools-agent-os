@@ -24,6 +24,24 @@ VAULT_HANDOFFS_DIR = os.path.join(
     workspace_root, config.get("vault", {}).get("handoffs_dir", "vault/handoffs")
 )
 
+CACHE_FILE = os.path.join(
+    workspace_root, config.get("vault", {}).get("search_cache_file", "vault/search_cache.json")
+)
+
+def get_handoffs_mtime() -> float:
+    """Вычисляет максимальное mtime файлов в vault/handoffs/."""
+    if not os.path.exists(VAULT_HANDOFFS_DIR):
+        return 0.0
+    mtimes = []
+    for root, _, files in os.walk(VAULT_HANDOFFS_DIR):
+        for file in files:
+            if file.endswith(".md"):
+                try:
+                    mtimes.append(os.path.getmtime(os.path.join(root, file)))
+                except Exception:
+                    pass
+    return max(mtimes) if mtimes else 0.0
+
 MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
 
@@ -200,11 +218,30 @@ def search_handoffs(query, limit=3, semantic=False):
 
 
 def get_semantic_brief(query: str, limit: int = 3, semantic: bool = False) -> str:
-    """Возвращает быстрый текстовый или семантический дайджест для интеграции с планировщиком."""
+    """Возвращает быстрый текстовый или семантический дайджест для интеграции с планировщиком (с поддержкой кэша)."""
+    current_mtime = get_handoffs_mtime()
+    cache = {"queries": {}}
+    if os.path.exists(CACHE_FILE):
+        try:
+            from tools.json_utils import safe_load_json
+            with open(CACHE_FILE, encoding="utf-8") as f:
+                loaded = safe_load_json(f.read())
+                if isinstance(loaded, dict) and "queries" in loaded:
+                    cache = loaded
+        except Exception:
+            pass
+
+    cache_key = f"{query}__{limit}__{semantic}"
+    if cache_key in cache.get("queries", {}):
+        item = cache["queries"][cache_key]
+        if item.get("mtime") == current_mtime:
+            return item.get("brief", "")
+
     index = load_index()
     if not index:
         return ""
 
+    brief_result = ""
     # Сначала пробуем быстрый текстовый поиск
     text_results = text_search(query, index, limit)
     if text_results:
@@ -213,45 +250,62 @@ def get_semantic_brief(query: str, limit: int = 3, semantic: bool = False) -> st
             brief_parts.append(
                 f"#### Handoff: {rel_path} (Быстрый поиск, Score: {score:.2f})\n{content.strip()}"
             )
-        return "\n\n---\n\n".join(brief_parts)
+        brief_result = "\n\n---\n\n".join(brief_parts)
+    else:
+        # Если текстовых совпадений нет и семантический поиск отключен, выходим без загрузки fastembed (YAGNI)
+        if not semantic:
+            brief_result = "ℹ️ Быстрый поиск не дал результатов. Векторный поиск отключен (YAGNI)."
+        else:
+            # Если текстовых совпадений нет, лениво загружаем fastembed и делаем векторный поиск
+            try:
+                model = load_model()
+                query_vector = np.array(next(iter(model.embed([query]))))
+            except Exception as e:
+                return f"⚠️ Ошибка инициализации модели семантического поиска: {e}"
 
-    # Если текстовых совпадений нет и семантический поиск отключен, выходим без загрузки fastembed (YAGNI)
-    if not semantic:
-        return "ℹ️ Быстрый поиск не дал результатов. Векторный поиск отключен (YAGNI)."
+            results = []
+            for rel_path, data in index.items():
+                if "vector" not in data:
+                    continue
+                doc_vector = np.array(data["vector"])
+                dot_product = np.dot(query_vector, doc_vector)
+                norm_q = np.linalg.norm(query_vector)
+                norm_d = np.linalg.norm(doc_vector)
+                similarity = (
+                    dot_product / (norm_q * norm_d) if norm_q > 0 and norm_d > 0 else 0.0
+                )
+                results.append((rel_path, similarity, data["content"]))
 
-    # Если текстовых совпадений нет, лениво загружаем fastembed и делаем векторный поиск
+            results.sort(key=lambda x: x[1], reverse=True)
+
+            brief_parts = []
+            for rel_path, similarity, content in results[:limit]:
+                if similarity < 0.4:
+                    continue
+                brief_parts.append(
+                    f"#### Handoff: {rel_path} (Семантическое сходство: {similarity:.2f})\n{content.strip()}"
+                )
+
+            if brief_parts:
+                brief_result = "\n\n---\n\n".join(brief_parts)
+            else:
+                brief_result = "ℹ️ Релевантных хэндоффов прошлых сессий не обнаружено."
+
+    # Сохраняем в кэш
+    if "queries" not in cache:
+        cache["queries"] = {}
+    cache["queries"][cache_key] = {
+        "mtime": current_mtime,
+        "brief": brief_result
+    }
     try:
-        model = load_model()
-        query_vector = np.array(next(iter(model.embed([query]))))
-    except Exception as e:
-        return f"⚠️ Ошибка инициализации модели семантического поиска: {e}"
+        os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
+        with open(CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(cache, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
 
-    results = []
-    for rel_path, data in index.items():
-        if "vector" not in data:
-            continue
-        doc_vector = np.array(data["vector"])
-        dot_product = np.dot(query_vector, doc_vector)
-        norm_q = np.linalg.norm(query_vector)
-        norm_d = np.linalg.norm(doc_vector)
-        similarity = (
-            dot_product / (norm_q * norm_d) if norm_q > 0 and norm_d > 0 else 0.0
-        )
-        results.append((rel_path, similarity, data["content"]))
-
-    results.sort(key=lambda x: x[1], reverse=True)
-
-    brief_parts = []
-    for rel_path, similarity, content in results[:limit]:
-        if similarity < 0.4:
-            continue
-        brief_parts.append(
-            f"#### Handoff: {rel_path} (Семантическое сходство: {similarity:.2f})\n{content.strip()}"
-        )
-
-    if brief_parts:
-        return "\n\n---\n\n".join(brief_parts)
-    return "ℹ️ Релевантных хэндоффов прошлых сессий не обнаружено."
+    return brief_result
 
 
 def main():
