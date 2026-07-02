@@ -15,6 +15,7 @@ YELLOW = "\033[93m"
 RED = "\033[91m"
 RESET = "\033[0m"
 
+
 def print_status(component: str, ok: bool, warning_msg: str = "", err_msg: str = ""):
     if ok:
         print(f"  [{GREEN}OK{RESET}] {component}")
@@ -22,6 +23,7 @@ def print_status(component: str, ok: bool, warning_msg: str = "", err_msg: str =
         print(f"  [{YELLOW}WARN{RESET}] {component} — {warning_msg}")
     else:
         print(f"  [{RED}FAIL{RESET}] {component} — {err_msg}")
+
 
 def check_files(tools_dir: pathlib.Path):
     print("\n🔍 Проверка целостности файлов ядра:")
@@ -35,7 +37,7 @@ def check_files(tools_dir: pathlib.Path):
         "collect_handoffs.py": "Сборщик файлов HANDOFF.md",
         "llm_wiki.py": "База знаний системы",
         "obsidian/session_logger.py": "Логгер сессий в Daily Note",
-        "obsidian/semantic_search.py": "Семантический поиск"
+        "obsidian/semantic_search.py": "Семантический поиск",
     }
 
     all_ok = True
@@ -48,6 +50,7 @@ def check_files(tools_dir: pathlib.Path):
 
     return all_ok
 
+
 def check_directories(root_dir: pathlib.Path):
     print("\n📁 Проверка структуры глобальных директорий:")
 
@@ -55,7 +58,7 @@ def check_directories(root_dir: pathlib.Path):
         "standards": "Глобальный банк стандартов",
         "vault": "Локальное хранилище и база знаний",
         "vault/handoffs": "Собранные файлы передачи контекста",
-        "scratch": "Временные файлы и черновики"
+        "scratch": "Временные файлы и черновики",
     }
 
     all_ok = True
@@ -68,6 +71,77 @@ def check_directories(root_dir: pathlib.Path):
 
     return all_ok
 
+
+def check_api_keys(root_dir: pathlib.Path):
+    print("\n🔑 Проверка API ключей и токенов:")
+    import json
+    import os
+    import urllib.request
+
+    env_file = root_dir / ".env"
+    env_vars = {}
+    if env_file.exists():
+        try:
+            with open(env_file, encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        env_vars[k.strip()] = v.strip().strip('"').strip("'")
+        except Exception:
+            pass
+
+    gemini_key = os.environ.get("GEMINI_API_KEY") or env_vars.get("GEMINI_API_KEY")
+    tg_token = os.environ.get("TELEGRAM_BOT_TOKEN") or env_vars.get(
+        "TELEGRAM_BOT_TOKEN"
+    )
+
+    # 1. Gemini API
+    if gemini_key:
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models?key={gemini_key}"
+            req = urllib.request.Request(url, method="GET")
+            with urllib.request.urlopen(req, timeout=3.0) as response:
+                data = json.loads(response.read().decode())
+                if "models" in data:
+                    print_status("Gemini API Key (связь установлена)", True)
+                else:
+                    print_status(
+                        "Gemini API Key", False, err_msg="Неверный формат ответа API."
+                    )
+        except Exception as e:
+            print_status("Gemini API Key", False, err_msg=f"Ошибка проверки: {e}")
+    else:
+        print_status(
+            "Gemini API Key",
+            False,
+            warning_msg="Переменная GEMINI_API_KEY не найдена в окружении или .env",
+        )
+
+    # 2. Telegram API
+    if tg_token:
+        try:
+            url = f"https://api.telegram.org/bot{tg_token}/getMe"
+            req = urllib.request.Request(url, method="GET")
+            with urllib.request.urlopen(req, timeout=3.0) as response:
+                data = json.loads(response.read().decode())
+                if data.get("ok"):
+                    bot_name = data["result"].get("username", "bot")
+                    print_status(f"Telegram Bot Token (связь с @{bot_name} ок)", True)
+                else:
+                    print_status(
+                        "Telegram Bot Token", False, err_msg="Неверный токен бота."
+                    )
+        except Exception as e:
+            print_status("Telegram Bot Token", False, err_msg=f"Ошибка проверки: {e}")
+    else:
+        print_status(
+            "Telegram Bot Token",
+            False,
+            warning_msg="Переменная TELEGRAM_BOT_TOKEN не найдена в окружении или .env",
+        )
+
+
 def check_integrations():
     print("\n📡 Проверка внешних интеграций и окружения:")
 
@@ -79,12 +153,12 @@ def check_integrations():
     print_status(
         "Obsidian CLI (утилита управления)",
         obsidian_cli is not None,
-        warning_msg="Не установлена утилита 'obsidian'. Авто-логирование будет работать в fallback-режиме."
+        warning_msg="Не установлена утилита 'obsidian'. Авто-логирование будет работать в fallback-режиме.",
     )
 
     # 3. Проверяем доступность Obsidian REST API (мягкая проверка)
-    # Пытаемся проверить, запущен ли локальный сервер Obsidian (по умолчанию порт 27124 или аналогичный)
     import socket
+
     obsidian_api_running = False
     for port in (27124, 27123):
         try:
@@ -97,8 +171,9 @@ def check_integrations():
     print_status(
         "Obsidian Local REST API",
         obsidian_api_running,
-        warning_msg="API недоступен. Убедитесь, что приложение Obsidian запущено и плагин Local REST API активен."
+        warning_msg="API недоступен. Убедитесь, что приложение Obsidian запущено и плагин Local REST API активен.",
     )
+
 
 def main():
     print("=====================================================")
@@ -110,14 +185,20 @@ def main():
 
     files_ok = check_files(tools_dir)
     dirs_ok = check_directories(root_dir)
+    check_api_keys(root_dir)
     check_integrations()
 
     print("=====================================================")
     if files_ok and dirs_ok:
-        print(f"🎉 {GREEN}ДИАГНОСТИКА УСПЕШНО ПРОЙДЕНА: Система на 100% исправна!{RESET}")
+        print(
+            f"🎉 {GREEN}ДИАГНОСТИКА УСПЕШНО ПРОЙДЕНА: Система на 100% исправна!{RESET}"
+        )
     else:
-        print(f"⚠️ {YELLOW}ОБНАРУЖЕНЫ ПРОБЛЕМЫ: Некоторые компоненты отсутствуют.{RESET}")
+        print(
+            f"⚠️ {YELLOW}ОБНАРУЖЕНЫ ПРОБЛЕМЫ: Некоторые компоненты отсутствуют.{RESET}"
+        )
     print("=====================================================")
+
 
 if __name__ == "__main__":
     main()

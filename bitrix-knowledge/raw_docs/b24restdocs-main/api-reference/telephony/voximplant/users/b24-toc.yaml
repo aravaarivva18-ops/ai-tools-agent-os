@@ -1,9 +1,0 @@
-title: User Management
-href: voximplant-user-get.md
-items: 
-  - name: Overview of Methods
-    href: index.md
-  - name: Get User Settings
-    href: voximplant-user-get.md
-  - name: Activate SIP Device
-    href: voximplant-user-activate-phone.md

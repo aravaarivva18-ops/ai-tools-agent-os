@@ -39,9 +39,90 @@ def _get_connection():
     # Enable Write-Ahead Logging (WAL) for better write concurrency
     try:
         conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS healer_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                session_id TEXT NOT NULL,
+                test_file TEXT NOT NULL,
+                target_file TEXT,
+                error_category TEXT,
+                iterations INTEGER DEFAULT 1,
+                status TEXT CHECK(status IN ('healed', 'failed', 'stealth_stop')),
+                time_saved_min INTEGER DEFAULT 0
+            );
+        """)
+        conn.commit()
     except Exception:
         pass
     return conn
+
+
+def log_healer_event(
+    session_id: str,
+    test_file: str,
+    target_file: str | None = None,
+    error_category: str | None = None,
+    iterations: int = 1,
+    status: str = "healed",
+    time_saved_min: int = 0,
+) -> None:
+    """Logs test healer execution statistics to the healer_log table with retry logic."""
+    max_attempts = 5
+    for attempt in range(max_attempts):
+        conn = None
+        try:
+            conn = _get_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO healer_log (session_id, test_file, target_file, error_category, iterations, status, time_saved_min)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (session_id, test_file, target_file, error_category, iterations, status, time_saved_min),
+            )
+            conn.commit()
+            print(f"Logged healer event for '{test_file}' successfully.")
+            return
+        except sqlite3.OperationalError as e:
+            if conn:
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+                conn = None
+            if "locked" in str(e).lower() and attempt < max_attempts - 1:
+                sleep_time = 0.1 * (2**attempt) + random.uniform(0.01, 0.05)
+                print(
+                    f"Database locked, retrying in {sleep_time:.3f}s (attempt {attempt + 1}/{max_attempts})..."
+                )
+                time.sleep(sleep_time)
+            else:
+                print(f"Error logging healer event: {e}")
+                raise e
+        except Exception as e:
+            if conn:
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+            print(f"Error logging healer event: {e}")
+            raise e
+        finally:
+            if conn:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+
 
 
 def _get_or_create_project_id(conn, project_name: str) -> int:

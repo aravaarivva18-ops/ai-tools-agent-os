@@ -42,19 +42,56 @@ description: Guidelines for high-performance HTML parsing with Selectolax and by
   ```
 - Reuse session instances where possible to keep cookies and session state.
 
-### 3. LLM-Guided Browser Automation (browser-use)
+### 3. Hybrid Scraping Architecture (Playwright + HTTPX/curl_cffi)
+When scraping sites with heavy anti-bot security (Cloudflare, JS-challenges, captcha, signature tokens like Xiaohongshu/Douyin):
+*   **Do NOT** route all requests through Playwright/Selenium (this is extremely slow and resource-heavy).
+*   **Do NOT** attempt to reverse complex JS signature obfuscation algorithms.
+*   **Instead, use the Hybrid Schema**:
+    1. Spin up Playwright headless/headful to complete the initial login, bypass the Cloudflare challenge, or fetch cookies.
+    2. Extract cookies and session headers from the Playwright context.
+    3. Close the browser context or keep it in the background for updates only.
+    4. Transfer the session cookies to a fast HTTP client (`curl_cffi.requests` or `httpx` with proxy) to fetch raw JSON/HTML endpoints directly.
+
+#### Code Pattern: Cookie Transfer
+```python
+import asyncio
+from playwright.async_api import async_playwright
+from curl_cffi import requests
+
+async def get_session_cookies(url: str) -> dict:
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context()
+        page = await context.new_page()
+        
+        # Navigate and solve anti-bot challenge
+        await page.goto(url)
+        await page.wait_for_load_state("networkidle")
+        
+        # Extract cookies
+        playwright_cookies = await context.cookies()
+        await browser.close()
+        
+        # Format cookies for requests/curl_cffi
+        return {cookie["name"]: cookie["value"] for cookie in playwright_cookies}
+
+def fetch_data_with_cookies(url: str, cookies: dict):
+    # Initialize curl_cffi with Chrome TLS signature
+    session = requests.Session()
+    session.cookies.update(cookies)
+    
+    headers = {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    
+    # Fast HTTP call bypasses anti-bot with browser cookies + JA3 TLS fingerprint
+    response = session.get(url, headers=headers, impersonate="chrome")
+    return response.json() if "json" in response.headers.get("content-type", "") else response.text
+```
+
+### 4. LLM-Guided Browser Automation (browser-use)
 - Use `browser-use` when scraping requires rendering complex JavaScript, performing clicks, scrolls, or dealing with multi-step interactive workflows (e.g. checkout, forms).
 - Standardize agent tasks clearly and configure appropriate limits to prevent infinite loops.
-- Use langchain-compatible model adapters to pass commands to the browser:
-  ```python
-  from browser_use import Agent
-  from langchain_openai import ChatOpenAI
-
-  agent = Agent(
-      task="Go to https://terebro-gnb.com and extract site performance elements",
-      llm=ChatOpenAI(model="gpt-4o")
-  )
-  ```
 
 ## ⚠️ Common Pitfalls & Anti-patterns
 - **Prohibited**: Do not import or use `bs4`, `BeautifulSoup`, or `lxml`.

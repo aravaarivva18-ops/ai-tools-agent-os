@@ -1,127 +1,70 @@
-# Spec: System Audit & Baseline Antigravity v10
+# План реализации: Архитектурный рефакторинг и оптимизация (YAGNI & YAGNI-2)
 
-## 🎯 Objective
-Провести аудит текущего состояния окружения, баз знаний, ограничений и путей Antigravity v10, устранить выявленные расхождения в тестах и зафиксировать baseline в `implementation_plan.md` и SQLite базах данных (`prompts.db`, `dashboard.db`).
+## 1. Цель
+Оптимизировать систему Antigravity AI-Tools, внедрив YAGNI-альтернативы для управления промптами, контекстом и RAG-поиском, **строго сохраняя мгновенную скорость запуска CLI `agy`** и стабильность 256 автотестов.
 
-## 📊 Pre-delegation Checklist (v10)
-- **Цель:** Зафиксировать состояние баз знаний и окружения перед изменениями.
-- **Зачем:** Обеспечить восстановление контекста и traceability.
-- **KPI:** 100% покрытие ключевых файлов аудитом, Time Saved: 40m на будущих сессиях.
-- **Допущения:** Файлы `@ai-tools/attachments/` доступны, `dashboard.db` инициализирована.
-- **Риски:** Устаревшие пути (mitigated by strict @-prefix и file://).
+## 2. Стек
+- Язык: Python 3.14 (macOS)
+- Тестирование: pytest (с флагом `--disable-socket`)
+- Линтинг: ruff
 
----
+## 3. Шаги реализации
 
-## 🏛️ 1. Executive Summary
-* **Общее состояние системы:** Отличное. Окружение полностью настроено, монорепозиторий функционирует стабильно. Все 404 теста проходят успешно.
-* **YAGNI Score (YAGNI/Abstractions):** 9.5 / 10 (Сверх-простая плоская архитектура, отсутствие лишних слоев абстракции).
-* **Overall Health Score:** 98 / 100.
-* **Критические риски:** Не обнаружены.
-* **Выявленные несоответствия:** Небольшое расхождение в строке валидации теста `test_rules_audit.py` (устранено).
+### Шаг 1. Базовый замер времени импорта (Baseline)
+- **Цель**: Убедиться, что рефакторинг не замедляет старт CLI.
+- **Действие**: Написать легкий тест/скрипт замера импорта с флагом `-X importtime` для `tools/cli.py` и зафиксировать baseline.
 
----
+### Шаг 2. Безопасная очистка (Архивация мусора)
+- **Цель**: Убрать лишние файлы без риска сломать зависимости.
+- **Действие**:
+  1. Запустить `rg` поиск по кодовой базе для `https:`, `apply_rules` и `parse_html`.
+  2. Перенести неиспользуемые файлы в директорию `_archive/` (а не удалять сразу).
+  3. Прогнать 256 тестов.
 
-## 📋 2. Detailed Findings Table
-| ID | Severity | Component/File | Description of Issue | Root Cause & Impact |
-| :--- | :--- | :--- | :--- | :--- |
-| FND-001 | Low | `tools/tests/test_rules_audit.py` | Падение теста `test_solo_loop_enforced_positive` из-за несовпадения фразы `"strictly disabled and blocked"` с фактической `"disabled and blocked"` в `gemini_bot_knowledge_base.md`. | Несинхронизированная формулировка. Влияет на общую стабильность автотестов CI. |
-| FND-002 | Low | `tools/dashboard_logger.py` | Метод `log_change` использует прямой доступ к SQLite без дополнительной валидации схем, что ускоряет разработку (YAGNI), но требует корректных типов на входе. | Прагматичный подход (levelsio). Риск минимален при вызове из проверенного кода. |
+### Шаг 3. Ленивый загрузчик промптов (Lazy Prompt Loader)
+- **Цель**: Вынести системные промпты из кода, избежав оверинжиниринга (без классов и автосканирования).
+- **Действие**:
+  1. Создать каталог `tools/prompts/` и вынести туда `.md` файлы промптов.
+  2. Написать простой модуль `tools/prompt_loader.py` со свободными функциями:
+     - `load_prompt(name: str) -> str` (с декоратором `@lru_cache`).
+     - `render_prompt(name: str, **vars) -> str`.
+  3. Все чтения файлов выполнять строго лениво и только в точках вызова LLM.
 
----
+### Шаг 4. Умный тримминг контекста (Context Trimming)
+- **Цель**: Контроль лимитов токенов без замедления старта CLI.
+- **Действие**:
+  1. Написать модуль `tools/context_utils.py` со свободными функциями:
+     - `estimate_tokens_fast(text: str) -> int` (эвристика `len(text) // 4`).
+     - `count_tokens_exact(text: str, model: str) -> int` (с ленивым импортом `tiktoken` внутри функции и fallback на эвристику при ошибке).
+     - `trim_context(messages: list, max_tokens: int)` с соблюдением жестких приоритетов (системные правила и текущий запрос никогда не удаляются).
 
-## 🛠️ 3. Remediation Action Plan & Verification
-1. **Синхронизация тестов (Выполнено):**
-   * В `tools/tests/test_rules_audit.py` заменена строка ожидания блокировки субагентов на корректную `"disabled and blocked"`.
-2. **Path Validation & AST TDD (Выполнено):**
-   * Внедрены функции `validate_path_compliance` для проверки запрета `/home/workdir` путей.
-   * Добавлены тесты `test_path_validation_positive` (для путей с `file://` и `@ai-tools/`) и `test_path_validation_negative` (для путей с `/home/workdir`).
-   * Добавлен тест `test_solo_loop_ast_compliance` для статического AST-анализа вызовов субагентов.
-3. **Импорт промптов и ADR в prompts.db (Выполнено):**
-   * Запущен `tools/update_gem_bot_prompts.py` для импорта обновленных файлов баз знаний с Рабочего стола (`/Users/rus/Desktop/`) в `vault/prompts.db`.
-4. **Регистрация изменений в dashboard.db (Выполнено):**
-   * Факт проведения системного аудита залогирован в таблицу `changelog` системных логов с помощью `tools/dashboard_logger.py`.
+### Шаг 5. Тонкий фасад для RAG (Knowledge Facade)
+- **Цель**: Объединить RAG-инструменты под единым фасадом, не допуская смешивания Wiki и памяти Obsidian в "монолит".
+- **Действие**:
+  1. Создать структуру каталога `tools/knowledge/`:
+     - `wiki.py` (поиск по справке, RAG).
+     - `memory.py` (поиск по логам сессий Obsidian с recency scoring).
+     - `search.py` (тонкий фасад оркестрации).
+  2. Импортировать модули `knowledge/` строго лениво при вызове команд поиска.
 
----
+### Шаг 6. Явные режимы запуска в CLI (`agy fast / deep`)
+- **Цель**: Сделать поведение системы предсказуемым для отладки и тестов.
+- **Действие**:
+  1. Добавить в `cli.py` новые явные команды/флаги:
+     - `agy fast "..."` (минимальный контекст, без RAG, быстрый ответ).
+     - `agy deep "..."` (RAG, анализ памяти, глубокий цикл).
+  2. Автоматический роутер отключить по умолчанию (сделать доступным только за флагом `--auto`).
 
-## 📐 4. baseline Constraints (v10)
-1. **Strict Solo Loop:** Создание субагентов (`define_subagent`, `invoke_subagent`) строго заблокировано.
-2. **macOS Host Only:** Пути `/home/workdir` запрещены. Разрешено использовать только локальные пути `/Users/rus/` и `@-префиксы`.
-3. **TDD:** Каждое изменение должно сопровождаться тестами (минимум 1 позитивный и 1 негативный).
-4. **UI & Performance:** HTML + Vanilla JS/CSS, загрузка страниц и Streamlit панелей strictly $< 2.0\text{s}$.
-5. **Context7 MCP:** Поиск документации строго через MCP `resolve-library-id` -> `query-docs` вместо обычного поиска в сети.
+## 4. Критерии готовности (DoD)
+1. Время старта `agy --help` не превышает baseline более чем на 10 мс.
+2. Все 256 тестов успешно пройдены.
+3. Отсутствуют тяжелые импорты (`tiktoken`, `sqlite3`, `embeddings`) на верхнем уровне `cli.py`.
+4. Мусорные файлы безопасно перемещены в `_archive/`.
+5. Линтер `ruff` не выдает ошибок.
 
-## ⚖️ 5. YAGNI Architectural Decisions (Отклоненные решения)
-В соответствии с принципами levelsio YAGNI и Karpathy Vibe Coding, следующие избыточные решения были официально отклонены (rejected):
-1. **n8n Integration:** Отклонен (rejected) в пользу локальных скриптов `tools/advanced_workflow.py`.
-2. **Claude Task Master:** Отклонен (rejected) в пользу встроенного планировщика задач в `PlanningWithFiles`.
-3. **Router / Need Router:** Отклонен (rejected) — маршрутизация запросов ведется напрямую без прокси-слоев.
-4. **SpecKit:** Отклонен (rejected) — ТЗ пишется напрямую в `implementation_plan.md`.
-
----
-
-## 🏁 6. Session Summary & Refactor Close (2026-06-21)
-* **Статус:** Глубокий аудит, YAGNI-очистка, оптимизация производительности и финальная верификация системы завершены.
-* **Удалено хлама (YAGNI):** Удалены неиспользуемые текстовые файлы ТЗ и данных (`tools/tz_target_media.txt` и `tools/dashboard_parking_ufa.txt`), тестовые файлы из корня `tools/` успешно перенесены в `tools/tests/`. Утилита запуска переименована в `tools/run_integration_pipeline.py`. Общий объем bloat в `tools/` сокращен более чем на 14%.
-* **Исправление багов и Оптимизация:**
-  - Исправлен баг путей в эндпоинте безопасности дашборда (`main.py`), приводивший к сканированию папки `/Users/rus/` вместо воркспейса `/Users/rus/ai-tools`.
-  - Кардинально ускорен SAST сканер секретов (`tools/security/security_scanner.py`) за счет динамической обрезки директорий в `os.walk` (пропуск `.venv`, `.git`, `.obsidian`, `bitrix-knowledge` и `vault`). Скорость сканирования выросла с зависания до **0.33 секунд** (файлов сканируется 170 вместо 9000+).
-* **Тесты & CI Контур:**
-  - В `Makefile` интегрирован последовательный изолированный запуск тестов для `geo-seo`, `tools`, `dashboard-hand-on-pulse` и `youtube-faceless-pipeline`.
-  - Успешно прогнаны все 185 тестов воркспейса и коммерческих проектов через единую команду `make test`. Покрытие стабильности 100%.
-* **Синхронизация и Логирование:**
-  - Обновлены базы знаний, глобальные правила `CLAUDE.md`, `AGENTS.md` и SQLite база `prompts.db`.
-  - Результаты очистки и ускорения сканирования залогированы в базу `dashboard.db`.
-  - Запущен финальный `tools/self_improve.py`.
-
-
-## 🏁 7. Session Summary & Autopilot Enhancements (2026-06-22)
-* **Статус:** Внедрены жесткие автопилот-гардрейлы для Solo Loop v10, WAL mode + retry, Context Compaction, AST Guard и Sandbox Hardening. Все тесты проходят на 100%.
-* **Внедренные фичи:**
-  1. **SQLite WAL + Retry:** Реализована retry-петля (до 5 попыток с экспоненциальным backoff) для предотвращения `OperationalError: database is locked` под Streamlit в `tools/dashboard_logger.py`. Написан TDD тест на конкурентную запись `test_log_change_retry_on_lock`.
-  2. **Context Compaction:** Реализован метод `compact_context` (summarize -> clean) в `core/solo_loop.py` для динамической фильтрации логов, сжатия tracebacks и сохранения вех. Покрыт TDD тестами (positive/negative) в `test_solo_loop_v10.py`.
-  3. **AST Guard:** Реализован статический анализ исходного кода регистрируемых инструментов через `ast.parse` для выявления и жесткой блокировки `define_subagent` и `invoke_subagent` в `tools/agent_skills.py`. Покрыт TDD тестами в `test_rules_audit.py`.
-  4. **Healer Sandbox Hardening:** Скрипт `test_healer.py` дополнен защищенным применением патчей SEARCH/REPLACE в режиме "diff-only" (с автоматическим резервным копированием, AST проверкой синтаксиса и откатом изменений при падении), строгими тайм-аутами и логированием в `dashboard.db` через `log_change`. Написан тестовый сьют `tools/tests/test_test_healer.py`.
-* **LOC delta:** Added: 180, Deleted: 42, Modified: 65.
-* **Test coverage status:** 100% (все 191 тест прошли успешно).
-* **Time saved:** 65m (ROI на авто-лечении и предотвращении деградации контекста).
-
-
-## Spec: SEO Analysis & Optimization Plan for Goedehuidverzorging.nl (v10)
-
-### 🎯 Objective
-Провести глубокий технический, контентный, UX и маркетинговый аудит интернет-магазина косметики `https://www.goedehuidverzorging.nl/`, выявить причины падения заказов на нидерландском рынке, разработать 90-дневный план продвижения, рассчитать стоимость пакетов услуг и автоматизировать аудит через скрипт `geo-seo/seo_optimizer.py` с TDD-тестами и логированием результатов.
-
-### 📊 Pre-delegation Checklist
-- **Цель**: Выявить причины падения заказов, подготовить SEO план и автоматизировать аудит.
-- **Зачем**: Восстановить конверсии и трафик для клиента в нише skincare в Нидерландах.
-- **KPI**: 5+ root causes (причин), 90-дневный план, 3 ценовых пакета, 100% прохождение тестов, Time Saved: 3h.
-- **Допущения**: Доступны публичные данные сайта + библиотека `curl_cffi` / `selectolax`.
-- **Риски**: Языковые барьеры (NL) и отсутствие внутренней аналитики (решается внешним аудитом).
-
-### 📐 Scope & Priorities (MoSCoW)
-- **Must Have**:
-  - Скрипт `geo-seo/seo_optimizer.py` с функциями `run_audit` и `generate_marketing_report`.
-  - Маркетинговый анализ причин падения заказов (5W сегментация ЦА, 4U офферы, CJM барьеры).
-  - 90-дневный пошаговый план продвижения (Technical, On-Page, Content, Linkbuilding, Local).
-  - 3 ценовых пакета (Базовый 1500€, Стандарт 2500€, Премиум 4000€).
-  - TDD unit-тесты в `geo-seo/tests/test_seo_optimizer.py`.
-- **Should Have**:
-  - Логирование факта аудита в `dashboard.db` через `dashboard_logger.py`.
-  - Использование `curl_cffi` для обхода ограничений / TLS-отпечатков в скрипте.
-- **Could Have**:
-  - Автоматическая отправка уведомления или запись в Obsidian ADR.
-- **Won't Have**:
-  - Интеграция с платными API (Ahrefs/Semrush) без ключей.
-
-### 🏁 Definition of Done (DoD)
-1. Создан и отлажен скрипт `geo-seo/seo_optimizer.py`.
-2. Создан подробный отчет в файле `vault/seo_report_goedehuidverzorging.md`.
-3. Написаны TDD тесты в `geo-seo/tests/test_seo_optimizer.py`.
-4. Все тесты (`make test`) проходят успешно.
-5. Залогирован запуск аудита в `dashboard.db`.
-6. Запущен `self_improve.py` для обновления логов.
-7. Предоставлены дельта-метрики сессии и `file://` ссылки на отчет и код.
-
-
-
+## 5. Архитектурные решения (Architecture Decisions / Rejections)
+- **Rejection of n8n integration**: Отклонено / Rejected by YAGNI to keep execution strictly local and serverless.
+- **Rejection of Need Router**: Отклонено / Rejected by YAGNI to prevent extra categorization overhead.
+- **Rejection of Spec Kit**: Отклонено / Rejected by YAGNI to keep the spec process simple.
+- **Rejection of Taskmaster**: Отклонено / Rejected by YAGNI to avoid complex task orchestration.
 

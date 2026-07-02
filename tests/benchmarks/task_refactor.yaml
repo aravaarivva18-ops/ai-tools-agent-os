@@ -1,0 +1,21 @@
+id: "benchmark-refactor-1"
+name: "Simplify nested conditions"
+description: "Refactor nested if-else structures to use early returns."
+target_file: "scratch/auth.py"
+initial_code: |
+  def verify_user(user):
+      if user is not None:
+          if user.get("active"):
+              if user.get("role") == "admin":
+                  return True
+              else:
+                  return False
+          else:
+              return False
+      else:
+          return False
+expected_code: "return"
+rubric:
+  - "The code must use early returns to decrease nested levels"
+  - "Must not use else statements as per rules"
+  - "Must strictly keep logic equivalent"

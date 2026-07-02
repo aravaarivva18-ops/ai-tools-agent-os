@@ -5,7 +5,6 @@ Provides clean validation and Agno-style schema generation under 2 levels of abs
 """
 
 import inspect
-import json
 import logging
 import re
 import typing
@@ -60,10 +59,13 @@ def validate_llm_output(data: Any, model_cls: type[T]) -> T:  # noqa: UP047
             clean_data = match.group(1).strip()
 
     try:
-        parsed_dict = json.loads(clean_data)
-    except json.JSONDecodeError as e:
+        from tools.json_utils import safe_load_json
+        parsed_dict = safe_load_json(clean_data)
+        if parsed_dict is None or not isinstance(parsed_dict, (dict, list)):
+            raise ValueError("Parsed JSON is not an object or array")
+    except Exception as e:
         raise LLMValidationError(
-            f"Failed to parse LLM output as JSON: {e}. Output was: {data}"
+            f"Failed to parse LLM output as JSON (even after repair attempt): {e}. Output was: {data}"
         ) from e
 
     try:
@@ -178,12 +180,27 @@ def generate_tool_schema(func: Callable[..., Any]) -> dict[str, Any]:
             continue
 
         unwrapped_annot = _unwrap_union(param.annotation)
-        param_type = _get_json_type(unwrapped_annot)
         param_desc = doc_params.get(param_name, "")
 
-        prop_def: dict[str, Any] = {"type": param_type}
-        if param_desc:
-            prop_def["description"] = param_desc
+        # Поддержка Pydantic моделей в сигнатуре
+        if inspect.isclass(unwrapped_annot) and issubclass(unwrapped_annot, BaseModel):
+            param_type = "OBJECT"
+            prop_def = {
+                "type": "OBJECT",
+                "description": param_desc or unwrapped_annot.__doc__ or "",
+                "properties": {},
+            }
+            for field_name, field in unwrapped_annot.model_fields.items():
+                field_type = _get_json_type(field.annotation)
+                f_def = {"type": field_type}
+                if field.description:
+                    f_def["description"] = field.description
+                prop_def["properties"][field_name] = f_def
+        else:
+            param_type = _get_json_type(unwrapped_annot)
+            prop_def = {"type": param_type}
+            if param_desc:
+                prop_def["description"] = param_desc
 
         # Check if Optional (Union with None)
         is_optional = False

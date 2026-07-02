@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from tools.uupm_adapter import UUPMAdapter
@@ -5,7 +7,7 @@ from tools.uupm_adapter import UUPMAdapter
 
 @pytest.fixture
 def adapter():
-    return UUPMAdapter(workspace_path="/Users/rus/ai-tools")
+    return UUPMAdapter()
 
 
 def test_init_environment(adapter):
@@ -46,3 +48,46 @@ def test_generate_typst_design_block(adapter):
     assert 'primary-color = rgb("#2563EB")' in typst_code
     assert 'heading-font = "Space Grotesk"' in typst_code
     assert 'body-font = "DM Sans"' in typst_code
+
+
+def test_generate_design_md_content(adapter):
+    content = adapter.generate_design_md_content("SaaS", "Tech Startup")
+    assert "name: SaaSTheme" in content
+    assert 'primary: "#2563EB"' in content
+    assert 'fontFamily: "Space Grotesk, sans-serif"' in content
+    assert 'fontFamily: "DM Sans, sans-serif"' in content
+
+
+def test_generate_css_variables(adapter):
+    content = adapter.generate_css_variables("SaaS", "Tech Startup")
+    assert (
+        '@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap");'
+        in content
+    )
+    assert (
+        '@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap");'
+        in content
+    )
+    assert "--color-primary: #2563EB;" in content
+    assert '--font-heading: "Space Grotesk", sans-serif;' in content
+
+
+def test_write_design_assets(adapter, tmp_path):
+    output_dir = str(tmp_path)
+    paths = adapter.write_design_assets(
+        "SaaS", "Tech Startup", output_dir=output_dir, generate_css=True
+    )
+
+    assert "design_md" in paths
+    assert "theme_css" in paths
+
+    assert os.path.exists(paths["design_md"])
+    assert os.path.exists(paths["theme_css"])
+
+    with open(paths["design_md"], encoding="utf-8") as f:
+        md_content = f.read()
+        assert "name: SaaSTheme" in md_content
+
+    with open(paths["theme_css"], encoding="utf-8") as f:
+        css_content = f.read()
+        assert "@theme" in css_content

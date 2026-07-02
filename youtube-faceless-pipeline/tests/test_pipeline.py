@@ -12,8 +12,8 @@ sys.path.insert(
 )
 import content_gen
 
-# Создаем временную директорию для вывода тестов
-TEST_OUTPUT_DIR = "/Users/rus/ai-tools/youtube-faceless-pipeline/tests/output"
+# Создаем временную директорию для вывода тестов динамически
+TEST_OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
 
 
 @pytest.fixture(autouse=True)

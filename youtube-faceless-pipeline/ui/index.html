@@ -94,13 +94,15 @@
             font-family: 'Outfit', sans-serif;
             font-size: 1.8rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-main);
             display: flex;
             align-items: center;
             gap: 0.75rem;
             letter-spacing: -0.03em;
+        }
+
+        .logo i {
+            color: var(--accent-cyan);
         }
 
         .logo span {
@@ -113,7 +115,6 @@
             background: rgba(56, 144, 255, 0.05);
             border-radius: 6px;
             color: var(--accent-purple);
-            -webkit-text-fill-color: var(--accent-purple);
         }
 
         /* Навигация / Вкладки с пружинной физикой */
@@ -551,7 +552,7 @@
             aspect-ratio: 9/16;
             border-radius: 8px;
             overflow: hidden;
-            background: #000;
+            background: #07090e;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }

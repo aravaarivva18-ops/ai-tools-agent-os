@@ -77,6 +77,10 @@ class LLMWiki:
         matches = re.findall(pattern, text)
         return [m.strip() for m in matches if m.strip()]
 
+    def ingest(self) -> None:
+        """Alias for injest() to support correct spelling."""
+        self.injest()
+
     def injest(self) -> None:
         """
         Process raw files in RAW/ to wiki/.
@@ -215,6 +219,7 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command", help="Wiki workflow commands")
 
     subparsers.add_parser("injest", help="Injest raw files into the wiki")
+    subparsers.add_parser("ingest", help="Ingest raw files into the wiki (alias)")
 
     query_parser = subparsers.add_parser(
         "query", help="Query the wiki starting from a node"
@@ -231,7 +236,7 @@ def main() -> None:
     args = parser.parse_args()
     wiki = LLMWiki()
 
-    if args.command == "injest":
+    if args.command in ("injest", "ingest"):
         wiki.injest()
         print("Ingestion completed successfully.")
     elif args.command == "query":

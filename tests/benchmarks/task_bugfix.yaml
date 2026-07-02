@@ -1,0 +1,12 @@
+id: "benchmark-bugfix-1"
+name: "Fix division by zero error"
+description: "Ensure division by zero is handled in a simple calculator function."
+target_file: "scratch/calc.py"
+initial_code: |
+  def divide(a, b):
+      return a / b
+expected_code: "def divide(a, b):"
+rubric:
+  - "The code must handle b == 0 and return None or raise ValueError"
+  - "Must strictly follow YAGNI (no complex math libraries imported)"
+  - "Must not contain Stop-Slop phrases like 'robust solution' in comments"

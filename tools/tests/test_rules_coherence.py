@@ -1,16 +1,29 @@
 import os
 import re
+from pathlib import Path
 
 import pytest
 
+try:
+    from tools.config import get_workspace_root
+except ImportError:
+    from config import get_workspace_root
+
+workspace_root = get_workspace_root()
+home = Path.home()
+
 # Список путей к файлам правил на хосте
 RULES_FILES = {
-    "GEMINI_ANTIGRAVITY.md": "/Users/rus/GEMINI_ANTIGRAVITY.md",
-    "STUDENT_GUIDE.md": "/Users/rus/STUDENT_GUIDE.md",
-    "CLAUDE.md": "/Users/rus/ai-tools/CLAUDE.md",
-    "AGENTS.md": "/Users/rus/ai-tools/AGENTS.md",
-    "gem_bot_prompt_architect.md": "/Users/rus/Desktop/gem_bot_prompt_architect.md",
-    "gemini_bot_knowledge_base.md": "/Users/rus/Desktop/gemini_bot_knowledge_base.md",
+    "GEMINI_ANTIGRAVITY.md": str(home / "GEMINI_ANTIGRAVITY.md"),
+    "STUDENT_GUIDE.md": str(home / "STUDENT_GUIDE.md"),
+    "CLAUDE.md": str(workspace_root / "CLAUDE.md"),
+    "AGENTS.md": str(workspace_root / "AGENTS.md"),
+    "gem_bot_prompt_architect.md": str(
+        home / "Desktop" / "gem_bot_prompt_architect.md"
+    ),
+    "gemini_bot_knowledge_base.md": str(
+        home / "Desktop" / "gemini_bot_knowledge_base.md"
+    ),
 }
 
 

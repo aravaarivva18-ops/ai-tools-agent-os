@@ -1,63 +1,154 @@
-# Проект: AI Tools Workspace (Monorepo)
+# AI Tools Workspace Configuration (CLAUDE.md)
 
-Набор профессиональных инструментов для локального SEO-анализа, маркетинговых аудитов, автоматизации продаж и юридического анализа контрактов.
+This file defines the build, test, and quality commands for Claude Code, along with references to active project guidelines.
 
-## 🛠️ Технологический стек
-- **Язык**: Python 3.12+
-- **Менеджер зависимостей**: `uv` (workspace с поддержкой monorepo-структуры и единым виртуальным окружением `.venv`)
-- **Линтер & Форматтер**: `ruff` (Google Style & PEP8 с правилами D и C90)
-- **Тестирование промптов**: Встроенные возможности ИИ-ассистента (тестирование на моках и self-evaluation)
-- **TUI Интерфейсы**: `textual` (асинхронные терминальные интерфейсы)
+## 💻 Commands
 
-## 📁 Структура воркспейса (Monorepo Layout)
-- [Makefile](file:///Users/rus/ai-tools/Makefile) — автоматизация рутинных задач разработчика.
-- [pyproject.toml](file:///Users/rus/ai-tools/pyproject.toml) — конфигурация monorepo workspace.
-- [ruff.toml](file:///Users/rus/ai-tools/ruff.toml) — глобальные правила линтинга и форматирования.
-- [geo-seo/](file:///Users/rus/ai-tools/geo-seo/) — парсинг сайтов, SERP-анализ, SEO-показатели и генерация `.txt` / `.md`.
-- [ai-sales/](file:///Users/rus/ai-tools/ai-sales/) — аудит продаж, анализ лидов и генерация PDF-отчетов.
-- [ai-marketing/](file:///Users/rus/ai-tools/ai-marketing/) — анализ маркетинговых стратегий и генерация PDF-отчетов.
-- [ai-legal/](file:///Users/rus/ai-tools/ai-legal/) — анализ юридических договоров, генерация типовых контрактов и PDF.
-- [youtube-faceless-pipeline/](file:///Users/rus/ai-tools/youtube-faceless-pipeline/) — автогенерация сценариев, озвучка, рендеринг сцен и загрузка видео на YouTube.
-- [dashboard-hand-on-pulse/](file:///Users/rus/ai-tools/dashboard-hand-on-pulse/) — Streamlit-дашборд «Рука на пульсе» для Таргет Медиа (клиентский продукт).
-- [skills/](file:///Users/rus/ai-tools/skills/) — специализированные навыки ИИ-агентов (модульные инструкции).
-- [tools/](file:///Users/rus/ai-tools/tools/) — вспомогательные скрипты разработки и утилиты.
+* **Sync Dependencies:** `make sync`
+* **Auto-Heal Errors:** `agy run` (runs `test_healer.py`)
+* **Semantic Search Handoffs:** `agy search "<query>"`
+* **Project Initialization:** `agy init`
+* **Incremental Tests:** `agy test`
+* **All Tests:** `agy test --all` (runs `pytest`)
+* **Format Code:** `make format`
+* **Lint & Auto-fix:** `make lint`
+* **Quality Check:** `make check`
+* **Ingest Wiki Docs:** `uv run python tools/llm_wiki.py ingest`
+* **Query Wiki:** `uv run python tools/llm_wiki.py query <note>`
 
-## 🔌 Подключение навыков по запросу (Just-In-Time Skills)
-Перед выполнением любой задачи **обязательно** ознакомьтесь с соответствующим файлом навыка в папке `skills/`:
-- **Скрапинг и парсинг HTML (Selectolax / curl_cffi)**: См. [skills/stealth-scraping/SKILL.md](file:///Users/rus/ai-tools/skills/stealth-scraping/SKILL.md)
-- **Генерация PDF-документов (Typst)**: См. [skills/typst-pdf/SKILL.md](file:///Users/rus/ai-tools/skills/typst-pdf/SKILL.md)
-- **Хранение данных и RLS (Supabase / pgvector / Alembic)**: См. [skills/database-persistence/SKILL.md](file:///Users/rus/ai-tools/skills/database-persistence/SKILL.md)
-- **Создание и стандартизация JIT-навыков (Pydantic / Agno-style)**: См. [skills/skill-creator/SKILL.md](file:///Users/rus/ai-tools/skills/skill-creator/SKILL.md)
-- **Проектирование архитектуры автоматизации и навыков (Solo Loop / Harness)**: См. [skills/harness/SKILL.md](file:///Users/rus/ai-tools/skills/harness/SKILL.md)
-- **Воркфлоу и генерация контента (ComfyUI / Vast.ai)**: См. [skills/comfyui/SKILL.md](file:///Users/rus/ai-tools/skills/comfyui/SKILL.md)
-- **Клонирование и реверс-инжиниринг сайтов (Browser Automation / Next.js)**: См. [skills/website-cloner/SKILL.md](file:///Users/rus/ai-tools/skills/website-cloner/SKILL.md)
-- **Генерация требований к продукту (PRD) по шагам**: См. [skills/prd/SKILL.md](file:///Users/rus/ai-tools/skills/prd/SKILL.md)
-- **Конвертация требований в задачи для цикла Ralph**: См. [skills/ralph/SKILL.md](file:///Users/rus/ai-tools/skills/ralph/SKILL.md)
+## 📐 Active Guidelines
 
+> 📂 **Primary Rules Source:** All active coding standards, context constraints, and stack-specific behaviors are compiled dynamically by `ContextOptimizer` in [.agents/AGENTS.md](file://.agents/AGENTS.md). Refer to it for the source of truth.
+>
+> * **Constitution:** [GEMINI_ANTIGRAVITY.md](file:///Users/rus/GEMINI_ANTIGRAVITY.md) — регламенты Solo Loop v10, ACI лимитов, TDD, SAST, Karpathy Vibe Coding и уровней абстракции levelsio.
 
+## 🛠️ JIT Skills
 
-## 💻 Команды сборки и разработки (Makefile CLI)
-- **Синхронизация зависимостей**: `make sync`
-- **Форматирование кода**: `make format`
-- **Автоматическое исправление**: `make lint`
-- **Проверка качества кода**: `make check`
-- **Юнит-тестирование**: `make test`
-- **Очистка кэша**: `make clean`
-- **Импорт документов в Wiki**: `uv run python tools/llm_wiki.py injest`
-- **Запрос из Wiki**: `uv run python tools/llm_wiki.py query <заметка> [--depth <глубина>]`
-
-
-
-## 📐 Глобальные правила разработки (v10)
-Все разработки в монорепозитории регулируются конституцией [GEMINI_ANTIGRAVITY.md](file:///Users/rus/GEMINI_ANTIGRAVITY.md).
-
-Ключевые регламенты (подробнее см. в соответствующих разделах [GEMINI_ANTIGRAVITY.md](file:///Users/rus/GEMINI_ANTIGRAVITY.md)):
-- **Strict Solo Loop & ACI** (раздел 3, 15): Использование субагентов полностью запрещено, Stealth Stop на 3-й ошибке, чтение файлов диапазонами.
-- **Инструменты и Плагины** (раздел 20, 21): Нативные инструменты имеют приоритет, обязательное использование `agent-skills`, `fablize` и `ponytail`.
-- **Karpathy Vibe Coding & YAGNI** (раздел 13): Плоский линейный код, максимум 2-3 уровня абстракции.
-- **TDD & Self-Healing** (раздел 5, 23): Разработка строго через тесты, автоисправление через `test_healer.py`.
-- **Безопасность (SAST) & Пути** (раздел 6, 10): Только абсолютные пути `file:///Users/rus/`, запуск Bandit из окружения `uv`.
-- **Self-Improvement** (раздел 22): Автоциклы улучшения и нормализация — см. раздел «Протокол Самообучения и Эволюции» в [GEMINI_ANTIGRAVITY.md](file:///Users/rus/GEMINI_ANTIGRAVITY.md).
-- **Изоляция прототипов**: Временный код (Spikes) сохраняется строго в папках `scratch/`. Импорт файлов из `scratch/` в основные рабочие модули категорически запрещен.
-
-
+* **8-Bit-Orbit-Video-Template:** [skills/8-bit-orbit-video-template/SKILL.md](file://skills/8-bit-orbit-video-template/SKILL.md)
+* **Ad-Creative:** [skills/ad-creative/SKILL.md](file://skills/ad-creative/SKILL.md)
+* **After-Hours-Editorial-Template:** [skills/after-hours-editorial-template/SKILL.md](file://skills/after-hours-editorial-template/SKILL.md)
+* **Agent-Browser:** [skills/agent-browser/SKILL.md](file://skills/agent-browser/SKILL.md)
+* **Ai-Music-Album:** [skills/ai-music-album/SKILL.md](file://skills/ai-music-album/SKILL.md)
+* **Algorithmic-Art:** [skills/algorithmic-art/SKILL.md](file://skills/algorithmic-art/SKILL.md)
+* **Apple-Hig:** [skills/apple-hig/SKILL.md](file://skills/apple-hig/SKILL.md)
+* **Article-Magazine:** [skills/article-magazine/SKILL.md](file://skills/article-magazine/SKILL.md)
+* **Artifacts-Builder:** [skills/artifacts-builder/SKILL.md](file://skills/artifacts-builder/SKILL.md)
+* **Brainstorming:** [skills/brainstorming/SKILL.md](file://skills/brainstorming/SKILL.md)
+* **Brand-Extract:** [skills/brand-extract/SKILL.md](file://skills/brand-extract/SKILL.md)
+* **Brand-Guidelines:** [skills/brand-guidelines/SKILL.md](file://skills/brand-guidelines/SKILL.md)
+* **Brandkit:** [skills/brandkit/SKILL.md](file://skills/brandkit/SKILL.md)
+* **Brutalist-Skill:** [skills/brutalist-skill/SKILL.md](file://skills/brutalist-skill/SKILL.md)
+* **Canvas-Design:** [skills/canvas-design/SKILL.md](file://skills/canvas-design/SKILL.md)
+* **Card-Twitter:** [skills/card-twitter/SKILL.md](file://skills/card-twitter/SKILL.md)
+* **Card-Xiaohongshu:** [skills/card-xiaohongshu/SKILL.md](file://skills/card-xiaohongshu/SKILL.md)
+* **Color-Expert:** [skills/color-expert/SKILL.md](file://skills/color-expert/SKILL.md)
+* **Comfyui:** [skills/comfyui/SKILL.md](file://skills/comfyui/SKILL.md)
+* **Competitive-Ads-Extractor:** [skills/competitive-ads-extractor/SKILL.md](file://skills/competitive-ads-extractor/SKILL.md)
+* **Copywriting:** [skills/copywriting/SKILL.md](file://skills/copywriting/SKILL.md)
+* **Creative-Director:** [skills/creative-director/SKILL.md](file://skills/creative-director/SKILL.md)
+* **D3-Visualization:** [skills/d3-visualization/SKILL.md](file://skills/d3-visualization/SKILL.md)
+* **Data-Report:** [skills/data-report/SKILL.md](file://skills/data-report/SKILL.md)
+* **Database-Persistence:** [skills/database-persistence/SKILL.md](file://skills/database-persistence/SKILL.md)
+* **Design-Brief:** [skills/design-brief/SKILL.md](file://skills/design-brief/SKILL.md)
+* **Design-Consultation:** [skills/design-consultation/SKILL.md](file://skills/design-consultation/SKILL.md)
+* **Design-Md:** [skills/design-md/SKILL.md](file://skills/design-md/SKILL.md)
+* **Design-Review:** [skills/design-review/SKILL.md](file://skills/design-review/SKILL.md)
+* **Doc:** [skills/doc/SKILL.md](file://skills/doc/SKILL.md)
+* **Doc-Kami-Parchment:** [skills/doc-kami-parchment/SKILL.md](file://skills/doc-kami-parchment/SKILL.md)
+* **Docx:** [skills/docx/SKILL.md](file://skills/docx/SKILL.md)
+* **Domain-Name-Brainstormer:** [skills/domain-name-brainstormer/SKILL.md](file://skills/domain-name-brainstormer/SKILL.md)
+* **Ecommerce-Image-Workflow:** [skills/ecommerce-image-workflow/SKILL.md](file://skills/ecommerce-image-workflow/SKILL.md)
+* **Emil-Design-Eng:** [skills/emil-design-eng/SKILL.md](file://skills/emil-design-eng/SKILL.md)
+* **Enhance-Prompt:** [skills/enhance-prompt/SKILL.md](file://skills/enhance-prompt/SKILL.md)
+* **Export-Download-Debugging:** [skills/export-download-debugging/SKILL.md](file://skills/export-download-debugging/SKILL.md)
+* **Faq-Page:** [skills/faq-page/SKILL.md](file://skills/faq-page/SKILL.md)
+* **Figma-Create-Design-System-Rules:** [skills/figma-create-design-system-rules/SKILL.md](file://skills/figma-create-design-system-rules/SKILL.md)
+* **Flutter-Animating-Apps:** [skills/flutter-animating-apps/SKILL.md](file://skills/flutter-animating-apps/SKILL.md)
+* **Frame-Data-Chart-Nyt:** [skills/frame-data-chart-nyt/SKILL.md](file://skills/frame-data-chart-nyt/SKILL.md)
+* **Frame-Flowchart-Sticky:** [skills/frame-flowchart-sticky/SKILL.md](file://skills/frame-flowchart-sticky/SKILL.md)
+* **Frame-Glitch-Title:** [skills/frame-glitch-title/SKILL.md](file://skills/frame-glitch-title/SKILL.md)
+* **Frame-Light-Leak-Cinema:** [skills/frame-light-leak-cinema/SKILL.md](file://skills/frame-light-leak-cinema/SKILL.md)
+* **Frame-Liquid-Bg-Hero:** [skills/frame-liquid-bg-hero/SKILL.md](file://skills/frame-liquid-bg-hero/SKILL.md)
+* **Frame-Logo-Outro:** [skills/frame-logo-outro/SKILL.md](file://skills/frame-logo-outro/SKILL.md)
+* **Frame-Macos-Notification:** [skills/frame-macos-notification/SKILL.md](file://skills/frame-macos-notification/SKILL.md)
+* **Frontend-Design:** [skills/frontend-design/SKILL.md](file://skills/frontend-design/SKILL.md)
+* **Frontend-Dev:** [skills/frontend-dev/SKILL.md](file://skills/frontend-dev/SKILL.md)
+* **Frontend-Skill:** [skills/frontend-skill/SKILL.md](file://skills/frontend-skill/SKILL.md)
+* **Frontend-Slides:** [skills/frontend-slides/SKILL.md](file://skills/frontend-slides/SKILL.md)
+* **Frontend-Taste:** [skills/frontend-taste/SKILL.md](file://skills/frontend-taste/SKILL.md)
+* **Full-Page-Screenshot:** [skills/full-page-screenshot/SKILL.md](file://skills/full-page-screenshot/SKILL.md)
+* **Gif-Sticker-Maker:** [skills/gif-sticker-maker/SKILL.md](file://skills/gif-sticker-maker/SKILL.md)
+* **Gpt-Tasteskill:** [skills/gpt-tasteskill/SKILL.md](file://skills/gpt-tasteskill/SKILL.md)
+* **Gsap-Animation:** [skills/gsap-animation/SKILL.md](file://skills/gsap-animation/SKILL.md)
+* **Hand-Drawn-Diagrams:** [skills/hand-drawn-diagrams/SKILL.md](file://skills/hand-drawn-diagrams/SKILL.md)
+* **Harness:** [skills/harness/SKILL.md](file://skills/harness/SKILL.md)
+* **Hatch-Pet:** [skills/hatch-pet/SKILL.md](file://skills/hatch-pet/SKILL.md)
+* **Html-Ppt-Retro-Quarterly-Review:** [skills/html-ppt-retro-quarterly-review/SKILL.md](file://skills/html-ppt-retro-quarterly-review/SKILL.md)
+* **Image-Enhancer:** [skills/image-enhancer/SKILL.md](file://skills/image-enhancer/SKILL.md)
+* **Image-To-Code-Skill:** [skills/image-to-code-skill/SKILL.md](file://skills/image-to-code-skill/SKILL.md)
+* **Imagegen:** [skills/imagegen/SKILL.md](file://skills/imagegen/SKILL.md)
+* **Imagegen-Frontend-Mobile:** [skills/imagegen-frontend-mobile/SKILL.md](file://skills/imagegen-frontend-mobile/SKILL.md)
+* **Imagegen-Frontend-Web:** [skills/imagegen-frontend-web/SKILL.md](file://skills/imagegen-frontend-web/SKILL.md)
+* **Imagen:** [skills/imagen/SKILL.md](file://skills/imagen/SKILL.md)
+* **Impeccable-Design-Polish:** [skills/impeccable-design-polish/SKILL.md](file://skills/impeccable-design-polish/SKILL.md)
+* **Library-Curator:** [skills/library-curator/SKILL.md](file://skills/library-curator/SKILL.md)
+* **Login-Flow:** [skills/login-flow/SKILL.md](file://skills/login-flow/SKILL.md)
+* **Marketing-Psychology:** [skills/marketing-psychology/SKILL.md](file://skills/marketing-psychology/SKILL.md)
+* **Minimalist-Skill:** [skills/minimalist-skill/SKILL.md](file://skills/minimalist-skill/SKILL.md)
+* **Minimax-Docx:** [skills/minimax-docx/SKILL.md](file://skills/minimax-docx/SKILL.md)
+* **Minimax-Pdf:** [skills/minimax-pdf/SKILL.md](file://skills/minimax-pdf/SKILL.md)
+* **Mockup-Device-3D:** [skills/mockup-device-3d/SKILL.md](file://skills/mockup-device-3d/SKILL.md)
+* **Nanobanana-Ppt:** [skills/nanobanana-ppt/SKILL.md](file://skills/nanobanana-ppt/SKILL.md)
+* **Output-Skill:** [skills/output-skill/SKILL.md](file://skills/output-skill/SKILL.md)
+* **Paywall-Upgrade-Cro:** [skills/paywall-upgrade-cro/SKILL.md](file://skills/paywall-upgrade-cro/SKILL.md)
+* **Pdf:** [skills/pdf/SKILL.md](file://skills/pdf/SKILL.md)
+* **Pixelbin-Media:** [skills/pixelbin-media/SKILL.md](file://skills/pixelbin-media/SKILL.md)
+* **Plan-Design-Review:** [skills/plan-design-review/SKILL.md](file://skills/plan-design-review/SKILL.md)
+* **Platform-Design:** [skills/platform-design/SKILL.md](file://skills/platform-design/SKILL.md)
+* **Poster-Hero:** [skills/poster-hero/SKILL.md](file://skills/poster-hero/SKILL.md)
+* **Ppt-Keynote:** [skills/ppt-keynote/SKILL.md](file://skills/ppt-keynote/SKILL.md)
+* **Pptx:** [skills/pptx/SKILL.md](file://skills/pptx/SKILL.md)
+* **Pptx-Generator:** [skills/pptx-generator/SKILL.md](file://skills/pptx-generator/SKILL.md)
+* **Pptx-Html-Fidelity-Audit:** [skills/pptx-html-fidelity-audit/SKILL.md](file://skills/pptx-html-fidelity-audit/SKILL.md)
+* **Pr-Feedback-Quality-Gate:** [skills/pr-feedback-quality-gate/SKILL.md](file://skills/pr-feedback-quality-gate/SKILL.md)
+* **Prd:** [skills/prd/SKILL.md](file://skills/prd/SKILL.md)
+* **Ralph:** [skills/ralph/SKILL.md](file://skills/ralph/SKILL.md)
+* **Redesign-Skill:** [skills/redesign-skill/SKILL.md](file://skills/redesign-skill/SKILL.md)
+* **Reference-Design-Contract:** [skills/reference-design-contract/SKILL.md](file://skills/reference-design-contract/SKILL.md)
+* **Release-Notes-One-Pager:** [skills/release-notes-one-pager/SKILL.md](file://skills/release-notes-one-pager/SKILL.md)
+* **Remotion:** [skills/remotion/SKILL.md](file://skills/remotion/SKILL.md)
+* **Research-Decision-Room:** [skills/research-decision-room/SKILL.md](file://skills/research-decision-room/SKILL.md)
+* **Resume-Modern:** [skills/resume-modern/SKILL.md](file://skills/resume-modern/SKILL.md)
+* **Screenshot:** [skills/screenshot/SKILL.md](file://skills/screenshot/SKILL.md)
+* **Screenshots-Marketing:** [skills/screenshots-marketing/SKILL.md](file://skills/screenshots-marketing/SKILL.md)
+* **Shadcn-Ui:** [skills/shadcn-ui/SKILL.md](file://skills/shadcn-ui/SKILL.md)
+* **Shader-Dev:** [skills/shader-dev/SKILL.md](file://skills/shader-dev/SKILL.md)
+* **Skill-Creator:** [skills/skill-creator/SKILL.md](file://skills/skill-creator/SKILL.md)
+* **Slack-Gif-Creator:** [skills/slack-gif-creator/SKILL.md](file://skills/slack-gif-creator/SKILL.md)
+* **Slides:** [skills/slides/SKILL.md](file://skills/slides/SKILL.md)
+* **Social-Reddit-Card:** [skills/social-reddit-card/SKILL.md](file://skills/social-reddit-card/SKILL.md)
+* **Social-Spotify-Card:** [skills/social-spotify-card/SKILL.md](file://skills/social-spotify-card/SKILL.md)
+* **Social-X-Post-Card:** [skills/social-x-post-card/SKILL.md](file://skills/social-x-post-card/SKILL.md)
+* **Soft-Skill:** [skills/soft-skill/SKILL.md](file://skills/soft-skill/SKILL.md)
+* **Speech:** [skills/speech/SKILL.md](file://skills/speech/SKILL.md)
+* **Stealth-Scraping:** [skills/stealth-scraping/SKILL.md](file://skills/stealth-scraping/SKILL.md)
+* **Stitch-Loop:** [skills/stitch-loop/SKILL.md](file://skills/stitch-loop/SKILL.md)
+* **Stitch-Skill:** [skills/stitch-skill/SKILL.md](file://skills/stitch-skill/SKILL.md)
+* **Swiftui-Design:** [skills/swiftui-design/SKILL.md](file://skills/swiftui-design/SKILL.md)
+* **Swiss-User-Research-Video-Template:** [skills/swiss-user-research-video-template/SKILL.md](file://skills/swiss-user-research-video-template/SKILL.md)
+* **Taste-Skill:** [skills/taste-skill/SKILL.md](file://skills/taste-skill/SKILL.md)
+* **Taste-Skill-V1:** [skills/taste-skill-v1/SKILL.md](file://skills/taste-skill-v1/SKILL.md)
+* **Theme-Factory:** [skills/theme-factory/SKILL.md](file://skills/theme-factory/SKILL.md)
+* **Threejs:** [skills/threejs/SKILL.md](file://skills/threejs/SKILL.md)
+* **Typst-Pdf:** [skills/typst-pdf/SKILL.md](file://skills/typst-pdf/SKILL.md)
+* **Ui-Skills:** [skills/ui-skills/SKILL.md](file://skills/ui-skills/SKILL.md)
+* **Ui-Ux-Pro-Max:** [skills/ui-ux-pro-max/SKILL.md](file://skills/ui-ux-pro-max/SKILL.md)
+* **Vfx-Text-Cursor:** [skills/vfx-text-cursor/SKILL.md](file://skills/vfx-text-cursor/SKILL.md)
+* **Video-Downloader:** [skills/video-downloader/SKILL.md](file://skills/video-downloader/SKILL.md)
+* **Video-Hyperframes:** [skills/video-hyperframes/SKILL.md](file://skills/video-hyperframes/SKILL.md)
+* **Web-Artifacts-Builder:** [skills/web-artifacts-builder/SKILL.md](file://skills/web-artifacts-builder/SKILL.md)
+* **Web-Design-Guidelines:** [skills/web-design-guidelines/SKILL.md](file://skills/web-design-guidelines/SKILL.md)
+* **Website-Cloner:** [skills/website-cloner/SKILL.md](file://skills/website-cloner/SKILL.md)
+* **Weread-Year-In-Review-Video-Template:** [skills/weread-year-in-review-video-template/SKILL.md](file://skills/weread-year-in-review-video-template/SKILL.md)
+* **Wpds:** [skills/wpds/SKILL.md](file://skills/wpds/SKILL.md)
+* **Youtube-Clipper:** [skills/youtube-clipper/SKILL.md](file://skills/youtube-clipper/SKILL.md)

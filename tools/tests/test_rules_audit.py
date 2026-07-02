@@ -2,6 +2,11 @@ import ast
 import re
 from pathlib import Path
 
+try:
+    from tools.config import get_workspace_root
+except ImportError:
+    from config import get_workspace_root
+
 
 def analyze_abstraction_levels(content: str) -> int:
     """Анализирует контент на количество уровней абстракции.
@@ -55,7 +60,7 @@ def detect_subagent_usage(code: str) -> bool:
 
 def test_gemini_antigravity_version_positive():
     """Позитивный тест: Проверяет, что GEMINI_ANTIGRAVITY.md содержит Max Power Protocol v3.0."""
-    path = Path("/Users/rus/GEMINI_ANTIGRAVITY.md")
+    path = Path.home() / "GEMINI_ANTIGRAVITY.md"
     assert path.exists(), "GEMINI_ANTIGRAVITY.md не найден"
     content = path.read_text(encoding="utf-8")
     assert "Max Power & Self-* Protocol v3.0" in content, (
@@ -94,8 +99,8 @@ class UserRepositoryLoggingWrapper:
 
 def test_solo_loop_enforced_positive():
     """Позитивный тест: Проверяет наличие требований строгого Solo Loop и блокировки субагентов в базах знаний."""
-    kb_path = Path("/Users/rus/ai-tools/attachments/gemini_bot_knowledge_base.md")
-    antigravity_path = Path("/Users/rus/GEMINI_ANTIGRAVITY.md")
+    kb_path = get_workspace_root() / "attachments" / "gemini_bot_knowledge_base.md"
+    antigravity_path = Path.home() / "GEMINI_ANTIGRAVITY.md"
 
     assert kb_path.exists(), "gemini_bot_knowledge_base.md не найден"
     assert antigravity_path.exists(), "GEMINI_ANTIGRAVITY.md не найден"

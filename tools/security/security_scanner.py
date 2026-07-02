@@ -10,10 +10,16 @@ import subprocess  # nosec B404
 import sys
 from pathlib import Path
 
+try:
+    from tools.config import get_workspace_root
+except ImportError:
+    from config import get_workspace_root
+
 
 def get_verified_python_path() -> str:
     """Returns the absolute path to the verified virtual environment python interpreter."""
-    venv_python = "/Users/rus/ai-tools/.venv/bin/python"
+    workspace_root = get_workspace_root()
+    venv_python = str(workspace_root / ".venv" / "bin" / "python")
     if os.path.exists(venv_python):
         return venv_python
     # Fallback to the current running interpreter if venv path does not exist

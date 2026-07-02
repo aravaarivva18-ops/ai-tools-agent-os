@@ -4,6 +4,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+try:
+    from tools.config import get_workspace_root, load_config
+except ImportError:
+    from config import get_workspace_root, load_config
+
 collect: Any = None
 try:
     import tools.collect_handoffs
@@ -71,86 +76,21 @@ except ImportError:
         pass
 
 
-def generate_research_queries(category: str, issue_content: str) -> list:
-    """Генерирует целевые поисковые запросы для GitHub/arXiv/Web на основе описания проблемы."""
-    clean_text = "".join(
-        c if c.isalnum() or c.isspace() else " " for c in issue_content
-    ).strip()
-    words = [w for w in clean_text.split() if len(w) > 3][:6]
-    keywords = " ".join(words)
-
-    queries = [
-        f"site:github.com {category} {keywords}",
-        f"site:arxiv.org {category} {keywords}",
-        f"best practices {category} {keywords}",
-    ]
-    return queries
-
-
-def detect_tool_conflicts(logs: list) -> list:
-    """Анализирует логи трения на наличие конфликтов инструментов."""
-    conflicts = []
-    for log in logs:
-        for pt in log.get("friction_points", []):
-            content = pt.get("content", "").lower()
-            if any(
-                k in content
-                for k in [
-                    "subagent",
-                    "субагент",
-                    "sub-agent",
-                    "invoke_subagent",
-                    "define_subagent",
-                ]
-            ):
-                conflicts.append(
-                    f"Session {log.get('session_id')}: Найдено упоминание субагентов или вызовов invoke_subagent/define_subagent. Убедитесь, что используется Solo Loop по умолчанию."
-                )
-            if "diff_applier" in content or "diff_applier.py" in content:
-                conflicts.append(
-                    f"Session {log.get('session_id')}: Использован diff_applier.py. По возможности используйте нативный replace_file_content."
-                )
-    return list(set(conflicts))
-
-
-def optimize_prompt_for_speed(category: str, issue_content: str) -> str:
-    """Создает оптимизированный сжатый промпт для устранения указанной проблемы."""
-    lines = [line.strip() for line in issue_content.splitlines() if line.strip()]
-    first_line = lines[0] if lines else ""
-
-    clean_line = "".join(
-        c if c.isalnum() or c.isspace() else " " for c in first_line
-    ).strip()
-    summary = " ".join(clean_line.split()[:10])
-
-    return f"Исправь {category}: {summary}. Используй TDD, YAGNI (max 3 levels) и Solo Loop."
-
-
-def suggest_tool_combinations(category: str) -> str:
-    """Рекомендует эффективные комбинации инструментов для решения проблемы."""
-    cat_lower = category.lower()
-    if "oom" in cat_lower or "memory" in cat_lower or "памят" in cat_lower:
-        return "`view_file` (ограничение чтения строк) + `run_command` (очистка памяти/проверка логов)"
-    if (
-        "тест" in cat_lower
-        or "ошибк" in cat_lower
-        or "fail" in cat_lower
-        or "error" in cat_lower
-    ):
-        return "`replace_file_content` (точечные правки) + `run_command` (запуск тестов) + `tools/test_healer.py` (автоисправление)"
-    return "`search_web` (сбор фактов) + `replace_file_content` (правка) + `make check-rules` (валидация)"
-
-
-def analyze_self_healing_needs(issue_content: str) -> str:
-    """Определяет, нужен ли запуск test_healer.py для самовосстановления."""
-    content_lower = issue_content.lower()
-    if any(
-        k in content_lower
-        for k in ["failed", "assert", "traceback", "syntaxerror", "import"]
-    ):
-        return "⚠️ Рекомендуется запуск `tools/test_healer.py` для автоматического исправления тестов/импортов."
-    return (
-        "💡 Проблема решается стандартным редактированием через `replace_file_content`."
+try:
+    from tools.self_improve_utils import (
+        analyze_self_healing_needs,
+        detect_tool_conflicts,
+        generate_research_queries,
+        optimize_prompt_for_speed,
+        suggest_tool_combinations,
+    )
+except ImportError:
+    from self_improve_utils import (
+        analyze_self_healing_needs,
+        detect_tool_conflicts,
+        generate_research_queries,
+        optimize_prompt_for_speed,
+        suggest_tool_combinations,
     )
 
 
@@ -326,7 +266,7 @@ def _build_priority_queue(issues_by_category: dict) -> tuple:
     priority_queue = sorted(priority_queue, key=lambda x: x["score"], reverse=True)
 
     # Save to Auto-Heal Queue file
-    queue_path = Path("/Users/rus/ai-tools/vault/auto_heal_queue.json")
+    queue_path = get_workspace_root() / "vault" / "auto_heal_queue.json"
     try:
         queue_path.parent.mkdir(parents=True, exist_ok=True)
         with open(queue_path, "w", encoding="utf-8") as f:
@@ -350,7 +290,7 @@ def _build_priority_queue(issues_by_category: dict) -> tuple:
 def _classify_jit_skills(skills_dir_path: Path | None) -> dict[str, int]:
     """Scans skills directory and classifies JIT skills by category."""
     if skills_dir_path is None:
-        skills_dir_path = Path("/Users/rus/ai-tools/skills")
+        skills_dir_path = get_workspace_root() / "skills"
 
     result = {
         "scale": 0,
@@ -603,101 +543,10 @@ def generate_improvement_report(
     }
 
 
-PACKAGE_TO_MODULE_MAP = {
-    "python-docx": "docx",
-    "python-pptx": "pptx",
-    "python-dotenv": "dotenv",
-    "google-generativeai": "google",
-    "google-genai": "google",
-    "pyjwt": "jwt",
-    "passlib": "passlib",
-    "psycopg2-binary": "psycopg2",
-    "pydantic-settings": "pydantic_settings",
-}
-
-
-def get_pyproject_dependencies(project_root: Path) -> set:
-    import re
-    import tomllib
-
-    pyproject_path = project_root / "pyproject.toml"
-    if not pyproject_path.exists():
-        return set()
-
-    try:
-        with open(pyproject_path, "rb") as f:
-            data = tomllib.load(f)
-        deps = data.get("project", {}).get("dependencies", [])
-
-        clean_deps = set()
-        for dep in deps:
-            match = re.match(r"^([a-zA-Z0-9_\-]+)", dep.strip())
-            if match:
-                clean_deps.add(match.group(1).lower())
-        return clean_deps
-    except Exception as e:
-        print(f"Warning: Failed to load pyproject.toml: {e}")
-        return set()
-
-
-def get_imported_modules(project_root: Path) -> set:
-    import ast
-
-    imported = set()
-    for path in project_root.rglob("*.py"):
-        path_parts = path.parts
-        # Исключаем временные файлы, виртуальное окружение и т.д.
-        if any(
-            p in path_parts
-            for p in (
-                ".venv",
-                ".git",
-                ".pytest_cache",
-                ".ruff_cache",
-                ".mypy_cache",
-                "scratch",
-            )
-        ):
-            continue
-
-        try:
-            tree = ast.parse(path.read_text(encoding="utf-8"))
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Import):
-                    for name in node.names:
-                        imported.add(name.name.split(".")[0].lower())
-                elif isinstance(node, ast.ImportFrom):
-                    if node.module:
-                        imported.add(node.module.split(".")[0].lower())
-        except Exception:
-            pass
-
-    return imported
-
-
-def yagni_audit_dependencies(project_root) -> list:
-    """
-    Проверяет импорты во всех .py файлах репозитория и сопоставляет их с зависимостями в pyproject.toml.
-    Возвращает список неиспользуемых зависимостей.
-    """
-    from pathlib import Path
-
-    root_path = Path(project_root)
-    clean_deps = get_pyproject_dependencies(root_path)
-    if not clean_deps:
-        return []
-
-    imported = get_imported_modules(root_path)
-    unused = []
-
-    for dep in clean_deps:
-        # Для стандартных библиотек или уже импортированных
-        module_name = PACKAGE_TO_MODULE_MAP.get(dep, dep.replace("-", "_"))
-        if module_name not in imported:
-            if dep.replace("-", "_") not in imported:
-                unused.append(dep)
-
-    return sorted(unused)
+try:
+    from tools.yagni_auditor import yagni_audit_dependencies
+except ImportError:
+    from yagni_auditor import yagni_audit_dependencies
 
 
 def apply_improvement_record(handoff_notes_path: Path, metrics: dict) -> None:
@@ -721,10 +570,13 @@ def apply_improvement_record(handoff_notes_path: Path, metrics: dict) -> None:
 
 
 def main() -> None:
-    target_dir = Path("/Users/rus/ai-tools/vault/handoffs")
+    config = load_config()
+    workspace_root = get_workspace_root()
+    handoffs_rel = config.get("vault", {}).get("handoffs_dir", "vault/handoffs")
+    target_dir = workspace_root / handoffs_rel
     friction_logs_path = target_dir / "friction_logs.json"
     output_report_path = target_dir / "self_improvement_report.md"
-    handoff_notes_path = Path("/Users/rus/ai-tools/handoff_notes.md")
+    handoff_notes_path = workspace_root / "handoff_notes.md"
 
     if not target_dir.exists():
         if collect is not None:
@@ -759,7 +611,7 @@ def main() -> None:
     # Ротация старых сессий (старше 7 дней)
     if rotate_sessions is not None:
         try:
-            brain_dir = Path("/Users/rus/.gemini/antigravity-cli/brain")
+            brain_dir = Path.home() / ".gemini" / "antigravity-cli" / "brain"
             rotate_sessions(brain_dir, age_days=7)
         except Exception as e:
             print(f"Warning: Failed to rotate old sessions: {e}")
@@ -780,7 +632,7 @@ def maintain_constitution(constitution_path: Path | None = None) -> None:
         return
 
     if constitution_path is None:
-        constitution_path = Path("/Users/rus/GEMINI_ANTIGRAVITY.md")
+        constitution_path = Path.home() / "GEMINI_ANTIGRAVITY.md"
 
     if not constitution_path.exists():
         print(
@@ -812,7 +664,7 @@ def maintain_constitution(constitution_path: Path | None = None) -> None:
                 adr_dir = constitution_path.parent / "vault" / "adr"
                 adr_dir.mkdir(parents=True, exist_ok=True)
             else:
-                adr_dir = Path("/Users/rus/ai-tools/vault/adr")
+                adr_dir = get_workspace_root() / "vault" / "adr"
 
             if adr_dir.exists():
                 adr_path = adr_dir / "ADR_0016_automated_constitution_maintenance.md"
@@ -863,7 +715,7 @@ def maintain_constitution(constitution_path: Path | None = None) -> None:
 def cleanup_clutter(constitution_dir: Path | None = None) -> None:
     """Удаляет временные файлы бэкапов конституции и другие .bak файлы старше 7 дней."""
     if constitution_dir is None:
-        constitution_dir = Path("/Users/rus")
+        constitution_dir = Path.home()
 
     # 1. Удаляем бэкапы конституции в /Users/rus
     if constitution_dir.exists():
@@ -876,8 +728,8 @@ def cleanup_clutter(constitution_dir: Path | None = None) -> None:
             except Exception as e:
                 print(f"Warning: Could not remove old backup {f}: {e}")
 
-    # 2. Удаляем временные .bak.* в репозитории /Users/rus/ai-tools
-    workspace_dir = Path("/Users/rus/ai-tools")
+    # 2. Удаляем временные .bak.* в репозитории
+    workspace_dir = get_workspace_root()
     if workspace_dir.exists() and constitution_dir != workspace_dir:
         for f in workspace_dir.rglob("*.bak.*"):
             try:

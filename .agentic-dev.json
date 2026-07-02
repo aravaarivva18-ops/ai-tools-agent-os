@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "vault": {
+    "handoffs_dir": "vault/handoffs",
+    "findings_file": "vault/findings.md"
+  },
+  "ui": {
+    "design_md": "DESIGN.md",
+    "theme_css": "theme.css"
+  },
+  "healer": {
+    "test_command": "pytest",
+    "exclude_logs": ["*.tmp", "*.log"]
+  }
+}

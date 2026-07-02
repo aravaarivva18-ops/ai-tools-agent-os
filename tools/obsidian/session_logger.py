@@ -130,6 +130,35 @@ def main():
     if not data:
         sys.exit(1)
 
+    # Автоматическое обновление STATUS.md на основе XML-тегов из HANDOFF.md
+    try:
+        with open(args.handoff_path, encoding="utf-8") as f:
+            handoff_content = f.read()
+
+        def extract_tag(content, tag):
+            match = re.search(f'<{tag}>(.*?)</{tag}>', content, re.DOTALL | re.IGNORECASE)
+            return match.group(1).strip() if match else ""
+
+        intent = extract_tag(handoff_content, "primary_request_and_intent")
+        current_work = extract_tag(handoff_content, "current_work")
+        errors = extract_tag(handoff_content, "errors_and_fixes")
+        next_step = extract_tag(handoff_content, "next_step")
+
+        if intent or current_work or errors or next_step:
+            status_content = (
+                "# Статус проекта\n\n"
+                f"## Текущая задача\n{intent or 'Не указана'}\n\n"
+                f"## Статус готовности (DoD)\n{current_work or 'В процессе'}\n\n"
+                f"## Зафиксированные ошибки\n{errors or 'Ошибок не обнаружено'}\n\n"
+                f"## Следующие шаги\n{next_step or 'Не определены'}\n"
+            )
+            status_path = os.path.join(os.getcwd(), "STATUS.md")
+            with open(status_path, "w", encoding="utf-8") as f:
+                f.write(status_content)
+            print(f"✅ Файл STATUS.md успешно обновлен по пути: {status_path}")
+    except Exception as e:
+        print(f"⚠️ Предупреждение: Не удалось обновить STATUS.md: {e}")
+
     log_content = format_log(data, args.conv_id)
     success = append_to_daily(log_content)
 
@@ -140,7 +169,9 @@ def main():
             os.makedirs(os.path.dirname(fallback_path), exist_ok=True)
             with open(fallback_path, "a", encoding="utf-8") as f:
                 f.write(log_content + "\n")
-            print(f"⚠️ Локальный резерв: Лог сессии успешно записан в fallback-файл: {fallback_path}")
+            print(
+                f"⚠️ Локальный резерв: Лог сессии успешно записан в fallback-файл: {fallback_path}"
+            )
         except Exception as e:
             print(f"❌ Ошибка записи локального резерва: {e}")
             sys.exit(1)
@@ -156,8 +187,17 @@ def main():
             [python_exe, search_script, "--index"], check=True
         )
         print("✅ База знаний успешно переиндексирована!")
+
+        # Запуск автоматического анализа сессий (Task Observer)
+        print("⚙️ Запуск автоматического анализа сессий (Task Observer)...")
+        observer_script = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "task_observer.py"
+        )
+        subprocess.run(  # nosec B603
+            [python_exe, observer_script], check=True
+        )
     except Exception as e:
-        print(f"⚠️ Предупреждение: Не удалось обновить индекс: {e}")
+        print(f"⚠️ Предупреждение: Не удалось обновить индекс или запустить Task Observer: {e}")
 
 
 if __name__ == "__main__":

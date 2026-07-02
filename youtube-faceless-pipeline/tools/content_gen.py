@@ -9,10 +9,10 @@ import PIL.Image
 import PIL.ImageDraw
 import PIL.ImageFont
 
-# Добавляем путь к родительской директории, чтобы импортировать seo_optimizer и upload_cli
+# Добавляем путь к родительской директории, чтобы импортировать youtube_seo_optimizer и upload_cli
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import seo_optimizer
 import upload_cli
+import youtube_seo_optimizer as seo_optimizer
 
 
 class ContentPolicyError(Exception):

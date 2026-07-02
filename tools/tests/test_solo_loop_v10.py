@@ -26,11 +26,19 @@ def setup_teardown_workspace():
 
 def test_planning_with_files_restore_and_log():
     """Tests context restoration from implementation_plan.md and progress logging."""
-    start = time.perf_counter()
-    planner = PlanningWithFiles(TEST_WORKSPACE)
+    import sys
+    from unittest.mock import MagicMock
 
-    # 1. Create a dummy implementation_plan.md
-    plan_content = """# 🧬 Test Title
+    mock_semantic = MagicMock()
+    mock_semantic.get_semantic_brief.return_value = "ℹ️ Релевантных"
+    sys.modules["semantic_search"] = mock_semantic
+
+    try:
+        start = time.perf_counter()
+        planner = PlanningWithFiles(TEST_WORKSPACE)
+
+        # 1. Create a dummy implementation_plan.md
+        plan_content = """# 🧬 Test Title
 Some context.
 
 ## 📅 5. Пошаговый план (5-Line Plan)
@@ -38,28 +46,101 @@ Some context.
 2. **Шаг 2**: Написать тесты Б.
 3. **Шаг 3**: Сделать ревью В.
 """
-    planner.plan_path.write_text(plan_content, encoding="utf-8")
+        planner.plan_path.write_text(plan_content, encoding="utf-8")
 
-    state = planner.restore_state()
-    assert state["title"] == "🧬 Test Title"
-    assert len(state["steps"]) == 3
-    assert state["steps"][0] == "Реализовать фичу А."
-    assert state["next_step"] == "Реализовать фичу А."
+        state = planner.restore_state()
+        assert state["title"] == "🧬 Test Title"
+        assert len(state["steps"]) == 3
+        assert state["steps"][0] == "Реализовать фичу А."
+        assert state["next_step"] == "Реализовать фичу А."
 
-    # 2. Record progress on Step 1
-    planner.record_progress("Реализовать фичу А.", "completed")
+        # 2. Record progress on Step 1
+        planner.record_progress("Реализовать фичу А.", "completed")
 
-    # Re-restore
-    state_new = planner.restore_state()
-    assert state_new["completed_steps"] == ["Реализовать фичу А. - COMPLETED"]
-    assert state_new["next_step"] == "Написать тесты Б."
+        # Re-restore
+        state_new = planner.restore_state()
+        assert state_new["completed_steps"] == ["Реализовать фичу А. - COMPLETED"]
+        assert state_new["next_step"] == "Написать тесты Б."
 
-    # 3. Record finding
-    planner.record_finding("Тест Факта", "Все работает отлично.")
-    assert planner.findings_path.exists()
-    assert "Тест Факта" in planner.findings_path.read_text(encoding="utf-8")
+        # 3. Record finding
+        planner.record_finding("Тест Факта", "Все работает отлично.")
+        assert planner.findings_path.exists()
+        assert "Тест Факта" in planner.findings_path.read_text(encoding="utf-8")
 
-    assert (time.perf_counter() - start) < 0.1
+        assert (time.perf_counter() - start) < 0.1
+    finally:
+        if "semantic_search" in sys.modules:
+            del sys.modules["semantic_search"]
+
+
+def test_planning_with_files_robust_parsing():
+    """Тестирует устойчивость парсера к различным форматам списков задач (TDD)."""
+    import sys
+    from unittest.mock import MagicMock
+
+    mock_semantic = MagicMock()
+    mock_semantic.get_semantic_brief.return_value = "ℹ️ Релевантных"
+    sys.modules["semantic_search"] = mock_semantic
+
+    try:
+        planner = PlanningWithFiles(TEST_WORKSPACE)
+
+        # Различные форматы записи шагов плана
+        plan_content = """# 🧬 Test Title Robust
+Some context.
+
+## 📅 Пошаговый план
+1. **Шаг Раз**: Описание первого шага.
+- **Шаг Два**: Описание второго шага.
+* Шаг Три: Описание третьего шага.
+- **Шаг Четыре**
+5. Шаг Пять
+"""
+        planner.plan_path.write_text(plan_content, encoding="utf-8")
+
+        state = planner.restore_state()
+        assert state["title"] == "🧬 Test Title Robust"
+        assert len(state["steps"]) == 5
+        assert state["steps"][0] == "Описание первого шага."
+        assert state["steps"][1] == "Описание второго шага."
+        assert state["steps"][2] == "Описание третьего шага."
+        assert state["steps"][3] == "Шаг Четыре"
+        assert state["steps"][4] == "Шаг Пять"
+
+        assert state["next_step"] == "Описание первого шага."
+    finally:
+        if "semantic_search" in sys.modules:
+            del sys.modules["semantic_search"]
+
+
+def test_planning_with_files_agents_local_md():
+    """Тестирует чтение AGENTS.local.md и автоматическое добавление в .gitignore."""
+    planner = PlanningWithFiles(TEST_WORKSPACE)
+
+    # 1. Создаем AGENTS.local.md
+    local_rules = TEST_WORKSPACE / "AGENTS.local.md"
+    local_rules.write_text("My Local Rules Go Here", encoding="utf-8")
+
+    # 1.1 Создаем фиктивный implementation_plan.md
+    planner.plan_path.write_text("# Test Plan\n1. **Step**: Test", encoding="utf-8")
+
+    # 2. Создаем .gitignore
+    gitignore = TEST_WORKSPACE / ".gitignore"
+    gitignore.write_text("some_file_to_ignore\n", encoding="utf-8")
+
+    # Вызываем restore_state (он вызовет inject_standards)
+    planner.restore_state()
+
+    # 3. Проверяем, что локальные правила попали в AGENTS.md
+    agents_file = TEST_WORKSPACE / ".agents" / "AGENTS.md"
+    assert agents_file.exists()
+    agents_content = agents_file.read_text(encoding="utf-8")
+    assert "👤 Локальные правила разработчика (AGENTS.local.md)" in agents_content
+    assert "My Local Rules Go Here" in agents_content
+
+    # 4. Проверяем, что AGENTS.local.md прописан в .gitignore
+    gitignore_content = gitignore.read_text(encoding="utf-8")
+    assert "AGENTS.local.md" in gitignore_content
 
 
 def test_solo_loop_v10_execution_and_stealth_stop():

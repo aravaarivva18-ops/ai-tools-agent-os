@@ -1,1 +1,0 @@
-**Scope**: [`crm`](../../scopes/permissions.md) **Execution Rights**: `administrator`

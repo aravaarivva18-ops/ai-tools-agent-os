@@ -5,10 +5,14 @@ Manages persistent state on disk using implementation_plan.md to allow
 AI agents to recover context after crashes or /clear.
 """
 
-import os
 import re
 from pathlib import Path
 from typing import Any
+
+try:
+    from tools.config import get_workspace_root, load_config
+except ImportError:
+    from config import get_workspace_root, load_config
 
 
 class PlanningWithFiles:
@@ -16,15 +20,21 @@ class PlanningWithFiles:
 
     def __init__(self, workspace_dir: str | Path | None = None):
         if workspace_dir is None:
-            self.workspace_root = Path(os.getcwd())
+            self.workspace_root = get_workspace_root()
         else:
             self.workspace_root = Path(workspace_dir)
 
-        self.plan_path = self.workspace_root / "implementation_plan.md"
-        self.findings_path = self.workspace_root / "vault" / "findings.md"
-        self.progress_path = self.workspace_root / "vault" / "progress.md"
+        config = load_config()
+        findings_rel = config.get("vault", {}).get("findings_file", "vault/findings.md")
+        progress_rel = config.get("vault", {}).get(
+            "progress_file", str(Path(findings_rel).parent / "progress.md")
+        )
 
-    def restore_state(self) -> dict[str, Any]:
+        self.plan_path = self.workspace_root / "implementation_plan.md"
+        self.findings_path = self.workspace_root / findings_rel
+        self.progress_path = self.workspace_root / progress_rel
+
+    def restore_state(self) -> dict[str, Any]:  # noqa: C901
         """Parses implementation_plan.md and progress logs to recover current task state.
 
         Returns:
@@ -48,19 +58,62 @@ class PlanningWithFiles:
         if title_match:
             state["title"] = title_match.group(1).strip()
 
-        # 2. Parse 5-Line Plan or Step List
-        # Look for numbered lines in 5. Пошаговый план (5-Line Plan) or similar lists
-        step_matches = re.findall(
-            r"^\d+\.\s+\*\*([^*]+)\*\*:\s*(.+)$", content, re.MULTILINE
+        # 2. Parse 5-Line Plan or Step List (Robust parsing)
+        plan_section = content
+        section_match = re.search(
+            r"##\s*[^#\n]*(?:план|шаг|step|plan|implementation|ход работы)[^#\n]*(.*?)(?=\n##\s|\Z)",
+            content,
+            re.DOTALL | re.IGNORECASE,
         )
-        if not step_matches:
-            # Fallback to general numbered list in the plan section
-            step_matches = re.findall(r"^\s*\d+\.\s+(.+)$", content, re.MULTILINE)
+        if section_match:
+            plan_section = section_match.group(1)
 
-        state["steps"] = [
-            step[1].strip() if isinstance(step, tuple) else step.strip()
-            for step in step_matches
-        ]
+        h3_steps = re.findall(r"^###\s+(.+)$", plan_section, re.MULTILINE)
+        raw_steps = []
+        if h3_steps:
+            for h3 in h3_steps:
+                h3_clean = h3.strip()
+                h3_clean = re.sub(r"^(?:Шаг|Step|Задача|Task)\s*\d+\.?\s*", "", h3_clean, flags=re.IGNORECASE)
+                h3_clean = re.sub(r"^\d+\.?\s*", "", h3_clean)
+                if h3_clean:
+                    raw_steps.append(h3_clean)
+        else:
+            raw_steps = re.findall(r"^\s*(?:\d+\.|\*|-)\s+(.+)$", plan_section, re.MULTILINE)
+
+        steps = []
+        for raw_step in raw_steps:
+            clean_step = raw_step.strip()
+
+            name_part = clean_step
+            details_part = ""
+
+            bold_colon_match = re.match(r"^\*\*([^*]+)\*\*:\s*(.+)$", clean_step)
+            if bold_colon_match:
+                name_part = bold_colon_match.group(1).strip()
+                details_part = bold_colon_match.group(2).strip()
+            else:
+                bold_match = re.match(r"^\*\*([^*]+)\*\*$", clean_step)
+                if bold_match:
+                    name_part = bold_match.group(1).strip()
+                else:
+                    colon_parts = clean_step.split(":", 1)
+                    if len(colon_parts) > 1 and len(colon_parts[0]) < 60:
+                        name_part = colon_parts[0].strip()
+                        details_part = colon_parts[1].strip()
+
+            step_name = name_part
+            name_lower = name_part.lower()
+            if details_part and any(kw in name_lower for kw in ["шаг", "задача", "step", "task", "todo"]):
+                step_name = details_part
+
+            step_name = step_name.strip()
+
+            if step_name and len(step_name) > 2 and len(step_name) < 200:
+                steps.append(step_name)
+
+        state["steps"] = steps
+
+
 
         # 3. Read findings if present
         if self.findings_path.exists():
@@ -85,7 +138,75 @@ class PlanningWithFiles:
                 state["next_step"] = step
                 break
 
+        # 6. Semantic search warmup context from past sessions
+        if state["title"] and state["title"] != "Unknown Plan":
+            try:
+                import sys
+                from pathlib import Path
+
+                # Add obsidian folder to system path dynamically to avoid import errors
+                sys.path.insert(0, str(Path(__file__).parent / "obsidian"))
+                import semantic_search
+
+                # Инициализируем векторный поиск только при наличии маркеров глубокого анализа
+                title_lower = state["title"].lower()
+                need_semantic = any(
+                    kw in title_lower
+                    for kw in [
+                        "avito", "lead", "video", "marketing", "sales",
+                        "scrape", "crawl", "audit", "pitch", "post",
+                        "copywrite", "humanis", "telegram", "instagram", "аудит"
+                    ]
+                )
+
+                brief = semantic_search.get_semantic_brief(state["title"], limit=2, semantic=need_semantic)
+                if brief and "ℹ️ Релевантных" not in brief and "ℹ️ Быстрый поиск" not in brief:
+                    # Write brief automatically to findings.md for agent retrieval
+                    self.findings_path.parent.mkdir(parents=True, exist_ok=True)
+
+                    header = "🧠 СЕМАНТИЧЕСКАЯ ПАМЯТЬ: Lessons Learned"
+                    content_to_write = f"\n\n### {header}\n{brief.strip()}\n"
+
+                    # Read existing findings to prevent duplicate append
+                    existing = ""
+                    if self.findings_path.exists():
+                        existing = self.findings_path.read_text(encoding="utf-8")
+
+                    if header not in existing:
+                        # Append semantic brief to findings
+                        with open(self.findings_path, "a", encoding="utf-8") as f:
+                            f.write(content_to_write)
+                        # Re-read findings to include in state
+                        state["findings"] = self.findings_path.read_text(
+                            encoding="utf-8"
+                        )
+            except Exception:
+                pass
+
+        # 7. Auto-inject codebase standards and build selective rule context
+        try:
+            self.optimize_rules()
+        except Exception:
+            pass
+
         return state
+
+    def optimize_rules(self) -> None:
+        """Запускает оптимизатор правил для компиляции селективного контекста в .agents/AGENTS.md."""
+        try:
+            from tools.context_optimizer import ContextOptimizer
+        except ImportError:
+            try:
+                import sys
+                from pathlib import Path
+                sys.path.insert(0, str(Path(__file__).parent))
+                from context_optimizer import ContextOptimizer
+            except Exception:
+                return
+
+        default_rules_dir = self.workspace_root / "vault" / "reference" / "rules"
+        optimizer = ContextOptimizer(rules_dir=str(default_rules_dir))
+        optimizer.optimize_context(workspace_dir=str(self.workspace_root))
 
     def record_progress(
         self, step_name: str, status: str, details: str | None = None

@@ -94,9 +94,7 @@ def test_validate_llm_output_already_model():
 def test_validate_llm_output_invalid_json():
     """Tests validation error for syntactically invalid JSON string."""
     start = time.perf_counter()
-    invalid_json = (
-        '{"name": "Bob", "age": 25, "skills": ["javascript"'  # missing closing brace
-    )
+    invalid_json = "not a json string"
     with pytest.raises(LLMValidationError) as exc_info:
         validate_llm_output(invalid_json, UserProfile)
     assert "Failed to parse LLM output as JSON" in str(exc_info.value)
@@ -141,3 +139,21 @@ def test_generate_tool_schema():
     assert params["required"] == ["username"]
 
     assert (time.perf_counter() - start) < 0.1
+
+
+def test_generate_tool_schema_with_pydantic():
+    def pydantic_tool(profile: UserProfile, category: str) -> None:
+        """Pydantic tool description."""
+        pass
+
+    schema = generate_tool_schema(pydantic_tool)
+    assert schema["name"] == "pydantic_tool"
+
+    props = schema["parameters"]["properties"]
+    assert props["category"]["type"] == "STRING"
+    assert props["profile"]["type"] == "OBJECT"
+
+    profile_props = props["profile"]["properties"]
+    assert profile_props["name"]["type"] == "STRING"
+    assert profile_props["age"]["type"] == "INTEGER"
+    assert profile_props["skills"]["type"] == "ARRAY"

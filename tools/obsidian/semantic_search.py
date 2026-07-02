@@ -3,32 +3,56 @@ import argparse
 import json
 import os
 import sys
+from pathlib import Path
 
 import numpy as np
 
-INDEX_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "handoffs_index.json")
-VAULT_HANDOFFS_DIR = "/Users/rus/ai-tools/vault/handoffs"
+try:
+    from tools.config import get_workspace_root, load_config
+except ImportError:
+    # Фолбэк на случай если запускают напрямую из папки tools/obsidian/
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from tools.config import get_workspace_root, load_config
+
+INDEX_FILE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "handoffs_index.json"
+)
+
+config = load_config()
+workspace_root = get_workspace_root()
+VAULT_HANDOFFS_DIR = os.path.join(
+    workspace_root, config.get("vault", {}).get("handoffs_dir", "vault/handoffs")
+)
+
 MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
 
 def load_model():
     """Загружает fastembed модель."""
     try:
         from fastembed import TextEmbedding
+
         # Подавляем лишний вывод fastembed при инициализации
         return TextEmbedding(model_name=MODEL_NAME)
     except ImportError:
-        print("❌ Ошибка: библиотека 'fastembed' не установлена во виртуальном окружении.")
+        print(
+            "❌ Ошибка: библиотека 'fastembed' не установлена во виртуальном окружении."
+        )
         sys.exit(1)
+
 
 def load_index():
     """Загружает существующий индекс."""
     if os.path.exists(INDEX_FILE):
         try:
+            from tools.json_utils import safe_load_json
             with open(INDEX_FILE, encoding="utf-8") as f:
-                return json.load(f)
+                res = safe_load_json(f.read())
+                return res if isinstance(res, dict) else {}
         except Exception as e:
             print(f"⚠️ Ошибка чтения индекса, создаем новый: {e}")
     return {}
+
 
 def save_index(index):
     """Сохраняет индекс на диск."""
@@ -37,6 +61,7 @@ def save_index(index):
             json.dump(index, f, ensure_ascii=False, indent=2)
     except Exception as e:
         print(f"❌ Ошибка сохранения индекса: {e}")
+
 
 def index_handoffs(force=False):
     """Сканирует и индексирует файлы хандоффов."""
@@ -81,11 +106,7 @@ def index_handoffs(force=False):
             # Генерируем вектор
             vector = next(iter(model.embed([content]))).tolist()
 
-            index[rel_path] = {
-                "mtime": mtime,
-                "content": content,
-                "vector": vector
-            }
+            index[rel_path] = {"mtime": mtime, "content": content, "vector": vector}
             updated = True
         except Exception as e:
             print(f"❌ Ошибка индексации {rel_path}: {e}")
@@ -104,55 +125,168 @@ def index_handoffs(force=False):
     else:
         print("✅ Изменений не обнаружено. Индекс актуален.")
 
-def search_handoffs(query, limit=3):
-    """Ищет релевантные хандоффы по семантическому сходству."""
+
+def text_search(query, index, limit=3):
+    """Ищет совпадения по ключевым словам в индексе (без загрузки FastEmbed)."""
+    query_words = [w.lower() for w in query.split() if len(w) > 2]
+    if not query_words:
+        query_words = [query.lower()]
+
+    results = []
+    for rel_path, data in index.items():
+        content_lower = data["content"].lower()
+        score = 0
+        for word in query_words:
+            score += content_lower.count(word)
+
+        if score > 0:
+            # Нормализуем по длине контента
+            score = score / (len(content_lower) + 1) * 1000
+            results.append((rel_path, score, data["content"]))
+
+    results.sort(key=lambda x: x[1], reverse=True)
+    return results[:limit]
+
+
+def search_handoffs(query, limit=3, semantic=False):
+    """Ищет релевантные хандоффы по ключевым словам или семантическому сходству."""
     index = load_index()
     if not index:
-        print("⚠️ Индекс пуст. Сначала запустите индексацию: python semantic_search.py --index")
+        print("⚠️ Индекс пуст. Сначала запустите индексацию: agy search --index")
         return
 
+    if not semantic:
+        results = text_search(query, index, limit)
+        if results:
+            print(f"\n🔍 Результаты быстрого текстового поиска по запросу: '{query}'")
+            print("=" * 60)
+            for i, (rel_path, score, content) in enumerate(results, 1):
+                preview = content[:200].replace("\n", " ").strip() + "..."
+                print(
+                    f"{i}. [{rel_path}](file://{os.path.join(VAULT_HANDOFFS_DIR, rel_path)}) (Score: {score:.2f})"
+                )
+                print(f"   Превью: {preview}")
+                print("-" * 60)
+            return
+
+    # Семантический поиск
     model = load_model()
-    # Получаем вектор запроса
     query_vector = np.array(next(iter(model.embed([query]))))
 
     results = []
     for rel_path, data in index.items():
+        if "vector" not in data:
+            continue
         doc_vector = np.array(data["vector"])
-
-        # Вычисляем косинусное сходство
         dot_product = np.dot(query_vector, doc_vector)
         norm_q = np.linalg.norm(query_vector)
         norm_d = np.linalg.norm(doc_vector)
-
-        similarity = dot_product / (norm_q * norm_d) if norm_q > 0 and norm_d > 0 else 0.0
+        similarity = (
+            dot_product / (norm_q * norm_d) if norm_q > 0 and norm_d > 0 else 0.0
+        )
         results.append((rel_path, similarity, data["content"]))
 
-    # Сортируем по убыванию сходства
     results.sort(key=lambda x: x[1], reverse=True)
 
-    print(f"\n🔍 Результаты поиска по запросу: '{query}'")
+    print(f"\n🔍 Результаты семантического поиска по запросу: '{query}'")
     print("=" * 60)
     for i, (rel_path, similarity, content) in enumerate(results[:limit], 1):
-        # Берем первые 200 символов для превью
         preview = content[:200].replace("\n", " ").strip() + "..."
-        print(f"{i}. [{rel_path}](file://{os.path.join(VAULT_HANDOFFS_DIR, rel_path)}) (Сходство: {similarity:.4f})")
+        print(
+            f"{i}. [{rel_path}](file://{os.path.join(VAULT_HANDOFFS_DIR, rel_path)}) (Сходство: {similarity:.4f})"
+        )
         print(f"   Превью: {preview}")
         print("-" * 60)
 
+
+def get_semantic_brief(query: str, limit: int = 3, semantic: bool = False) -> str:
+    """Возвращает быстрый текстовый или семантический дайджест для интеграции с планировщиком."""
+    index = load_index()
+    if not index:
+        return ""
+
+    # Сначала пробуем быстрый текстовый поиск
+    text_results = text_search(query, index, limit)
+    if text_results:
+        brief_parts = []
+        for rel_path, score, content in text_results:
+            brief_parts.append(
+                f"#### Handoff: {rel_path} (Быстрый поиск, Score: {score:.2f})\n{content.strip()}"
+            )
+        return "\n\n---\n\n".join(brief_parts)
+
+    # Если текстовых совпадений нет и семантический поиск отключен, выходим без загрузки fastembed (YAGNI)
+    if not semantic:
+        return "ℹ️ Быстрый поиск не дал результатов. Векторный поиск отключен (YAGNI)."
+
+    # Если текстовых совпадений нет, лениво загружаем fastembed и делаем векторный поиск
+    try:
+        model = load_model()
+        query_vector = np.array(next(iter(model.embed([query]))))
+    except Exception as e:
+        return f"⚠️ Ошибка инициализации модели семантического поиска: {e}"
+
+    results = []
+    for rel_path, data in index.items():
+        if "vector" not in data:
+            continue
+        doc_vector = np.array(data["vector"])
+        dot_product = np.dot(query_vector, doc_vector)
+        norm_q = np.linalg.norm(query_vector)
+        norm_d = np.linalg.norm(doc_vector)
+        similarity = (
+            dot_product / (norm_q * norm_d) if norm_q > 0 and norm_d > 0 else 0.0
+        )
+        results.append((rel_path, similarity, data["content"]))
+
+    results.sort(key=lambda x: x[1], reverse=True)
+
+    brief_parts = []
+    for rel_path, similarity, content in results[:limit]:
+        if similarity < 0.4:
+            continue
+        brief_parts.append(
+            f"#### Handoff: {rel_path} (Семантическое сходство: {similarity:.2f})\n{content.strip()}"
+        )
+
+    if brief_parts:
+        return "\n\n---\n\n".join(brief_parts)
+    return "ℹ️ Релевантных хэндоффов прошлых сессий не обнаружено."
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Локальный семантический поиск по файлам HANDOFF.md.")
+    parser = argparse.ArgumentParser(
+        description="Локальный гибридный поиск по файлам HANDOFF.md."
+    )
     parser.add_argument("query", nargs="?", help="Поисковый запрос.")
-    parser.add_argument("--index", "-i", action="store_true", help="Обновить индекс файлов.")
-    parser.add_argument("--force", action="store_true", help="Принудительно переиндексировать всё.")
-    parser.add_argument("--limit", "-l", type=int, default=3, help="Количество результатов (по умолчанию 3).")
+    parser.add_argument(
+        "--index", "-i", action="store_true", help="Обновить индекс файлов."
+    )
+    parser.add_argument(
+        "--force", action="store_true", help="Принудительно переиндексировать всё."
+    )
+    parser.add_argument(
+        "--semantic",
+        "-s",
+        action="store_true",
+        help="Использовать векторный поиск вместо текстового.",
+    )
+    parser.add_argument(
+        "--limit",
+        "-l",
+        type=int,
+        default=3,
+        help="Количество результатов (по умолчанию 3).",
+    )
     args = parser.parse_args()
 
     if args.index or args.force:
         index_handoffs(force=args.force)
     elif args.query:
-        search_handoffs(args.query, limit=args.limit)
+        search_handoffs(args.query, limit=args.limit, semantic=args.semantic)
     else:
         parser.print_help()
+
 
 if __name__ == "__main__":
     main()

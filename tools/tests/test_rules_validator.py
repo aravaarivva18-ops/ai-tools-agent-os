@@ -5,8 +5,12 @@ import pytest
 
 from tools.rules_validator import (
     check_constitution_health,
+    check_jit_skills,
+    check_link_formatting,
     check_overlap,
+    check_rules_bloat,
     check_sequential_sections,
+    check_stop_slop,
     enforce_anti_clutter,
     ensure_core_imperatives_block,
     estimate_overlap,
@@ -118,6 +122,37 @@ def test_ensure_core_block_already_exists():
     assert "## 🏛️ Ядро (Core Imperatives)" not in out
 
 
+def test_check_jit_skills_fix(tmp_path, monkeypatch):
+    """Позитивный тест: автоисправление JIT-навыков дописывает их в CLAUDE.md."""
+    import tools.rules_validator
+
+    claude_file = tmp_path / "CLAUDE.md"
+    claude_file.write_text("# CLAUDE.md\n## Commands\n* **Test:** `pytest`\n", encoding="utf-8")
+
+    skills_dir = tmp_path / "skills"
+    skills_dir.mkdir()
+
+    skill_a = skills_dir / "skill_a"
+    skill_a.mkdir()
+    (skill_a / "SKILL.md").write_text("# Skill A\n", encoding="utf-8")
+
+    monkeypatch.setattr(tools.rules_validator, "CLAUDE_PATH", claude_file)
+    monkeypatch.setattr(tools.rules_validator, "WORKSPACE_ROOT", tmp_path)
+
+    # Проверяем без fix=True, файл не должен измениться
+    assert check_jit_skills(fix=False) is True
+    assert "## 🛠️ JIT Skills" not in claude_file.read_text(encoding="utf-8")
+
+    # Запускаем с fix=True
+    assert check_jit_skills(fix=True) is True
+
+    # Проверяем, что в CLAUDE.md добавилась секция и ссылка на навык
+    updated_content = claude_file.read_text(encoding="utf-8")
+    assert "## 🛠️ JIT Skills" in updated_content
+    assert "skills/skill_a/SKILL.md" in updated_content
+
+
+
 def test_constitution_health_positive(tmp_path):
     temp_file = tmp_path / "GEMINI_ANTIGRAVITY.md"
     temp_file.write_text(
@@ -161,23 +196,30 @@ def test_get_constitution_health_score(tmp_path):
 
 
 def test_enforce_anti_clutter():
-    assert enforce_anti_clutter("/Users/rus/ai-tools/tools/script.py") is True
-    assert enforce_anti_clutter("/Users/rus/ai-tools/vault/some_data.json") is True
+    from tools.config import get_workspace_root
+
+    workspace_root = get_workspace_root()
+    home = Path.home()
+
+    assert enforce_anti_clutter(str(workspace_root / "tools" / "script.py")) is True
     assert (
-        enforce_anti_clutter("/Users/rus/ai-tools/dashboard-hand-on-pulse/app.py")
+        enforce_anti_clutter(str(workspace_root / "vault" / "some_data.json")) is True
+    )
+    assert (
+        enforce_anti_clutter(str(workspace_root / "dashboard-hand-on-pulse" / "app.py"))
         is True
     )
 
-    assert enforce_anti_clutter("/Users/rus/GEMINI_ANTIGRAVITY.md") is True
-    assert enforce_anti_clutter("/Users/rus/GEMINI_ANTIGRAVITY.md.bak.123") is True
-    assert enforce_anti_clutter("/Users/rus/ai-tools/handoff_notes.md") is True
+    assert enforce_anti_clutter(str(home / "GEMINI_ANTIGRAVITY.md")) is True
+    assert enforce_anti_clutter(str(home / "GEMINI_ANTIGRAVITY.md.bak.123")) is True
+    assert enforce_anti_clutter(str(workspace_root / "handoff_notes.md")) is True
 
     with pytest.raises(ValueError, match="Anti-Clutter"):
-        enforce_anti_clutter("/Users/rus/ai-tools/geo-seo/tests/test_x.py")
+        enforce_anti_clutter(str(workspace_root / "some_clutter_dir" / "test.py"))
     with pytest.raises(ValueError, match="Anti-Clutter"):
-        enforce_anti_clutter("/Users/rus/Desktop/clutter.py")
+        enforce_anti_clutter(str(home / "Desktop" / "clutter.py"))
     with pytest.raises(ValueError, match="Anti-Clutter"):
-        enforce_anti_clutter("/tmp/temp.txt")
+        enforce_anti_clutter("/etc/hosts")
 
 
 def test_detect_tool_conflicts_positive_subagent():
@@ -236,3 +278,79 @@ def test_detect_tool_conflicts_explicit_subagent_calls():
     conflicts = detect_tool_conflicts(mock_logs)
     assert len(conflicts) == 1
     assert "invoke_subagent/define_subagent" in conflicts[0]
+
+
+def test_check_stop_slop_positive():
+    """Тест: текст без ИИ-маркеров проходит проверку."""
+    content = "Мы пишем простой и понятный код без лишних абстракций."
+    assert check_stop_slop(content, Path("dummy.md")) is True
+
+
+def test_check_stop_slop_negative():
+    """Тест: текст с ИИ-маркерами падает на проверке."""
+    content_en = "We must delve deeper into this problem."
+    assert check_stop_slop(content_en, Path("dummy.md")) is False
+
+    content_ru = "Это бесшовный переход к новой экосистеме."
+    assert check_stop_slop(content_ru, Path("dummy.md")) is False
+
+
+def test_check_stop_slop_ignored():
+    """Тест: строки с описанием правил Stop-Slop игнорируются."""
+    content = "Строжайший запрет на ИИ-мусор: delve, tapestry, бесшовный."
+    assert check_stop_slop(content, Path("dummy.md")) is True
+
+
+def test_check_link_formatting_positive():
+    """Тест: правильно оформленные ссылки проходят проверку."""
+    content = (
+        "Прочитайте [AGENTS.md](file:///Users/rus/ai-tools/AGENTS.md) для деталей."
+    )
+    assert check_link_formatting(content, Path("dummy.md")) is True
+
+    content_portable = "Посмотрите [cli.py](@ai-tools/tools/cli.py)."
+    assert check_link_formatting(content_portable, Path("dummy.md")) is True
+
+
+def test_check_link_formatting_negative_whole():
+    """Тест: полностью обернутая в бэктики ссылка вызывает ошибку."""
+    content = "Прочитайте `[AGENTS.md](file:///Users/rus/ai-tools/AGENTS.md)`."
+    assert check_link_formatting(content, Path("dummy.md")) is False
+
+
+def test_check_link_formatting_negative_text():
+    """Тест: имя ссылки в бэктиках вызывает ошибку."""
+    content = "Посмотрите [`cli.py`](@ai-tools/tools/cli.py)."
+    assert check_link_formatting(content, Path("dummy.md")) is False
+
+
+def test_check_rules_bloat(tmp_path, monkeypatch):
+    """Тест: проверяет, что предупреждение о раздувании правил срабатывает корректно."""
+    import tools.rules_validator
+
+    # 1. Позитивный случай (маленький файл)
+    small_file = tmp_path / "AGENTS.md"
+    small_file.write_text("Line 1\nLine 2\n", encoding="utf-8")
+
+    monkeypatch.setattr(tools.rules_validator, "RULES_FILES", [small_file])
+    assert check_rules_bloat() is True
+
+    # 2. Негативный случай (раздутый файл > 120 строк)
+    big_file = tmp_path / "CLAUDE.md"
+    big_file.write_text("Line\n" * 150, encoding="utf-8")
+
+    monkeypatch.setattr(tools.rules_validator, "RULES_FILES", [big_file])
+
+    # Перехватываем вывод в stderr, чтобы убедиться, что WARNING пишется
+    import sys
+    from io import StringIO
+
+    stderr_buf = StringIO()
+    monkeypatch.setattr(sys, "stderr", stderr_buf)
+
+    assert check_rules_bloat() is True
+
+    output = stderr_buf.getvalue()
+    assert "[WARNING]" in output
+    assert "CLAUDE.md" in output
+    assert "разросся" in output

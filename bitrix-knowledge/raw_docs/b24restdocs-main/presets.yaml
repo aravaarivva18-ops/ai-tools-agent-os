@@ -1,4 +1,0 @@
-default:
-    build: prod
-internal:
-    build: dev

@@ -6,6 +6,11 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
+try:
+    from tools.config import get_workspace_root, load_config
+except ImportError:
+    from config import get_workspace_root, load_config
+
 
 def extract_friction_blocks(file_path: Path) -> list[dict]:
     """Parses a markdown file and extracts sections under headers containing friction keywords."""
@@ -147,8 +152,11 @@ def parse_stealth_stop_and_metrics(file_path: Path) -> dict:
 
 
 def collect() -> None:
-    brain_dir = "/Users/rus/.gemini/antigravity-cli/brain"
-    target_dir = "/Users/rus/ai-tools/vault/handoffs"
+    config = load_config()
+    workspace_root = get_workspace_root()
+    brain_dir = str(Path.home() / ".gemini" / "antigravity-cli" / "brain")
+    handoffs_rel = config.get("vault", {}).get("handoffs_dir", "vault/handoffs")
+    target_dir = str(workspace_root / handoffs_rel)
     json_output_path = os.path.join(target_dir, "friction_logs.json")
 
     os.makedirs(target_dir, exist_ok=True)
@@ -197,7 +205,7 @@ def collect() -> None:
         )
 
     # Also parse and copy global handoff_notes.md
-    global_notes_str = "/Users/rus/ai-tools/handoff_notes.md"
+    global_notes_str = str(workspace_root / "handoff_notes.md")
     if os.path.exists(global_notes_str):
         global_notes_path = Path(global_notes_str)
         mtime = os.path.getmtime(global_notes_str)
@@ -231,6 +239,17 @@ def collect() -> None:
         print(f"Error writing friction logs JSON: {e}")
 
     print(f"Total documents collected: {copied_count}")
+
+    # Автоматическая ротация старых логов (YAGNI / Оптимизация памяти)
+    try:
+        from obsidian.rotate_handoffs import rotate_logs
+        rotate_logs(days_threshold=7)
+    except ImportError:
+        try:
+            from rotate_handoffs import rotate_logs
+            rotate_logs(days_threshold=7)
+        except Exception as e:
+            print(f"Warning: Failed to auto-rotate logs: {e}")
 
 
 if __name__ == "__main__":

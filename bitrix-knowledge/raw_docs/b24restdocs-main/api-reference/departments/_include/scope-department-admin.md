@@ -1,1 +1,0 @@
-**Scope**: [`department`](../../scopes/permissions.md) | **Who can execute the method**: `user with permissions to modify the structure`

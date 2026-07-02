@@ -68,6 +68,36 @@ new 2
         assert not success
         assert "Could not match block" in err
 
+    def test_unicode_normalization_match(self):
+        content = "def hello():\n    print(“Привет, мир!”)  — это приветствие"
+        # В SEARCH передаем обычные ASCII кавычки и тире
+        search = 'print("Привет, мир!")  - это приветствие'
+        replace = 'print("Hello, World!")  - eng'
+        blocks = [{"search": search, "replace": replace}]
+        success, result, _err = apply_blocks(content, blocks)
+        assert success
+        assert 'print("Hello, World!")  - eng' in result
+
+    def test_rstrip_match(self):
+        content = "line 1   \nline 2  \nline 3"
+        search = "line 1\nline 2"
+        replace = "line one\nline two"
+        blocks = [{"search": search, "replace": replace}]
+        success, result, _err = apply_blocks(content, blocks)
+        assert success
+        assert "line one\nline two\nline 3" in result
+
+    def test_strip_match(self):
+        content = "    def foo():\n        x = 1\n        return x"
+        # SEARCH блок с другими отступами
+        search = "def foo():\n    x = 1\n    return x"
+        replace = "def foo():\n    x = 2\n    return x"
+        blocks = [{"search": search, "replace": replace}]
+        success, result, _err = apply_blocks(content, blocks)
+        assert success
+        # Отступы должны адаптироваться к оригиналу (4 пробела)
+        assert "    def foo():\n        x = 2\n        return x" in result
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -72,7 +72,10 @@ def main():
     tools_ok = True
     tools_to_check = [
         (tools_dir / "rules_validator.py", []),
-        (tools_dir / "test_healer.py", [str(tools_dir / "test_diff_applier.py")]),
+        (
+            tools_dir / "test_healer.py",
+            [str(tools_dir / "tests" / "test_diff_applier.py")],
+        ),
     ]
 
     for script, args in tools_to_check:

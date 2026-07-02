@@ -1,7 +1,0 @@
-title: Tutorials and Use-Cases for REST in the Open Channels Module  
-href: index.md  
-items:  
-  - name: Overview of Use-Cases  
-    href: index.md  
-  - name: How to Create an Open Channels Connector for Website Chat  
-    href: example-connector.md  

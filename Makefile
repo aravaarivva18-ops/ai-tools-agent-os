@@ -4,10 +4,25 @@ sync:
 	uv sync --all-packages
 
 lint:
-	uv run ruff check . --fix
+	@DIFF_FILES=$$(git diff --name-only | grep '\.py$$' || true); \
+	if [ -n "$$DIFF_FILES" ]; then \
+		echo "Linting modified files: $$DIFF_FILES"; \
+		uv run ruff check $$DIFF_FILES --fix; \
+	else \
+		echo "No modified Python files to lint."; \
+		uv run ruff check . --fix; \
+	fi
 
 format:
-	uv run ruff format .
+	@DIFF_FILES=$$(git diff --name-only | grep '\.py$$' || true); \
+	if [ -n "$$DIFF_FILES" ]; then \
+		echo "Formatting modified files: $$DIFF_FILES"; \
+		uv run ruff format $$DIFF_FILES; \
+	else \
+		echo "No modified Python files to format."; \
+		uv run ruff format .; \
+	fi
+
 
 check-rules:
 	python3 tools/rules_validator.py
@@ -27,10 +42,12 @@ check: check-rules
 check-all: check test
 
 test:
-	uv run --package geo-seo pytest geo-seo/tests/ -v
-	uv run pytest tools/tests/ -v
-	uv run pytest dashboard-hand-on-pulse/ -v
-	uv run pytest youtube-faceless-pipeline/ -v
+	uv run --package geo-seo pytest geo-seo/tests/ -v --disable-socket --allow-unix-socket
+	uv run pytest tools/tests/ -v --disable-socket --allow-unix-socket
+	uv run pytest youtube-faceless-pipeline/ -v --disable-socket --allow-unix-socket
+
+mcp:
+	uv run python tools/mcp_server.py
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +

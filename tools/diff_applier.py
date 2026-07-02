@@ -1,6 +1,20 @@
 import difflib
 import os
 import re
+import time
+
+
+def is_safe_path(filepath: str) -> bool:
+    """
+    Проверяет, лежит ли файл внутри разрешенной директории /Users/rus/ai-tools/.
+    Разрешены только пути внутри этой директории.
+    """
+    try:
+        abs_path = os.path.abspath(filepath)
+        jail_dir = "/Users/rus/ai-tools"
+        return abs_path == jail_dir or abs_path.startswith(jail_dir + os.sep)
+    except Exception:
+        return False
 
 
 def parse_blocks(patch_text):
@@ -15,6 +29,27 @@ def parse_blocks(patch_text):
     for search_content, replace_content in matches:
         blocks.append({"search": search_content, "replace": replace_content})
     return blocks
+
+
+def normalize_unicode(s: str) -> str:
+    """Нормализует юникод-символы кавычек, тире и неразрывных пробелов к ASCII."""
+    s = s.replace("“", '"').replace("”", '"')
+    s = s.replace("‘", "'").replace("’", "'")
+    s = s.replace("—", "-").replace("–", "-")
+    s = s.replace("\u00a0", " ").replace("\u2002", " ").replace("\u2003", " ")
+    return s
+
+
+def find_sequence(lines: list[str], pattern: list[str]) -> int:
+    """Ищет последовательность pattern в lines. Возвращает индекс начала или -1."""
+    if not pattern:
+        return -1
+    n_lines = len(lines)
+    n_pat = len(pattern)
+    for i in range(n_lines - n_pat + 1):
+        if lines[i : i + n_pat] == pattern:
+            return i
+    return -1
 
 
 def match_fuzzy(content, search_block, threshold=0.8):
@@ -70,7 +105,7 @@ def match_fuzzy(content, search_block, threshold=0.8):
 
 def apply_blocks(content, blocks, fuzzy_threshold=0.8):
     """
-    Применяет список блоков изменений к контенту.
+    Применяет список блоков изменений к контенту с использованием каскада строгости.
     Возвращает (success, new_content, error_message)
     """
     current_content = content
@@ -84,17 +119,93 @@ def apply_blocks(content, blocks, fuzzy_threshold=0.8):
             current_content = current_content.replace(search_str, replace_str, 1)
             continue
 
-        # 2. Попытка нечеткого совпадения
+        # 2. Попытка точного совпадения после Unicode-нормализации (без изменения отступов)
+        norm_content = normalize_unicode(current_content)
+        norm_search = normalize_unicode(search_str)
+        idx = norm_content.find(norm_search)
+        if idx != -1:
+            prefix = current_content[:idx]
+            suffix = current_content[idx + len(search_str) :]
+            current_content = prefix + replace_str + suffix
+            continue
+
+        # Подготовка строк для построчного поиска
+        content_lines = current_content.split("\n")
+        search_lines = search_str.split("\n")
+
+        # 3. Построчное совпадение после Unicode-нормализации и rstrip()
+        norm_lines = [normalize_unicode(line).rstrip() for line in content_lines]
+        norm_search_lines = [normalize_unicode(line).rstrip() for line in search_lines]
+
+        line_idx = find_sequence(norm_lines, norm_search_lines)
+        if line_idx != -1:
+            # Адаптация отступов для REPLACE
+            orig_text = "\n".join(
+                content_lines[line_idx : line_idx + len(search_lines)]
+            )
+            orig_indent = len(content_lines[line_idx]) - len(
+                content_lines[line_idx].lstrip()
+            )
+
+            replace_lines = replace_str.split("\n")
+            if replace_lines and search_lines:
+                search_indent = len(search_lines[0]) - len(search_lines[0].lstrip())
+                indent_diff = orig_indent - search_indent
+                if indent_diff != 0:
+                    new_rep_lines = []
+                    for line in replace_lines:
+                        if line.strip():
+                            if indent_diff > 0:
+                                new_rep_lines.append(" " * indent_diff + line)
+                            else:
+                                new_rep_lines.append(line[-indent_diff:])
+                        else:
+                            new_rep_lines.append(line)
+                    replace_str = "\n".join(new_rep_lines)
+
+            content_lines[line_idx : line_idx + len(search_lines)] = [replace_str]
+            current_content = "\n".join(content_lines)
+            continue
+
+        # 4. Построчное совпадение после Unicode-нормализации и strip() (изменение вложенности)
+        norm_lines_strip = [normalize_unicode(line).strip() for line in content_lines]
+        norm_search_lines_strip = [
+            normalize_unicode(line).strip() for line in search_lines
+        ]
+
+        line_idx = find_sequence(norm_lines_strip, norm_search_lines_strip)
+        if line_idx != -1:
+            orig_indent = len(content_lines[line_idx]) - len(
+                content_lines[line_idx].lstrip()
+            )
+            replace_lines = replace_str.split("\n")
+            if replace_lines and search_lines:
+                search_indent = len(search_lines[0]) - len(search_lines[0].lstrip())
+                indent_diff = orig_indent - search_indent
+                if indent_diff != 0:
+                    new_rep_lines = []
+                    for line in replace_lines:
+                        if line.strip():
+                            if indent_diff > 0:
+                                new_rep_lines.append(" " * indent_diff + line)
+                            else:
+                                new_rep_lines.append(line[-indent_diff:])
+                        else:
+                            new_rep_lines.append(line)
+                    replace_str = "\n".join(new_rep_lines)
+
+            content_lines[line_idx : line_idx + len(search_lines)] = [replace_str]
+            current_content = "\n".join(content_lines)
+            continue
+
+        # 5. Резервный нечеткий поиск по SequenceMatcher
         start_idx, end_idx, _confidence = match_fuzzy(
             current_content, search_str, fuzzy_threshold
         )
         if start_idx is not None:
-            # Вырезаем совпавший блок и заменяем
             prefix = current_content[:start_idx]
             suffix = current_content[end_idx:]
 
-            # Пытаемся адаптировать отступы REPLACE под контекст
-            # Извлекаем отступ первой строки найденного оригинального блока
             matched_text = current_content[start_idx:end_idx]
             orig_lines = matched_text.splitlines()
             if orig_lines:
@@ -125,6 +236,187 @@ def apply_blocks(content, blocks, fuzzy_threshold=0.8):
     return True, current_content, None
 
 
+class FileLock:
+    def __init__(self, filepath: str, timeout: float = 10.0, delay: float = 0.1):
+        if not is_safe_path(filepath):
+            raise PermissionError(
+                f"Access denied: path {filepath} is outside /Users/rus/ai-tools/"
+            )
+        self.filepath = os.path.abspath(filepath)
+        self.lock_file = self.filepath + ".lock"
+        self.timeout = timeout
+        self.delay = delay
+        self.has_lock = False
+
+    def __enter__(self):
+        start_time = time.time()
+        while time.time() - start_time < self.timeout:
+            try:
+                fd = os.open(self.lock_file, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+                with os.fdopen(fd, "w") as f:
+                    f.write(str(os.getpid()))
+                self.has_lock = True
+                return self
+            except FileExistsError:
+                # Очистка устаревшей блокировки (старше 15 секунд)
+                try:
+                    mtime = os.path.getmtime(self.lock_file)
+                    if time.time() - mtime > 15.0:
+                        os.remove(self.lock_file)
+                        continue
+                except FileNotFoundError:
+                    pass
+                time.sleep(self.delay)
+        raise TimeoutError(
+            f"Не удалось получить блокировку для файла {self.lock_file} за {self.timeout} секунд."
+        )
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.has_lock:
+            try:
+                os.remove(self.lock_file)
+            except FileNotFoundError:
+                pass
+
+
+def verify_no_placeholders(blocks: list[dict[str, str]]) -> tuple[bool, str | None]:
+    """Проверяет REPLACE-блоки на наличие явных заглушек (TODO, FIXME, пустой pass)."""
+    for i, block in enumerate(blocks):
+        rep = block["replace"]
+        for line in rep.splitlines():
+            line_clean = line.strip()
+            if line_clean.startswith("#") and any(
+                kw in line_clean.upper() for kw in ("TODO", "FIXME")
+            ):
+                return (
+                    False,
+                    f"Блок #{i + 1} содержит заглушку в комментарии: '{line_clean}'",
+                )
+            if line_clean == "pass" and "def " in rep:
+                return (
+                    False,
+                    f"Блок #{i + 1} содержит пустую заглушку 'pass' в новой функции.",
+                )
+    return True, None
+
+
+def apply_patch_file(
+    target_file: str, patch_file_or_text: str
+) -> tuple[bool, str | None]:
+    """
+    Применяет SEARCH/REPLACE патч к файлу target_file с использованием файловой блокировки и каскада нечеткого поиска.
+    Возвращает: (success, error_message)
+    """
+    if not is_safe_path(target_file):
+        return False, f"Access denied: target file {target_file} is outside jail."
+
+    is_path = False
+    if "\n" not in patch_file_or_text and len(patch_file_or_text) < 1024:
+        try:
+            if os.path.exists(patch_file_or_text):
+                is_path = True
+        except Exception:
+            pass
+
+    if is_path:
+        if not is_safe_path(patch_file_or_text):
+            return (
+                False,
+                f"Access denied: patch file {patch_file_or_text} is outside jail.",
+            )
+
+    if not os.path.exists(target_file):
+        return False, f"Target file {target_file} not found."
+
+    with FileLock(target_file):
+        # Читаем целевой файл
+        with open(target_file, encoding="utf-8") as f:
+            target_content = f.read()
+
+        # Читаем патч
+        if os.path.exists(patch_file_or_text):
+            with open(patch_file_or_text, encoding="utf-8") as f:
+                patch_text = f.read()
+        else:
+            patch_text = patch_file_or_text
+
+        blocks = parse_blocks(patch_text)
+        if not blocks:
+            return False, "No SEARCH/REPLACE blocks parsed from input."
+
+        # Валидация на заглушки
+        no_placeholders, placeholder_err = verify_no_placeholders(blocks)
+        if not no_placeholders:
+            return False, f"Placeholder Validation Failed: {placeholder_err}"
+
+        # Maker/Checker Split валидация перед применением патча
+        try:
+            from tools.checker_review import CheckerReview
+        except ImportError:
+            try:
+                from checker_review import CheckerReview
+            except ImportError:
+                CheckerReview = None
+
+        if CheckerReview is not None:
+            checker = CheckerReview()
+            ok, review_err = checker.review_patch(target_file, patch_text)
+            if not ok:
+                return False, f"Checker Review Failed: {review_err}"
+
+        success, new_content, err_msg = apply_blocks(target_content, blocks)
+        if not success:
+            return False, f"Error applying patch: {err_msg}"
+
+        backup_path = target_file + ".bak"
+
+        # Проверка на anti-clutter перед записью
+        try:
+            enforce_fn = None
+            try:
+                import tools.rules_validator
+
+                enforce_fn = tools.rules_validator.enforce_anti_clutter
+            except ImportError:
+                try:
+                    import rules_validator
+
+                    enforce_fn = rules_validator.enforce_anti_clutter
+                except ImportError:
+                    pass
+            if enforce_fn is not None:
+                enforce_fn(target_file)
+                enforce_fn(backup_path)
+        except Exception as e:
+            return False, f"Anti-Clutter validation error: {e}"
+
+        # Делаем резервную копию перед записью
+        with open(backup_path, "w", encoding="utf-8") as f:
+            f.write(target_content)
+
+        # Записываем изменения
+        with open(target_file, "w", encoding="utf-8") as f:
+            f.write(new_content)
+
+        # Проверка синтаксиса для Python файлов через AST
+        if target_file.endswith(".py"):
+            try:
+                import ast
+
+                ast.parse(new_content)
+                if os.path.exists(backup_path):
+                    os.remove(backup_path)
+                return True, None
+            except Exception as e:
+                # Восстанавливаем из бэкапа
+                os.replace(backup_path, target_file)
+                return False, f"AST verification failed: {e}"
+        else:
+            if os.path.exists(backup_path):
+                os.remove(backup_path)
+            return True, None
+
+
 if __name__ == "__main__":
     import sys
 
@@ -135,79 +427,9 @@ if __name__ == "__main__":
     target_path = sys.argv[1]
     patch_source = sys.argv[2]
 
-    # Читаем целевой файл
-    if not os.path.exists(target_path):
-        print(f"Error: Target file {target_path} not found.")
-        sys.exit(1)
-
-    with open(target_path, encoding="utf-8") as f:
-        target_content = f.read()
-
-    # Читаем патч (из файла или как прямую строку)
-    if os.path.exists(patch_source):
-        with open(patch_source, encoding="utf-8") as f:
-            patch_text = f.read()
-    else:
-        patch_text = patch_source
-
-    blocks = parse_blocks(patch_text)
-    if not blocks:
-        print("Error: No SEARCH/REPLACE blocks parsed from input.")
-        sys.exit(1)
-
-    success, new_content, err_msg = apply_blocks(target_content, blocks)
-
+    success, err_msg = apply_patch_file(target_path, patch_source)
     if not success:
         print(f"Error applying patch: {err_msg}")
         sys.exit(1)
-
-    backup_path = target_path + ".bak"
-
-    # Проверяем на anti-clutter перед записью
-    try:
-        enforce_fn = None
-        try:
-            import tools.rules_validator
-
-            enforce_fn = tools.rules_validator.enforce_anti_clutter
-        except ImportError:
-            try:
-                import rules_validator
-
-                enforce_fn = rules_validator.enforce_anti_clutter
-            except ImportError:
-                pass
-        if enforce_fn is not None:
-            enforce_fn(target_path)
-            enforce_fn(backup_path)
-    except Exception as e:
-        print(f"Anti-Clutter error: {e}")
-        sys.exit(1)
-
-    # Делаем резервную копию перед записью
-    with open(backup_path, "w", encoding="utf-8") as f:
-        f.write(target_content)
-
-    # Записываем изменения
-    with open(target_path, "w", encoding="utf-8") as f:
-        f.write(new_content)
-
-    # Проверка синтаксиса для Python файлов через AST (без компиляции в .pyc файлы)
-    if target_path.endswith(".py"):
-        try:
-            import ast
-
-            with open(target_path, encoding="utf-8") as f:
-                ast.parse(f.read())
-            print(f"Success: Patch applied cleanly to {target_path} and AST verified.")
-            if os.path.exists(backup_path):
-                os.remove(backup_path)  # Удаляем бэкап при успехе
-        except Exception as e:
-            print(f"Error: AST syntax check failed after patch: {e}")
-            # Восстанавливаем из бэкапа
-            os.replace(backup_path, target_path)
-            sys.exit(1)
     else:
         print(f"Success: Patch applied cleanly to {target_path}.")
-        if os.path.exists(backup_path):
-            os.remove(backup_path)

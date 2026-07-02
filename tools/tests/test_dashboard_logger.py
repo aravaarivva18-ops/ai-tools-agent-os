@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from tools.dashboard_logger import log_change, log_marketing_fact
+from tools.dashboard_logger import log_change, log_healer_event, log_marketing_fact
 
 
 @pytest.fixture
@@ -270,3 +270,32 @@ def test_log_session_start_invalid_project(temp_db):
             project_name=None,
             description="Session start: ну как ты",
         )
+
+
+def test_log_healer_event(temp_db):
+    """Positive test: Verifies that log_healer_event logs execution metrics correctly."""
+    log_healer_event(
+        session_id="test-session-123",
+        test_file="tools/tests/test_dummy.py",
+        target_file="tools/dummy.py",
+        error_category="AssertionError",
+        iterations=2,
+        status="healed",
+        time_saved_min=15,
+    )
+
+    conn = sqlite3.connect(temp_db)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM healer_log WHERE session_id = ?", ("test-session-123",))
+    event = cursor.fetchone()
+    assert event is not None
+    assert event["test_file"] == "tools/tests/test_dummy.py"
+    assert event["target_file"] == "tools/dummy.py"
+    assert event["error_category"] == "AssertionError"
+    assert event["iterations"] == 2
+    assert event["status"] == "healed"
+    assert event["time_saved_min"] == 15
+    conn.close()
+
