@@ -1,7 +1,9 @@
 import os
-import pytest
 from unittest.mock import patch
-from tools.obsidian.semantic_search import get_semantic_brief, CACHE_FILE
+
+import pytest
+
+from tools.obsidian.semantic_search import CACHE_FILE, get_semantic_brief
 
 
 @pytest.fixture(autouse=True)
@@ -33,7 +35,7 @@ def test_semantic_brief_cache_flow():
 
     with patch("tools.obsidian.semantic_search.get_handoffs_mtime") as mock_mtime, \
          patch("tools.obsidian.semantic_search.load_index") as mock_load:
-        
+
         mock_mtime.return_value = 100.0
         mock_load.return_value = mock_index
 
