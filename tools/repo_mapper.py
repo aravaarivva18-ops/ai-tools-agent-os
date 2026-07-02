@@ -44,27 +44,32 @@ def parse_py_file(file_path: Path) -> str:
     # Извлекаем docstring модуля
     module_doc = ast.get_docstring(tree)
     if module_doc:
-        doc_line = module_doc.strip().splitlines()[0]
-        lines.append(f"  # {doc_line}")
+        module_lines = module_doc.strip().splitlines()
+        if module_lines:
+            lines.append(f"  # {module_lines[0]}")
 
     for node in tree.body:
         if isinstance(node, ast.FunctionDef):
             sig = get_function_sig(node)
             doc = ast.get_docstring(node)
-            doc_suffix = f"  # {doc.strip().splitlines()[0]}" if doc else ""
+            doc_lines = doc.strip().splitlines() if doc else []
+            doc_suffix = f"  # {doc_lines[0]}" if doc_lines else ""
             lines.append(f"  - {sig}{doc_suffix}")
 
         elif isinstance(node, ast.ClassDef):
             lines.append(f"  - class {node.name}:")
             class_doc = ast.get_docstring(node)
             if class_doc:
-                lines.append(f"    # {class_doc.strip().splitlines()[0]}")
+                class_lines = class_doc.strip().splitlines()
+                if class_lines:
+                    lines.append(f"    # {class_lines[0]}")
 
             for sub_node in node.body:
                 if isinstance(sub_node, ast.FunctionDef):
                     sig = get_function_sig(sub_node)
                     doc = ast.get_docstring(sub_node)
-                    doc_suffix = f"  # {doc.strip().splitlines()[0]}" if doc else ""
+                    method_lines = doc.strip().splitlines() if doc else []
+                    doc_suffix = f"  # {method_lines[0]}" if method_lines else ""
                     lines.append(f"    - {sig}{doc_suffix}")
 
     return "\n".join(lines) + "\n" if lines else ""
