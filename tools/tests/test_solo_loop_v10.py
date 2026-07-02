@@ -242,3 +242,41 @@ def test_solo_loop_compaction_negative():
     res = loop.compact_context([])
     assert res["summary_text"] == "No history to compact."
     assert res["cleaned_steps"] == []
+
+
+def test_solo_loop_exact_token_compression():
+    """Тестирует алгоритм Exact Token Compression при превышении лимита токенов."""
+    loop = SoloLoopV10(TEST_WORKSPACE)
+
+    # 1. Шаги истории, которые укладываются в лимит
+    history_ok = [
+        {"command": "cmd1", "success": True, "output": "ok"},
+        {"command": "cmd2", "success": True, "output": "ok"}
+    ]
+    res_ok = loop.compact_context(history_ok, max_tokens=100)
+    assert len(res_ok["cleaned_steps"]) == 2
+    assert res_ok["cleaned_steps"][0]["output"] == "ok"
+
+    # 2. Шаги превышают лимит: Фаза 1 (схлопывание успешных шагов)
+    history_compress = [
+        {"command": "cmd1", "success": True, "output": "a" * 200},  # длинный успешный вывод
+        {"command": "cmd2", "success": False, "output": "err"}      # ошибка (не должна схлопываться)
+    ]
+    # Задаем маленький лимит max_tokens
+    res_comp = loop.compact_context(history_compress, max_tokens=50)
+    assert len(res_comp["cleaned_steps"]) == 2
+    # Первый (успешный) шаг должен быть схлопнут
+    assert res_comp["cleaned_steps"][0]["output"] == "[success output trimmed]"
+    # Второй (ошибка) шаг должен сохранить свой вывод
+    assert res_comp["cleaned_steps"][1]["output"] == "err"
+
+    # 3. Шаги сильно превышают лимит: Фаза 2 (удаление старых шагов, кроме последнего)
+    history_prune = [
+        {"command": "cmd1", "success": False, "output": "a" * 200}, # очень длинная ошибка 1
+        {"command": "cmd2", "success": False, "output": "b" * 200}, # очень длинная ошибка 2
+        {"command": "cmd3", "success": False, "output": "c" * 200}  # очень длинная ошибка 3 (последний шаг)
+    ]
+    res_pruned = loop.compact_context(history_prune, max_tokens=30)
+    # Старые шаги должны быть полностью удалены, но последний шаг (cmd3) должен остаться!
+    assert len(res_pruned["cleaned_steps"]) == 1
+    assert res_pruned["cleaned_steps"][0]["command"] == "cmd3"

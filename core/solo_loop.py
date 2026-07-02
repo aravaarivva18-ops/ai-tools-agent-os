@@ -37,17 +37,24 @@ class SoloLoopV10:
         state = self.planner.restore_state()
         return state
 
-    def compact_context(self, history_steps: list[dict[str, Any]]) -> dict[str, Any]:
-        """Summarizes history steps and cleans up detailed logs (summarize -> clean).
+    def compact_context(self, history_steps: list[dict[str, Any]], max_tokens: int = 2000) -> dict[str, Any]:
+        """Summarizes history steps and cleans up detailed logs using Exact Token Compression.
 
         Args:
             history_steps: A list of dicts with 'command', 'success', 'output'.
+            max_tokens: Maximum allowed tokens for the history block.
 
         Returns:
             dict: Containing 'summary_text', 'cleaned_steps'.
         """
         if not history_steps:
             return {"summary_text": "No history to compact.", "cleaned_steps": []}
+
+        try:
+            from tools.context_utils import count_tokens_exact
+        except ImportError:
+            def count_tokens_exact(text: str, *_args: Any, **_kwargs: Any) -> int:
+                return len(text) // 4
 
         successful_commands = []
         failed_commands = []
@@ -75,6 +82,21 @@ class SoloLoopV10:
                 err_sig = self._extract_error_signature(output)
                 if err_sig:
                     unique_errors.add(err_sig)
+
+        # Фаза 1: Сжимаем успешные шаги, если превышен лимит
+        def calc_total_tokens(steps_list):
+            return sum(count_tokens_exact(s["command"]) + count_tokens_exact(s["output"]) for s in steps_list)
+
+        if calc_total_tokens(cleaned_steps) > max_tokens:
+            for step in cleaned_steps:
+                if calc_total_tokens(cleaned_steps) <= max_tokens:
+                    break
+                if step["success"] and step["output"] != "[success output trimmed]":
+                    step["output"] = "[success output trimmed]"
+
+        # Фаза 2: Удаляем старые шаги, если все еще превышен лимит (но не трогаем последний шаг)
+        while len(cleaned_steps) > 1 and calc_total_tokens(cleaned_steps) > max_tokens:
+            cleaned_steps.pop(0)
 
         # Build a concise summary text
         summary_parts = []
