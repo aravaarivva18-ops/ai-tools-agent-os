@@ -16,6 +16,7 @@ dependencies = [
     "pytest-socket>=0.7.0",
     "browser-use>=0.1.0",
     "langchain-google-genai>=0.1.0",
+    "json-repair>=0.13.0",
 ]
 
 [tool.hatch.build.targets.wheel]

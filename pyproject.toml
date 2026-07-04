@@ -20,6 +20,7 @@ dependencies = [
     "google-genai>=0.1.0",
     "piexif>=1.1.3",
     "pydantic-settings>=2.0.0",
+    "agent-runtime @ git+https://github.com/easylink-ai-open/agent-runtime.git",
 ]
 
 [tool.uv.workspace]
@@ -37,6 +38,7 @@ dev = [
     "ruff>=0.15.17",
     "bandit>=1.7.0",
     "mypy>=1.11.0",
+    "pytest-socket",
 ]
 
 [tool.pytest.ini_options]

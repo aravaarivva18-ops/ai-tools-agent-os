@@ -19,6 +19,11 @@ members = [
 ]
 
 [[package]]
+name = "agent-runtime"
+version = "0.2.5"
+source = { git = "https://github.com/easylink-ai-open/agent-runtime.git#28a4187ae2be32971ad6800ed560c350e01e2e87" }
+
+[[package]]
 name = "ai-legal"
 version = "0.1.0"
 source = { virtual = "ai-legal" }
@@ -83,6 +88,7 @@ dependencies = [
     { name = "beautifulsoup4" },
     { name = "browser-use" },
     { name = "fastembed" },
+    { name = "json-repair" },
     { name = "langchain-google-genai" },
     { name = "loguru" },
     { name = "mcp" },
@@ -95,6 +101,7 @@ requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.12.0" },
     { name = "browser-use", specifier = ">=0.1.0" },
     { name = "fastembed", specifier = ">=0.2.0" },
+    { name = "json-repair", specifier = ">=0.13.0" },
     { name = "langchain-google-genai", specifier = ">=0.1.0" },
     { name = "loguru", specifier = ">=0.7.0" },
     { name = "mcp", specifier = ">=1.2.0" },
@@ -107,6 +114,7 @@ name = "ai-tools-workspace"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "agent-runtime" },
     { name = "fastapi" },
     { name = "google-genai" },
     { name = "google-generativeai" },
@@ -129,11 +137,13 @@ dev = [
     { name = "bandit" },
     { name = "mypy" },
     { name = "pytest" },
+    { name = "pytest-socket" },
     { name = "ruff" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "agent-runtime", git = "https://github.com/easylink-ai-open/agent-runtime.git" },
     { name = "fastapi", specifier = ">=0.110.0" },
     { name = "google-genai", specifier = ">=0.1.0" },
     { name = "google-generativeai", specifier = ">=0.8.0" },
@@ -156,6 +166,7 @@ dev = [
     { name = "bandit", specifier = ">=1.7.0" },
     { name = "mypy", specifier = ">=1.11.0" },
     { name = "pytest", specifier = ">=9.0.3" },
+    { name = "pytest-socket" },
     { name = "ruff", specifier = ">=0.15.17" },
 ]
 
@@ -1530,6 +1541,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f1/26/abe1ad855eb334b5ebc9c6495d4798e12bee70e5e8e815d54570710b8312/joserfc-1.7.2.tar.gz", hash = "sha256:537ffb8888b2df039cb5b6d017d7cff6f09d521ce65d89cc9b8ab752b1cff947", size = 233183, upload-time = "2026-06-29T09:03:10.868Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/13/80/d1b30336582cced4dce0dae776508a6011723e32f907bc7a702c0b25890a/joserfc-1.7.2-py3-none-any.whl", hash = "sha256:ddd818c0ca9b4f17bbc2d72cb3966e6ded7502be089316c62c3cc64ae86132b5", size = 70426, upload-time = "2026-06-29T09:03:09.393Z" },
+]
+
+[[package]]
+name = "json-repair"
+version = "0.61.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7c/92/b46b19c400cdb87c634778cc7eec140c922f7ec0af3941d1e4a04ebeda81/json_repair-0.61.1.tar.gz", hash = "sha256:24a68de2891c696ad3bd9a94874e8d3ef2d309c56af2973094b8297c975b5b58", size = 50069, upload-time = "2026-06-29T12:09:55.104Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/36/0d/abd5fe1251c8588c6c8d441fab263734bcaa71dfd895ec4b88c202a86254/json_repair-0.61.1-py3-none-any.whl", hash = "sha256:7ab26583e4c73418b8b60cc61202f64f119984a9b5fed61087e84158fa29e7d0", size = 48543, upload-time = "2026-06-29T12:09:53.962Z" },
 ]
 
 [[package]]
