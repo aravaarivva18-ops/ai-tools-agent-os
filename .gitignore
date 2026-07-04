@@ -33,3 +33,7 @@ Desktop/*.py
 tools/obsidian/handoffs_index.json
 *.db
 dashboard.db
+
+# Large distribution packages and DB backups
+dist/
+bitrix-knowledge/
