@@ -407,6 +407,21 @@ def check_loop_detection(test_file: str, error_message: str) -> None:
                 pass
             sys.exit(3)
 
+    # Проверяем общий лимит попыток (бюджет итераций): 5 падений подряд для одного файла
+    if len(history) >= 5:
+        if all(h["test_file"] == test_file for h in history):
+            print(
+                f"\n❌ BudgetExhausted: Test '{test_file}' failed 5 times in a row (different errors).\n"
+                f"Iteration budget exhausted to prevent token burn. Please review your edits manually.",
+                file=sys.stderr,
+            )
+            # Очищаем историю при аварийной остановке
+            try:
+                history_file.unlink(missing_ok=True)
+            except Exception:
+                pass
+            sys.exit(3)
+
 
 def parse_pytest_error(stdout_text):
     """

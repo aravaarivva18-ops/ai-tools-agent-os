@@ -30,6 +30,17 @@ def is_safe_command(cmd: list[str]) -> bool:
 
     cmd_str = " ".join(cmd)
 
+    # 0.5 Проверка деструктивных действий (git reset --hard, force push, drop table)
+    try:
+        from tools.command_safety_gate import is_destructive_command
+        if is_destructive_command(cmd_str):
+            if os.environ.get("FORCE_DANGER") != "1":
+                print("\n❌ Ошибка безопасности: перехвачено потенциально опасное (деструктивное) действие!")
+                print("Для принудительного выполнения установите переменную окружения FORCE_DANGER=1")
+                return False
+    except ImportError:
+        pass
+
     # 1. Запрет sudo
     if "sudo" in cmd:
         return False
@@ -87,9 +98,57 @@ def cmd_init(args):
         with open(config_path, "w", encoding="utf-8") as f:
             json.dump(config.DEFAULT_CONFIG, f, ensure_ascii=False, indent=2)
         print(f"✅ Успешно инициализирован файл конфигурации: {config_path}")
+
+        # Установка git-хука pre-commit
+        git_dir = root / ".git"
+        if git_dir.exists():
+            hooks_dir = git_dir / "hooks"
+            hooks_dir.mkdir(exist_ok=True)
+            pre_commit_hook = hooks_dir / "pre-commit"
+
+            hook_content = (
+                "#!/bin/sh\n"
+                "# AI-Tools Linter Config Guard pre-commit hook\n"
+                'python3 -m tools.linter_config_guard --cached\n'
+            )
+
+            pre_commit_hook.write_text(hook_content, encoding="utf-8")
+            pre_commit_hook.chmod(0o755)
+            print("✅ Установлен Git хук pre-commit для защиты конфигураций линтеров.")
     except Exception as e:
-        print(f"❌ Ошибка создания файла конфигурации: {e}")
+        print(f"❌ Ошибка создания файла конфигурации или установки хуков: {e}")
         sys.exit(1)
+
+
+def run_in_background(cmd_args: list[str], job_type: str) -> None:
+    import time
+    from datetime import datetime
+    from pathlib import Path
+
+    workspace_root = config.get_workspace_root()
+    jobs_dir = workspace_root / "vault" / "jobs"
+    jobs_dir.mkdir(parents=True, exist_ok=True)
+
+    job_id = f"job_{job_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    runner_path = Path(__file__).resolve().parent / "job_runner.py"
+
+    background_cmd = [sys.executable, str(runner_path), job_id, *cmd_args]
+
+    subprocess.Popen( # nosec B603
+        background_cmd,
+        cwd=str(workspace_root),
+        start_new_session=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+
+    time.sleep(0.3)
+
+    print(f"✅ Задача '{job_type}' успешно запущена в фоновом режиме.")
+    print(f"🆔 ID задачи: {job_id}")
+    print(f"📝 Лог-файл: vault/jobs/{job_id}.log")
+    print(f"📊 Проверить статус: agy status {job_id}")
+    sys.exit(0)
 
 
 def cmd_run(args, extra_args):
@@ -102,7 +161,22 @@ def cmd_run(args, extra_args):
         print(f"❌ Скрипт авто-лечения не найден по пути: {healer_script}")
         sys.exit(1)
 
-    cmd = [sys.executable, str(healer_script), *extra_args]
+    cmd = [sys.executable, str(healer_script)]
+
+    run_bg = False
+    filtered_args = []
+    for arg in extra_args:
+        if arg in ("--background", "-b"):
+            run_bg = True
+        else:
+            filtered_args.append(arg)
+
+    cmd.extend(filtered_args)
+
+    if run_bg:
+        run_in_background(cmd, "run")
+        return
+
     try:
         result = safe_subprocess_run(cmd, check=False)  # nosec B603
         sys.exit(result.returncode)
@@ -140,7 +214,22 @@ def cmd_improve(args, extra_args):
         print(f"❌ Скрипт самосовершенствования не найден по пути: {improve_script}")
         sys.exit(1)
 
-    cmd = [sys.executable, str(improve_script), *extra_args]
+    cmd = [sys.executable, str(improve_script)]
+
+    run_bg = False
+    filtered_args = []
+    for arg in extra_args:
+        if arg in ("--background", "-b"):
+            run_bg = True
+        else:
+            filtered_args.append(arg)
+
+    cmd.extend(filtered_args)
+
+    if run_bg:
+        run_in_background(cmd, "improve")
+        return
+
     try:
         result = safe_subprocess_run(cmd, check=False)  # nosec B603
         sys.exit(result.returncode)
@@ -670,6 +759,111 @@ def cmd_ask(args):
         cmd_fast(DummyArgs())
 
 
+def cmd_status(args):
+    """Показывает статус фоновых задач."""
+    workspace_root = config.get_workspace_root()
+    jobs_dir = workspace_root / "vault" / "jobs"
+
+    if not jobs_dir.exists():
+        print("ℹ️ Нет активных или завершенных фоновых задач.")
+        sys.exit(0)
+
+    if getattr(args, "job_id", None):
+        job_id = args.job_id
+        json_path = jobs_dir / f"{job_id}.json"
+        log_path = jobs_dir / f"{job_id}.log"
+
+        if not json_path.exists():
+            print(f"❌ Фоновая задача с ID {job_id} не найдена.")
+            sys.exit(1)
+
+        with open(json_path, encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Check if actually running by PID
+        if data["status"] == "running":
+            pid = data["pid"]
+            try:
+                os.kill(pid, 0)
+            except OSError:
+                data["status"] = "failed"
+                data["error"] = "Процесс неожиданно завершился без обновления статуса."
+                with open(json_path, "w", encoding="utf-8") as wf:
+                    json.dump(data, wf, ensure_ascii=False, indent=2)
+
+        print(f"\n📊 СТАТУС ЗАДАЧИ: {data['id']}")
+        print(f"   Команда:    {data['command']}")
+        print(f"   Статус:     {data['status'].upper()}")
+        print(f"   PID:        {data['pid']}")
+        print(f"   Начало:     {data['start_time']}")
+        if data.get('end_time'):
+            print(f"   Конец:      {data['end_time']}")
+        if data.get('exit_code') is not None:
+            print(f"   Exit Code:  {data['exit_code']}")
+        if "error" in data:
+            print(f"   Ошибка:     {data['error']}")
+
+        if log_path.exists():
+            print("\n📝 Последние 20 строк лога:")
+            print("=" * 60)
+            lines = log_path.read_text(encoding="utf-8").splitlines()
+            for line in lines[-20:]:
+                print(line)
+            print("=" * 60)
+    else:
+        # List all jobs
+        json_files = sorted(jobs_dir.glob("*.json"), key=lambda x: x.stat().st_mtime, reverse=True)
+        if not json_files:
+            print("ℹ️ Нет сохраненных фоновых задач.")
+            sys.exit(0)
+
+        print(f"\n📋 Список фоновых задач ({len(json_files)}):")
+        print(f"{'ID Задачи':<25} | {'Статус':<10} | {'Начало':<20} | {'Команда'}")
+        print("-" * 80)
+        for jf in json_files[:15]:
+            try:
+                with open(jf, encoding="utf-8") as f:
+                    data = json.load(f)
+                print(f"{data['id']:<25} | {data['status'].upper():<10} | {data['start_time'][:19]:<20} | {data['command'][:30]}")
+            except Exception:
+                pass
+        sys.exit(0)
+
+
+def cmd_cancel(args):
+    """Останавливает фоновую задачу."""
+    if not args.job_id:
+        print("❌ Укажите ID задачи: agy cancel <job_id>")
+        sys.exit(1)
+
+    workspace_root = config.get_workspace_root()
+    json_path = workspace_root / "vault" / "jobs" / f"{args.job_id}.json"
+
+    if not json_path.exists():
+        print(f"❌ Задача {args.job_id} не найдена.")
+        sys.exit(1)
+
+    with open(json_path, encoding="utf-8") as f:
+        data = json.load(f)
+
+    if data["status"] != "running":
+        print(f"ℹ️ Задача {args.job_id} уже завершена (статус: {data['status']}).")
+        sys.exit(0)
+
+    pid = data["pid"]
+    try:
+        import signal
+        os.kill(pid, signal.SIGTERM)
+        data["status"] = "cancelled"
+        data["exit_code"] = -15
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        print(f"✅ Задача {args.job_id} успешно отменена (SIGTERM отправлен PID {pid}).")
+    except Exception as e:
+        print(f"❌ Не удалось остановить задачу {args.job_id}: {e}")
+        sys.exit(1)
+
+
 def main():
     enforce_license()
 
@@ -768,6 +962,14 @@ def main():
         help="Включить автоматический выбор режима",
     )
 
+    # status
+    parser_status = subparsers.add_parser("status", help="Показать статус фоновых задач")
+    parser_status.add_argument("job_id", type=str, nargs="?", help="ID задачи")
+
+    # cancel
+    parser_cancel = subparsers.add_parser("cancel", help="Остановить фоновую задачу")
+    parser_cancel.add_argument("job_id", type=str, nargs="?", help="ID задачи")
+
     if len(sys.argv) < 2:
         show_dashboard()
         sys.exit(0)
@@ -809,6 +1011,12 @@ def main():
     elif cmd == "ask":
         args = parser.parse_args()
         cmd_ask(args)
+    elif cmd == "status":
+        args = parser.parse_args()
+        cmd_status(args)
+    elif cmd == "cancel":
+        args = parser.parse_args()
+        cmd_cancel(args)
     else:
         parser.print_help()
         sys.exit(1)

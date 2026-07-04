@@ -66,25 +66,44 @@ def analyze_handoffs(workspace_root: Path = DEFAULT_WORKSPACE_ROOT) -> list[dict
             s1 = snapshots[i]
             s2 = snapshots[j]
 
-            # Проверяем пользовательские сообщения на повторы
+            # 1. Проверяем пользовательские сообщения на повторы
             msgs1 = [line.strip() for line in s1["user_messages"].splitlines() if line.strip()]
             msgs2 = [line.strip() for line in s2["user_messages"].splitlines() if line.strip()]
 
             for m1 in msgs1:
                 for m2 in msgs2:
-                    # Исключаем короткие строки вроде "ок", "да", "/goal", "уверен?"
+                    # Исключаем короткие строки
                     if len(m1) < 10 or len(m2) < 10:
                         continue
 
                     sim = jaccard_similarity(m1, m2)
                     if sim >= 0.35:
-                        # Нашли дублирующееся требование!
-                        # Проверяем, не добавляли ли мы его уже в этом прогоне
+                        # Нашли дублирующееся требование
                         if not any(jaccard_similarity(m1, r["addition"]) > 0.6 for r in proposed_rules):
                             proposed_rules.append({
                                 "addition": m1,
                                 "why": f"Повторяющееся требование пользователя в сессиях {s1['file']} и {s2['file']}.",
                                 "prompt_scaffold": f"Всегда следуй правилу: {m1}"
+                            })
+
+            # 2. Проверяем ошибки и исправления на повторы
+            errs1 = [line.strip() for line in s1["errors_fixes"].splitlines() if line.strip()]
+            errs2 = [line.strip() for line in s2["errors_fixes"].splitlines() if line.strip()]
+
+            for e1 in errs1:
+                for e2 in errs2:
+                    if len(e1) < 15 or len(e2) < 15:
+                        continue
+
+                    sim = jaccard_similarity(e1, e2)
+                    if sim >= 0.35:
+                        # Нашли дублирующуюся ошибку
+                        rule_text = e1.strip("-* ")
+                        if not any(jaccard_similarity(rule_text, r["addition"]) > 0.6 for r in proposed_rules):
+                            proposed_rules.append({
+                                "addition": rule_text,
+                                "why": f"Повторяющаяся ошибка/исправление в сессиях {s1['file']} and {s2['file']}.",
+                                "prompt_scaffold": f"Избегай повторения ошибки: {rule_text}"
                             })
 
     return proposed_rules

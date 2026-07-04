@@ -264,3 +264,28 @@ def test_run_test_file_syntax_validation():
         if target_file.exists():
             target_file.unlink()
 
+
+def test_budget_exhausted_trigger():
+    import pytest
+
+    from tools.test_healer import check_loop_detection
+
+    history_file = Path("/Users/rus/ai-tools/scratch/healer_run_history.json")
+    if history_file.exists():
+        history_file.unlink()
+
+    # Запускаем 4 раза с разными ошибками
+    check_loop_detection("test_y.py", "AssertionError: 1 != 2")
+    check_loop_detection("test_y.py", "AssertionError: 2 != 3")
+    check_loop_detection("test_y.py", "AssertionError: 3 != 4")
+    check_loop_detection("test_y.py", "AssertionError: 4 != 5")
+
+    assert history_file.exists()
+
+    # 5-й запуск должен вызвать BudgetExhausted (exit code 3)
+    with pytest.raises(SystemExit) as excinfo:
+        check_loop_detection("test_y.py", "AssertionError: 5 != 6")
+
+    assert excinfo.value.code == 3
+
+
